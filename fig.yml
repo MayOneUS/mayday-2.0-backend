@@ -1,0 +1,18 @@
+# Fig configuration file for Mayone-2.0 app
+
+web:
+  build: .
+  command: rails server -b 0.0.0.0
+  volumes:
+    - .:/usr/src/app
+  ports:
+    - "3000:3000"
+  links:
+    - db
+  environment:
+    - DATABASE_URL=postgres://postgres@db:5432/postgres
+
+db:
+  image: postgres:9.4
+  ports:
+    - "5432"
