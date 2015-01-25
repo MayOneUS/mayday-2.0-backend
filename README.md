@@ -60,3 +60,16 @@ Deployments to production are still manual for now. If you have already configur
 You can now deploy to production the standard Heroku way. Example: `git push prod master`
 
 You can also look at production logs with `heroku logs --app mayone-prod`.
+
+Application monitoring
+----------------------
+
+This app is configured to use [New Relic](http://newrelic.com/)'s application monitoring.
+
+The easiest way to access the monitoring data is through the Heroku dashboard:
+
+1. Go to https://dashboard.heroku.com/apps
+1. Click on either the staging or production apps
+1. Click on **New Relic APM**.
+
+You will be automatically signed in to the New Relic dashboard.
