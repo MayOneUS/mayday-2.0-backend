@@ -26,6 +26,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Heroku-required
 gem 'rails_12factor', group: :production
 
+# New Relic
+gem 'newrelic_rpm'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
