@@ -12,6 +12,7 @@ gem 'jquery-rails'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 # API gems
+gem 'rails-api'
 gem 'jbuilder', '~> 2.0'
 gem 'versionist'
 
