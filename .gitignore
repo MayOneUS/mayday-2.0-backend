@@ -13,3 +13,8 @@
 /log/*
 !/log/.keep
 /tmp
+
+# Ignore other unneeded files.
+*.swp
+*~
+.DS_Store
