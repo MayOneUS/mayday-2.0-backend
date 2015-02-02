@@ -23,14 +23,18 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" charset="utf-8">
       $(function() {
-        function addPerson(person) {
-          $('#people').append('<li>' + person.email + '</ul>');
-        }
-
-        $('#address_search').submit(function(e) {
+        $('#address-search').submit(function(e) {
           $.getJSON('/congressional_district?address=' + $('#address').val(), function(results) {
-            $('#address_name').html(results.address);
-            $('#district').html(results.district);
+            $('#bing-address').html(results.bing_address);
+            $('#bing-time').html(results.bing_time);
+            $('#google-address').html(results.google_address);
+            $('#google-time').html(results.google_time);
+            $('#here-address').html(results.here_address);
+            $('#here-time').html(results.here_time);
+            $('#sunlight-district').html(results.sunlight.district);
+            $('#sunlight-time').html(results.sunlight.time);
+            $('#mcommons-district').html(results.mcommons.district);
+            $('#mcommons-time').html(results.mcommons.time);
           });
           this.reset();
           e.preventDefault();
@@ -41,15 +45,39 @@
   <body>
     <div id="container">
       <h1>District Lookup</h1>
-      <form id="address_search">
+      <form id="address-search">
         <input type="text" name="address" id="address" size="50">
         <input type="submit" value="Search">
       </form>
       <p>
-        Address: <span id="address_name"></span>
+        Bing Address: <span id="bing-address"></span>
       </p>
       <p>
-        District: <span id="district"></span>
+        Bing Time: <span id="bing-time"></span>
+      </p>
+      <p>
+        Google Address: <span id="google-address"></span>
+      </p>
+      <p>
+        Google Time: <span id="google-time"></span>
+      </p>
+      <p>
+        Here Address: <span id="here-address"></span>
+      </p>
+      <p>
+        Here Time: <span id="here-time"></span>
+      </p>
+      <p>
+        Sunlight District: <span id="sunlight-district"></span>
+      </p>
+      <p>
+        Sunlight Time: <span id="sunlight-time"></span>
+      </p>
+      <p>
+        Mobile Commons District: <span id="mcommons-district"></span>
+      </p>
+      <p>
+        Mobile Commons Time: <span id="mcommons-time"></span>
       </p>
     </div>
   </body>
