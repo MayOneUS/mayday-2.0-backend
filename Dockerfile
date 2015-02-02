@@ -1,4 +1,4 @@
-# Dockerfile for Mayone-2.0 Rails project
+# Dockerfile for Mayday-2.0 Rails project
 
 FROM ruby:2.2-onbuild
 

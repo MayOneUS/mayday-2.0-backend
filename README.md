@@ -1,12 +1,12 @@
-mayone-2.0
+mayday-2.0
 ==========
 
-The API-driven next-generation MADAY site
+The API-driven next-generation MAYDAY site
 
 Overview
 --------
 
-This is currently an out-of-the-box [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database.
+This is a [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database.
 
 It is currently deployed on [Heroku](https://www.heroku.com/) in two environments:
 
