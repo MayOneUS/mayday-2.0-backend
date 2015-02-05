@@ -25,12 +25,8 @@
       $(function() {
         $('#address-search').submit(function(e) {
           $.getJSON('/congressional_district?address=' + $('#address').val(), function(results) {
-            $('#bing-address').html(results.bing_address);
-            $('#bing-time').html(results.bing_time);
-            $('#google-address').html(results.google_address);
-            $('#google-time').html(results.google_time);
-            $('#here-address').html(results.here_address);
-            $('#here-time').html(results.here_time);
+            $('#addr').html(results.address);
+            $('#time').html(results.time);
             $('#sunlight-district').html(results.sunlight.district);
             $('#sunlight-time').html(results.sunlight.time);
             $('#mcommons-district').html(results.mcommons.district);
@@ -50,22 +46,10 @@
         <input type="submit" value="Search">
       </form>
       <p>
-        Bing Address: <span id="bing-address"></span>
+        Address: <span id="addr"></span>
       </p>
       <p>
-        Bing Time: <span id="bing-time"></span>
-      </p>
-      <p>
-        Google Address: <span id="google-address"></span>
-      </p>
-      <p>
-        Google Time: <span id="google-time"></span>
-      </p>
-      <p>
-        Here Address: <span id="here-address"></span>
-      </p>
-      <p>
-        Here Time: <span id="here-time"></span>
+        Time: <span id="time"></span>
       </p>
       <p>
         Sunlight District: <span id="sunlight-district"></span>

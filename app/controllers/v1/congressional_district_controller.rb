@@ -3,19 +3,12 @@ class V1::CongressionalDistrictController < V1::BaseController
     output = {}
     if address = params[:address].presence
 
-      if bing_results = bing_coords(address)
-        coords = bing_results[:coordinates]
-        here_results = here_coords(address)
-        google_results = google_coords(address)
-        output = { bing_address:   bing_results[:address_name],
-                   bing_time:      bing_results[:time],
-                   bing_coords:    coords,
-                   google_address: google_results[:address_name],
-                   google_time:    google_results[:time],
-                   here_address:   here_results[:address_name],
-                   here_time:      here_results[:time],
-                   here_coords:    here_results[:coordinates],
-                   sunlight:       sunlight_district(*coords),
+      if here_results = here_coords(address)
+        coords = here_results[:coordinates]
+        output = { address:   here_results[:address_name],
+                   time:      here_results[:time],
+                   coords:    here_results[:coordinates],
+                   sunlight:       sunlight_district(address),
                    mcommons:       mcommons_district(*coords) }
       else
         output = { error: "couldn't find address" }
@@ -44,7 +37,62 @@ class V1::CongressionalDistrictController < V1::BaseController
                    time: time }
   end
 
+  def test_sunlight
+    zips = ['04265',
+'04346',
+'04352',
+'04359',
+'04360',
+'04910',
+'04917',
+'04918',
+'06059',
+'07311',
+'10911',
+'11351',
+'11425',
+'15087',
+'15313',
+'15635',
+'16036',
+'20118',
+'02108',
+'02109',
+'02906',
+'04963',
+'06021',
+'10032',
+'10069',
+'11042',
+'12460',
+'13076',
+'13475',
+'15222',
+'16049',
+'17978',
+'19103',
+'19112',
+'19128',
+'19144',
+'19477',
+'20832',
+'21405',
+'22716']
+    results = []
+    time = Benchmark.realtime { results = lookup_zips(zips) }
+    render json: { results: results,
+                   time: time }
+  end
+
   private
+    def lookup_zips(zips)
+      results = []
+      zips.each do |zip|
+        results << sunlight_district(zip)
+      end
+      results
+    end
+
     def lookup_addresses(addresses)
       results = []
       addresses.each do |address|
@@ -53,7 +101,25 @@ class V1::CongressionalDistrictController < V1::BaseController
       results
     end
 
-    def sunlight_district(lat, long)
+    def sunlight_district(zip)
+      key = ENV['SUNLIGHT_KEY']
+      url = "https://congress.api.sunlightfoundation.com/districts/locate?zip=#{zip}&apikey=#{key}"
+      response = nil
+      time = Benchmark.realtime { response = open(url).read }
+      results = JSON.parse(response)
+
+      count = results['count'].to_i
+      return { district: 'not found' } unless count > 0
+
+      { district: results['results'].first['state'] + results['results'].first['district'].to_s,
+        count: count,
+        time: time }
+    
+    rescue OpenURI::HTTPError => e
+      byebug
+    end
+
+    def sunlight_reps(lat, long)
       key = ENV['SUNLIGHT_KEY']
       url = "https://congress.api.sunlightfoundation.com/legislators/locate?latitude=#{lat}&longitude=#{long}&apikey=#{key}"
       response = nil
@@ -89,7 +155,7 @@ class V1::CongressionalDistrictController < V1::BaseController
       url = "http://congress.mcommons.com/districts/lookup.json?lat=#{lat}&lng=#{long}"
       response = nil
       time = Benchmark.realtime { response = open(url).read }
-      results = JSON.parse(response)['federal']
+      results = JSON.parse(response)['federal'] || { district: 'not found' }
       results.merge({ time: time })
     end
 
