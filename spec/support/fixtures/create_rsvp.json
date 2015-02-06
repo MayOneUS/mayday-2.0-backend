@@ -1,0 +1,15 @@
+{
+  "rsvp": {
+    "id": 13,
+    "event_id": 2,
+    "person_id": 57126,
+    "guests_count": 0,
+    "volunteer": null,
+    "private": null,
+    "canceled": false,
+    "attended": false,
+    "shift_ids": [],
+    "ticket_type": null,
+    "tickets_sold": 0
+  }
+}

@@ -1,0 +1,19 @@
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+
+development:
+  <<: *default
+  database: mayday_development
+
+test:
+  <<: *default
+  database: mayday_test
+  
+production:
+  <<: *default
+  database: mayday_production
+  username: mayday
+  password: <%= ENV['MAYONE_DATABASE_PASSWORD'] %>
