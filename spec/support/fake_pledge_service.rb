@@ -1,4 +1,4 @@
-# spec/support/fake_github.rb
+# spec/support/fake_pledge_serice.rb
 require 'sinatra/base'
 
 class FakePledgeService < Sinatra::Base

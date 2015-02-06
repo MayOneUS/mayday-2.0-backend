@@ -35,14 +35,15 @@ group :development, :test do
   gem 'web-console', '~> 2.0'
   gem 'spring'
   gem 'dotenv-rails'
+  gem 'rspec-rails'
 end
 
 group :test do
-  gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'ffaker'
   gem 'sinatra'
   gem 'webmock'
+  gem "fakeredis", :require => "fakeredis/rspec"
 end
 
 ruby "2.2.0"

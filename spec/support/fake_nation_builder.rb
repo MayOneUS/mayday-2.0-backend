@@ -1,21 +1,25 @@
-# spec/support/fake_github.rb
+# spec/support/fake_nation_builder.rb
 require 'sinatra/base'
 
 class FakeNationBuilder < Sinatra::Base
 
-  get '/api/v1/lists/?per_page=100' do
+  get '/api/v1/lists/' do
     json_response 200, 'lists.json'
   end
 
   put '/api/v1/people/push' do
-    json_response 200, 'people.json'
-  end
-
-  get '/api/v1/people/match?email=%s' do
     json_response 200, 'person.json'
   end
 
-  post '/api/v1/sites/mayday/pages/events/%s/rsvps' do
+  get '/api/v1/people/' do
+    json_response 200, 'people.json'
+  end
+
+  get '/api/v1/people/match' do
+    json_response 200, 'person.json'
+  end
+
+  post '/api/v1/sites/mayday/pages/events/:id/rsvps' do
     json_response 200, 'create_rsvp.json'
   end
 
