@@ -1,12 +1,12 @@
-mayone-2.0
+mayday-2.0
 ==========
 
-The API-driven next-generation MADAY site
+The API-driven next-generation MAYDAY site
 
 Overview
 --------
 
-This is currently an out-of-the-box [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database.
+This is a [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database.
 
 It is currently deployed on [Heroku](https://www.heroku.com/) in two environments:
 
@@ -73,3 +73,14 @@ The easiest way to access the monitoring data is through the Heroku dashboard:
 1. Click on **New Relic APM**.
 
 You will be automatically signed in to the New Relic dashboard.
+
+## Code Review Process
+
+Goal: Ensure at least two parties have reviewed any code commited for "production."
+
+### Process:
+1. Branch off any new feature development 
+2. Regularly commit to your branch.
+3. When code is ready to be merged, create merge request from your branch into master.  Your merge request should be able to be merged by github and all/any tests should be passing.
+4. Assign another developer to review your merge request.
+5. Merge request is reviewed and made on github.

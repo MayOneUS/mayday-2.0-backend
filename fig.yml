@@ -1,4 +1,4 @@
-# Fig configuration file for Mayone-2.0 app
+# Fig configuration file for Mayday-2.0 app
 
 web:
   build: .
