@@ -3,6 +3,8 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.0'
 gem 'pg'
+gem 'redis'
+gem 'redis-objects'
 
 gem 'uglifier', '>= 1.3.0' #js compressor
 #gem 'coffee-rails', '~> 4.1.0'
@@ -10,6 +12,9 @@ gem 'therubyracer', platforms: :ruby
 gem 'jquery-rails'
 # gem 'turbolinks'
 gem 'sdoc', '~> 0.4.0', group: :doc
+
+gem 'rest-client'
+gem 'oauth2'
 
 # API gems
 gem 'rails-api'
@@ -30,12 +35,15 @@ group :development, :test do
   gem 'web-console', '~> 2.0'
   gem 'spring'
   gem 'dotenv-rails'
+  gem 'rspec-rails'
 end
 
 group :test do
-  gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'ffaker'
+  gem 'sinatra'
+  gem 'webmock'
+  gem "fakeredis", :require => "fakeredis/rspec"
 end
 
 ruby "2.2.0"
