@@ -1,21 +1,38 @@
 class V1::CongressionalDistrictController < V1::BaseController
   def index
-    output = {}
     if address = params[:address].presence
-
-      if here_results = here_coords(address)
+      query = "#{address} #{params[:zip_code]}"
+      if here_results = here_coords(query)
         coords = here_results[:coordinates]
-        output = { address:   here_results[:address_name],
-                   time:      here_results[:time],
-                   coords:    here_results[:coordinates],
-                   sunlight:       sunlight_district(address),
-                   mcommons:       mcommons_district(*coords) }
-      else
-        output = { error: "couldn't find address" }
+        render json: { address:   here_results[:address_name],
+                       time:      here_results[:time],
+                       coords:    here_results[:coordinates],
+                       district:  mcommons_district(coords) }
       end
+    elsif zip_code = params[:zip_code].presence
+      result = Campaign.first.relevant_district_for_zip(zip_code)
+      render json: { result:   result[:result], 
+                     district: result[:district].try(:to_s) },
+              status: 200
+    else
+      render json: { error: 'zip code is required' }
     end
+    # output = {}
+    # if address = params[:address].presence
 
-    render json: output
+    #   if here_results = here_coords(address)
+    #     coords = here_results[:coordinates]
+    #     output = { address:   here_results[:address_name],
+    #                time:      here_results[:time],
+    #                coords:    here_results[:coordinates],
+    #                sunlight:       sunlight_district(address),
+    #                mcommons:       mcommons_district(*coords) }
+    #   else
+    #     output = { error: "couldn't find address" }
+    #   end
+    # end
+
+    # render json: output
   end
 
   def test_here
@@ -151,11 +168,23 @@ class V1::CongressionalDistrictController < V1::BaseController
       byebug
     end
 
-    def mcommons_district(lat, long)
-      url = "http://congress.mcommons.com/districts/lookup.json?lat=#{lat}&lng=#{long}"
-      response = nil
-      time = Benchmark.realtime { response = open(url).read }
-      results = JSON.parse(response)['federal'] || { district: 'not found' }
+    def mcommons_district(coords)
+      district, results = nil, nil
+      time = Benchmark.realtime do
+        district = Integration::MobileCommons.district_from_coords(coords)
+      end
+      if district
+        result = nil
+        if Campaign.first.districts.include?(district)
+          result = 'in campaign'
+        else
+          result = 'not in campaign'
+        end
+        results = { district: district.to_s,
+                    result: result }
+      else
+        results = { district: 'not found' }
+      end
       results.merge({ time: time })
     end
 
@@ -180,23 +209,11 @@ class V1::CongressionalDistrictController < V1::BaseController
     end
 
     def here_coords(address)
-      app_id = ENV['HERE_ID']
-      app_code = ENV['HERE_CODE']
-      url = "http://geocoder.cit.api.here.com/6.2/geocode.json?searchtext=#{address}&app_id=#{app_id}&app_code=#{app_code}&gen=6"
-      response = nil
-      time = Benchmark.realtime { response = open(url).read }
-      address_name, coordinates = nil, nil
-      if result = JSON.parse(response)['Response']['View'].first
-        location = result['Result'].first['Location']
-        coords = location['DisplayPosition']
-        address_name = location['Address']['Label']
-        coordinates  = [coords['Latitude'], coords['Longitude']]
+      results = nil
+      time = Benchmark.realtime do
+        results = Integration::Here.coords_from_text(address)
       end
-      { address_name: address_name,
-        coordinates:  coordinates,
-        time:         time }
-    rescue OpenURI::HTTPError => e
-      byebug
+      results.merge({ time: time })
     end
 
     def google_coords(address)
