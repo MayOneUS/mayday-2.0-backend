@@ -46,7 +46,6 @@ class Integration::NationBuilder
   private
 
   def self.request_handler(method: 'get', endpoint_path:, body: {})
-    # puts "endpoint_path: #{endpoint_path}"
     response = token.send(method, endpoint_path, body: body.to_json, headers: STANDARD_HEADERS)
     JSON.parse(response.body)
   end
