@@ -10,7 +10,7 @@
  class ExternalCountFetcher
   attr_accessor :counter_hash
 
-  COUNTER_HASH_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :called_reps_count, :house_supporters, :senate_supporters, :donations_total, :donations_count] 
+  COUNTER_HASH_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :called_reps_count, :house_supporters, :senate_supporters, :donations_total, :donations_count]
 
 
   def initialize

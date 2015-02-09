@@ -41,7 +41,7 @@ describe Integration::NationBuilder do
       body = {'rsvp': {'person_id': @person_id}}
       expect(Integration::NationBuilder)
         .to receive(:request_handler)
-        .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:rsvps_by_event]% @event_id,  body: body, method: 'post')
+        .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:rsvps_by_event] % @event_id,  body: body, method: 'post')
         .and_call_original
       Integration::NationBuilder.create_rsvp(event_id: @event_id, person_id: @person_id)
     end
