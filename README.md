@@ -1,6 +1,8 @@
 mayday-2.0
 ==========
 
+[![Circle CI](https://circleci.com/gh/MayOneUS/mayday-2.0-backend.svg?style=svg)](https://circleci.com/gh/MayOneUS/mayday-2.0-backend)
+
 The API-driven next-generation MAYDAY site
 
 Overview
