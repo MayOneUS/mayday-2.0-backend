@@ -18,9 +18,10 @@ class Integration::NationBuilder
     end
   end
 
-  def self.create_person_and_rsvp(person_attributes:,event_id:)
-    person = create_or_update_person(attributes: person_attributes)
-    create_rsvp(event_id: event_id, person_id: person['id'])
+  def self.create_person_and_rsvp(event_id:, person_attributes: {}, person_id: nil)
+    raise ArgumentError, ':mising person_id or :person_attributes' if person_id.blank? && (person_attributes.nil? || person_attributes.empty?)
+    person_id ||= create_or_update_person(attributes: person_attributes)['id']
+    create_rsvp(event_id: event_id, person_id: person_id)
   end
 
   def self.create_or_update_person(attributes:)
@@ -67,7 +68,6 @@ class Integration::NationBuilder
       elsif e.response.parsed['code'] == 'validation_failed'
         e.response.parsed['validation_errors'][0]
       else
-        byebug
         puts e.inspect
         e.response.parsed['message']
       end

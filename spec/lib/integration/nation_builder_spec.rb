@@ -25,15 +25,36 @@ describe Integration::NationBuilder do
   end
 
   describe "#create_person_and_rsvp" do
-    it "should call proper methods" do
-      person_attributes = {'first_name' => 'Fred', 'email' => 'fred@email.com'}
-      allow(Integration::NationBuilder).to receive(:create_or_update_person).and_call_original
-      allow(Integration::NationBuilder).to receive(:create_rsvp)
+    context "with a person object" do
+      it "should call proper methods" do
+        person_attributes = {'first_name' => 'Fred', 'email' => 'fred@email.com'}
+        allow(Integration::NationBuilder).to receive(:create_or_update_person).and_call_original
+        allow(Integration::NationBuilder).to receive(:create_rsvp)
 
-      Integration::NationBuilder.create_person_and_rsvp(person_attributes: person_attributes, event_id: @event_id)
+        Integration::NationBuilder.create_person_and_rsvp(event_id: @event_id, person_attributes: person_attributes)
 
-      expect(Integration::NationBuilder).to have_received(:create_or_update_person)
-      expect(Integration::NationBuilder).to have_received(:create_rsvp)
+        expect(Integration::NationBuilder).to have_received(:create_or_update_person)
+        expect(Integration::NationBuilder).to have_received(:create_rsvp)
+      end
+    end
+
+    context "with a person_id" do
+      it "should call proper methods" do
+        person_id = @person_id
+        allow(Integration::NationBuilder).to receive(:create_or_update_person).and_call_original
+        allow(Integration::NationBuilder).to receive(:create_rsvp)
+
+        Integration::NationBuilder.create_person_and_rsvp(event_id: @event_id, person_id: person_id)
+
+        expect(Integration::NationBuilder).not_to have_received(:create_or_update_person)
+        expect(Integration::NationBuilder).to have_received(:create_rsvp)
+      end
+    end
+
+    context "without a person_id or person_attributes" do
+      it "should raise ArgumentError" do
+        expect{ Integration::NationBuilder.create_person_and_rsvp(event_id: @event_id) }.to raise_error(ArgumentError)
+      end
     end
   end
 
