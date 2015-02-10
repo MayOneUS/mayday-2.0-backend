@@ -19,7 +19,7 @@ class FakeNationBuilder < Sinatra::Base
     json_response 200, 'person.json'
   end
 
-  post '/api/v1/sites/mayday/pages/events/:id/rsvps' do
+  post %r{/api/v1/sites/mayday/pages/events/(\d*)/rsvps} do
     json_response 200, 'create_rsvp.json'
   end
 
