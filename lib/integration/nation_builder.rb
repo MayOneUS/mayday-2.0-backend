@@ -14,15 +14,20 @@ class Integration::NationBuilder
   def self.query_people_by_email(email)
     rescue_oauth_errors do
       response = request_handler(endpoint_path: ENDPOINTS[:people_by_email] % email)
-      response['person']['id']
+      response['person']
     end
+  end
+
+  def self.create_person_and_rsvp(person_attributes:,event_id:)
+    person = create_or_update_person(attributes: person_attributes)
+    create_rsvp(event_id: event_id, person_id: person['id'])
   end
 
   def self.create_or_update_person(attributes:)
     rescue_oauth_errors do
       body = {'person': parse_person_attributes(attributes)}
       response = request_handler(endpoint_path: ENDPOINTS[:people], body: body, method: 'put')
-      response['person']['id']
+      response['person']
     end
   end
 
@@ -30,7 +35,7 @@ class Integration::NationBuilder
     rescue_oauth_errors do
       body = {'rsvp': {'person_id': person_id}}
       response = request_handler(endpoint_path: ENDPOINTS[:rsvps_by_event] % event_id, body: body, method: 'post')
-      response['rsvp']['id']
+      response['rsvp']
     end
   end
 
