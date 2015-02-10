@@ -7,6 +7,9 @@ class Integration::NationBuilder
     people_by_email: '/api/v1/people/match?email=%s',
     rsvps_by_event:  '/api/v1/sites/mayday/pages/events/%s/rsvps'
   }
+  ALLOWED_PARAMS_PERSON = %w[birthdate do_not_call first_name last_name email email_opt_in employer is_volunteer mobile_opt_in
+    mobile occupation phone primary_address recruiter_id sex tags request_ip skills rootstrikers_subscription uuid
+    pledge_page_slug fundraising email subscription maydayin30_entry_url voting_district_id map_lookup_district]
 
   def self.query_people_by_email(email)
     rescue_oauth_errors do
@@ -17,7 +20,7 @@ class Integration::NationBuilder
 
   def self.create_or_update_person(attributes:)
     rescue_oauth_errors do
-      body = {'person': attributes.stringify_keys}
+      body = {'person': parse_person_attributes(attributes)}
       response = request_handler(endpoint_path: ENDPOINTS[:people], body: body, method: 'put')
       response['person']['id']
     end
@@ -72,6 +75,11 @@ class Integration::NationBuilder
 
   def self.token
     @@token ||= OAuth2::AccessToken.new(client, ENV['NATION_BUILDER_API_TOKEN'])
+  end
+
+  def self.parse_person_attributes(raw_parameters)
+    parameters = ActionController::Parameters.new(raw_parameters)
+    parameters.permit(ALLOWED_PARAMS_PERSON)
   end
 
 end

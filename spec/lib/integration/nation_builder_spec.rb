@@ -64,4 +64,15 @@ describe Integration::NationBuilder do
       expect(response).to include(supporter_count: 2812, volunteer_count: 43949)
     end
   end
+
+  describe "#parse_person_attributes" do
+    it "should handle allowed params" do
+      sample_attributes = {first_name: 'Fred', email: 'dude@gmail.com', bad_param: 'bad'}
+
+      parsed_attributed = Integration::NationBuilder.__send__(:parse_person_attributes, sample_attributes)
+
+      expect(parsed_attributed).not_to have_key(:bad_param)
+      expect(parsed_attributed).to have_key(:first_name)
+    end
+  end
 end
