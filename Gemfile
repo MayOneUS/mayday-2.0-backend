@@ -6,6 +6,7 @@ gem 'pg'
 gem 'redis'
 gem 'redis-objects'
 
+# Assets
 gem 'uglifier', '>= 1.3.0' #js compressor
 #gem 'coffee-rails', '~> 4.1.0'
 gem 'therubyracer', platforms: :ruby
@@ -13,14 +14,14 @@ gem 'jquery-rails'
 # gem 'turbolinks'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
+# API consuming
 gem 'rest-client'
 gem 'oauth2'
 
-# API gems
+# API publishing
 gem 'rails-api'
 gem 'jbuilder', '~> 2.0'
 gem 'versionist'
-
 
 # SysOps + Monitoring
 gem 'rails_12factor', group: :production # Heroku-required
@@ -34,6 +35,7 @@ group :development, :test do
   gem 'byebug'
   gem 'web-console', '~> 2.0'
   gem 'spring'
+  gem 'spring-commands-rspec'
   gem 'dotenv-rails'
   gem 'rspec-rails'
 end
