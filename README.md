@@ -10,7 +10,7 @@ Overview
 
 This is a [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database.
 
-It is currently deployed on [Heroku](https://www.heroku.com/) in two environments:
+This is currently deployed on [Heroku](https://www.heroku.com/) in two environments:
 
 - **Staging** https://mayone-staging.herokuapp.com/
 - **Production** https://mayone-prod.herokuapp.com/

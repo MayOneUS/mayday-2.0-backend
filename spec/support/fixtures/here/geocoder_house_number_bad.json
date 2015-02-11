@@ -1,0 +1,69 @@
+{
+  "Response":{
+    "MetaInfo":{
+      "Timestamp":"2015-02-10T01:20:16.977+0000"
+    },
+    "View":[
+      {
+        "_type":"SearchResultsViewType",
+        "ViewId":0,
+        "Result":[
+          {
+            "Relevance":0.93,
+            "MatchLevel":"street",
+            "MatchQuality":{
+              "Street":[
+                1.0
+              ],
+              "PostalCode":0.78
+            },
+            "Location":{
+              "LocationId":"NT_xAo5lmAGFxIntVLPWBno3D",
+              "LocationType":"address",
+              "DisplayPosition":{
+                "Latitude":41.7193184,
+                "Longitude":-71.15168
+              },
+              "NavigationPosition":[
+                {
+                  "Latitude":41.7193184,
+                  "Longitude":-71.15168
+                }
+              ],
+              "MapView":{
+                "TopLeft":{
+                  "Latitude":41.7203293,
+                  "Longitude":-71.1521683
+                },
+                "BottomRight":{
+                  "Latitude":41.7185097,
+                  "Longitude":-71.1513519
+                }
+              },
+              "Address":{
+                "Label":"Oregon St, Fall River, MA 02720, United States",
+                "Country":"USA",
+                "State":"MA",
+                "County":"Bristol",
+                "City":"Fall River",
+                "District":"North End",
+                "Street":"Oregon St",
+                "PostalCode":"02720",
+                "AdditionalData":[
+                  {
+                    "value":"United States",
+                    "key":"CountryName"
+                  },
+                  {
+                    "value":"Massachusetts",
+                    "key":"StateName"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
