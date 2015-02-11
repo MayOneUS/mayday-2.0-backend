@@ -4,12 +4,12 @@ class V1::DistrictsController < V1::BaseController
       results = here_coords(address, params[:city], params[:state], params[:zip])
       coords = results[:coordinates]
       district_info = coords ? mcommons_district(coords) : {}
-      
+
       render json: { address:    results[:address_name],
                      confidence: results[:confidence],
                      coords: coords
                    }.merge(district_info)
-    
+
     elsif zip = params[:zip].presence
       render json: district_info_for_zip(zip),
               status: 200
@@ -29,7 +29,7 @@ class V1::DistrictsController < V1::BaseController
             district = zip_code.districts.first
             state = district.state.abbrev
             district = district.district
-            targeted = true  
+            targeted = true
           end
         else
           targeted = false
@@ -42,11 +42,7 @@ class V1::DistrictsController < V1::BaseController
       results = Integration::MobileCommons.district_from_coords(coords)
       state = State.find_by(abbrev: results[:state])
       district = District.find_by(state: state, district: results[:district])
-      if Campaign.first.districts.include?(district)
-        targeted = true
-      else
-        targeted = false
-      end
+      targeted =  Campaign.first.districts.include?(district)
       results.merge({ targeted: targeted })
     end
 
