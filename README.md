@@ -1,6 +1,8 @@
 mayday-2.0
 ==========
 
+[![Build Status](https://travis-ci.org/MayOneUS/mayday-2.0-backend.svg?branch=master)](https://travis-ci.org/MayOneUS/mayday-2.0-backend)
+
 The API-driven next-generation MAYDAY site
 
 Overview
@@ -41,13 +43,11 @@ You can test if it works by running a command like `heroku logs`.
 Continuous Integration
 ----------------------
 
-The site currently uses [CircleCI](https://circleci.com/) for Continuous Integration (CI). Whenever new code is pushed to the repository, CircleCI will start a new build for that code.
+The site currently uses [Travis CI](https://travis-ci.org/) for Continuous Integration (CI). Whenever new code is pushed to the master branch (or included in a pull request), Travis will start a new build for that code.
 
-CircleCI uses GitHub for authentication, so if you have access to this repo you should have access to the CircleCI builds.
+Watch the builds here: https://travis-ci.org/MayOneUS/mayday-2.0-backend
 
-Watch the builds here: https://circleci.com/gh/atbaker/mayone-2.0
-
-CircleCI will automatically deploy all successful builds to the mayone-staging Herkou app.
+All successful builds of the master branch will be automatically deployed to the mayone-staging Herkou app.
 
 Deploying to production
 -----------------------
