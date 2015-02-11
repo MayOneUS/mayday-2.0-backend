@@ -1,0 +1,32 @@
+{  
+  "lat":"37.8570709",
+  "lng":"-122.2673874",
+  "date":"2015-02-10T21:18:26-05:00",
+  "state_upper":{  
+    "state":"CA",
+    "district":"9",
+    "display_name":"CA 9th",
+    "data_source":{  
+      "organization":"U.S. Census",
+      "url":"http://www.census.gov/geo/maps-data/data/tiger-line.html#tab_2013"
+    }
+  },
+  "state_lower":{  
+    "state":"CA",
+    "district":"15",
+    "display_name":"CA 15th",
+    "data_source":{  
+      "organization":"U.S. Census",
+      "url":"http://www.census.gov/geo/maps-data/data/tiger-line.html#tab_2013"
+    }
+  },
+  "federal":{  
+    "state":"CA",
+    "district":"13",
+    "display_name":"CA 13th",
+    "data_source":{  
+      "organization":"U.S. Census",
+      "url":"http://www.census.gov/geo/maps-data/data/tiger-line.html#tab_2013"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "lat":"42.8524284",
+  "lng":"-72.5578537",
+  "date":"2015-02-10T15:55:30-05:00",
+  "federal":{
+    "state":"VT",
+    "district":"1",
+    "display_name":"VT 1st",
+    "data_source":{
+      "organization":"U.S. Census",
+      "url":"http://www.census.gov/geo/maps-data/data/tiger-line.html#tab_2013"
+    }
+  },
+  "state_upper":{
+    "state":"VT",
+    "district":"Windham",
+    "display_name":"VT Windham",
+    "data_source":{
+      "organization":"U.S. Census",
+      "url":"http://www.census.gov/geo/maps-data/data/tiger-line.html#tab_2013"
+    }
+  },
+  "state_lower":{
+    "state":"VT",
+    "district":"Windham-2-3",
+    "display_name":"VT Windham-2-3",
+    "data_source":{
+      "organization":"U.S. Census",
+      "url":"http://www.census.gov/geo/maps-data/data/tiger-line.html#tab_2013"
+    }
+  }
+}

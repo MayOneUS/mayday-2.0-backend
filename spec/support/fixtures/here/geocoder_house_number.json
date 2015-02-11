@@ -1,0 +1,74 @@
+{
+  "Response":{
+    "MetaInfo":{
+      "Timestamp":"2015-02-10T01:51:51.253+0000"
+    },
+    "View":[
+      {
+        "_type":"SearchResultsViewType",
+        "ViewId":0,
+        "Result":[
+          {
+            "Relevance":1.0,
+            "MatchLevel":"houseNumber",
+            "MatchQuality":{
+              "State":1.0,
+              "City":1.0,
+              "Street":[
+                1.0
+              ],
+              "HouseNumber":1.0,
+              "PostalCode":1.0
+            },
+            "MatchType":"pointAddress",
+            "Location":{
+              "LocationId":"NT_hmpe3ysfx5g6o7nW8lUvdC_2020",
+              "LocationType":"address",
+              "DisplayPosition":{
+                "Latitude":37.8570709,
+                "Longitude":-122.2673874
+              },
+              "NavigationPosition":[
+                {
+                  "Latitude":37.8575516,
+                  "Longitude":-122.2673492
+                }
+              ],
+              "MapView":{
+                "TopLeft":{
+                  "Latitude":37.8581951,
+                  "Longitude":-122.2688112
+                },
+                "BottomRight":{
+                  "Latitude":37.8559468,
+                  "Longitude":-122.2659636
+                }
+              },
+              "Address":{
+                "Label":"2020 Oregon St, Berkeley, CA 94703, United States",
+                "Country":"USA",
+                "State":"CA",
+                "County":"Alameda",
+                "City":"Berkeley",
+                "District":"South Berkeley",
+                "Street":"Oregon St",
+                "HouseNumber":"2020",
+                "PostalCode":"94703",
+                "AdditionalData":[
+                  {
+                    "value":"United States",
+                    "key":"CountryName"
+                  },
+                  {
+                    "value":"California",
+                    "key":"StateName"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
