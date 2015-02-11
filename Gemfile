@@ -17,6 +17,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # API consuming
 gem 'rest-client'
 gem 'oauth2'
+gem 'twilio-ruby'
 
 # API publishing
 gem 'rails-api'
