@@ -4,7 +4,7 @@ describe V1::DistrictsController do
   describe "GET index" do
 
     context "no params" do
-      before { get :index }
+      subject(:response) { get :index }
 
       it "returns success" do
         expect(response).to be_success
@@ -22,6 +22,7 @@ describe V1::DistrictsController do
         FactoryGirl.create(:district, state: state, district: '13')
       end
 
+      subject(:response) do
         get :index, { address: '2020 Oregon St', zip: '94703' }
       end
 
@@ -69,6 +70,9 @@ describe V1::DistrictsController do
       context "zip in one district, targeted" do
         before do
           zip.districts = [district]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
@@ -92,6 +96,9 @@ describe V1::DistrictsController do
       context "zip in one district, not targeted" do
         before do
           zip.districts = [FactoryGirl.create(:district)]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
@@ -103,6 +110,9 @@ describe V1::DistrictsController do
       context "zip in multiple districts, including targeted district" do
         before do
           zip.districts = [district, FactoryGirl.create(:district)]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
@@ -122,6 +132,9 @@ describe V1::DistrictsController do
       context "zip in multiple districts, none targeted" do
         before do
           zip.districts = [FactoryGirl.create(:district), FactoryGirl.create(:district)]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
@@ -131,7 +144,7 @@ describe V1::DistrictsController do
       end
 
       context "zip not found" do
-        before do
+        subject(:response) do
           get :index, { zip: '99999' }
         end
 

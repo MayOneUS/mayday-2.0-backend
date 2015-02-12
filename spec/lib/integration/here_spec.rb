@@ -4,10 +4,10 @@ describe Integration::Here do
 
   describe "#geocode_address" do
     context "good address" do
-      let(:response) do
-        Integration::Here.geocode_address( address:'2020 Oregon St', 
-                                           city:   'Berkeley', 
-                                           state:  'CA', 
+      subject(:response) do
+        Integration::Here.geocode_address( address:'2020 Oregon St',
+                                           city:   'Berkeley',
+                                           state:  'CA',
                                            zip:    '94703' )
       end
 
@@ -25,7 +25,7 @@ describe Integration::Here do
     end
 
     context "insufficitent address" do
-      let(:response) do
+      subject(:response) do
         Integration::Here.geocode_address(address: '2020 Oregon St')
       end
 
@@ -39,7 +39,7 @@ describe Integration::Here do
     end
 
     context "bad address" do
-      let(:response) do
+      subject(:response) do
         Integration::Here.geocode_address(address: '2020 Oregon St', zip: 'bad')
       end
 
