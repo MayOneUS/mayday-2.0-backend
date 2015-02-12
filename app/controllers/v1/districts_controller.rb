@@ -25,8 +25,8 @@ class V1::DistrictsController < V1::BaseController
     if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
       if zip_code.targeted?
         if district = zip_code.single_district
-          output[:district] = district.district
           output[:state]    = district.state.abbrev
+          output[:district] = district.district
           output[:targeted] = true
         else
           output[:state]    = zip_code.state.abbrev
