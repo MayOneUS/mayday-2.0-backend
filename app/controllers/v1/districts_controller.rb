@@ -25,8 +25,8 @@ class V1::DistrictsController < V1::BaseController
         output[:city]  = zip_code.city
         output[:state] = zip_code.state.abbrev
         if zip_code.targeted_by_campaign?(targeted_campaign) && zip_code.single_district?
-            output[:district] = zip_code.single_district.district
-            output[:targeted] = true
+          output[:district] = zip_code.single_district.district
+          output[:targeted] = true
         end
       end
       output

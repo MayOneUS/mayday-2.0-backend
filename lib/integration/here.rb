@@ -1,6 +1,5 @@
 class Integration::Here
 
-
   DOMAIN = 'geocoder.cit.api.here.com'
   GEOCODER_ENDPOINT = '/6.2/geocode.json?gen=6'
 
