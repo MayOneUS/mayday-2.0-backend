@@ -1,13 +1,11 @@
-# Travis CI configuration file
-
 language: ruby
-
 rvm:
-  - 2.2.0
-
+- 2.2.0
 addons:
-  postgresql: "9.3"
-
+  postgresql: '9.3'
 before_script:
-  - psql -c 'create database mayday_test;' -U postgres
-  - cp config/database.yml.example config/database.yml
+- psql -c 'create database mayday_test;' -U postgres
+- cp config/database.yml.example config/database.yml
+notifications:
+  slack:
+    secure: sufSq/CqwMPRbYALEZcGGk15X9PYpU7Q7UCL1bnDTrVTOfr2kyWmhX/6uwkemd3cq0WGpuruyvpSGfJ1vbhgYkGBjZnIXUYjBwmj64Lh80pw8KOsbNgIBQhuGkUUMMp/cm17Ys4+onik1BUSpoIMrOrtB8dfuI8U1zVLnCMKRME=
