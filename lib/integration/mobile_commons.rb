@@ -20,6 +20,8 @@ class Integration::MobileCommons
     end
   end
 
+  private
+
   def self.district_lookup_url(coords)
     'http://' + DOMAIN + (DISTRICT_LOOKUP_PATH % coords)
   end
