@@ -27,12 +27,26 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
+  config.include FactoryGirl::Syntax::Methods
 
   config.before(:each) do
     stub_request(:any, /#{Integration::PledgeService::PLEDGE_SERVICE_DOMAIN}/).to_rack(FakePledgeService)
     stub_request(:any, /#{ENV['NATION_BUILDER_DOMAIN']}/).to_rack(FakeNationBuilder)
     stub_request(:any, /#{Integration::MobileCommons::DOMAIN}/).to_rack(FakeMobileCommons)
     stub_request(:any, /#{Integration::Here::DOMAIN}/).to_rack(FakeHere)
+  end
+
+  config.before(:suite) do
+    DatabaseCleaner.clean_with :deletion
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 
   # RSpec Rails can automatically mix in different behaviours to your tests
