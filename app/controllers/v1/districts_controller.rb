@@ -20,38 +20,38 @@ class V1::DistrictsController < V1::BaseController
 
   private
 
-    def targeted_campaign
-      @targeted_campaign ||= Campaign.first
-    end
+  def targeted_campaign
+    @targeted_campaign ||= Campaign.first
+  end
 
-    def district_info_for_zip(zip)
-      output = {}
-      if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
-        if zip_code.targeted_by_campaign?(targeted_campaign) 
-          if district = zip_code.single_district
-            output[:district] = district.district
-            output[:state]    = district.state.abbrev
-            output[:targeted] = true
-          else
-            output[:state]    = zip_code.state.abbrev
-            output[:city]     = zip_code.city
-            output[:targeted] = nil
-          end
+  def district_info_for_zip(zip)
+    output = {}
+    if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
+      if zip_code.targeted_by_campaign?(targeted_campaign) 
+        if district = zip_code.single_district
+          output[:district] = district.district
+          output[:state]    = district.state.abbrev
+          output[:targeted] = true
         else
-          output[:targeted] = false
+          output[:state]    = zip_code.state.abbrev
+          output[:city]     = zip_code.city
+          output[:targeted] = nil
         end
+      else
+        output[:targeted] = false
       end
-      output
     end
+    output
+  end
 
-    def get_district(coords)
-      Integration::MobileCommons.district_from_coords(coords)
-    end
+  def get_district(coords)
+    Integration::MobileCommons.district_from_coords(coords)
+  end
 
-    def get_coords(address, city, state, zip)
-      Integration::Here.geocode_address( address: address,
-                                         city:    city,
-                                         state:   state,
-                                         zip:     zip )
-    end
+  def get_coords(address, city, state, zip)
+    Integration::Here.geocode_address( address: address,
+                                       city:    city,
+                                       state:   state,
+                                       zip:     zip )
+  end
 end

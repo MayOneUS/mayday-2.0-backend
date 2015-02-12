@@ -1,5 +1,7 @@
 class V1::BaseController < ApplicationController
 
+  protected
+
   def rescue_error_messages
     begin
       response = yield

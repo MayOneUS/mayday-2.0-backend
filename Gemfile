@@ -32,6 +32,7 @@ gem 'unicorn'
 # gem 'bcrypt', '~> 3.1.7'
 
 group :development, :test do
+  gem 'annotate', ">=2.6.0"
   gem 'byebug'
   gem 'web-console', '~> 2.0'
   gem 'spring'

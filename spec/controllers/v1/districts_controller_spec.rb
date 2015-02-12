@@ -4,7 +4,7 @@ describe V1::DistrictsController do
   describe "GET index" do
 
     context "no params" do
-      before { get :index }
+      subject(:response) { get :index }
 
       it "returns success" do
         expect(response).to be_success
@@ -16,10 +16,8 @@ describe V1::DistrictsController do
     end
 
     context "bad address" do
-      before do
-        FactoryGirl.create(:campaign)
-        get :index, { address: '2020 Oregon St', zip: 'bad' }
-      end
+      before  { FactoryGirl.create(:campaign) }
+      subject(:response) { get :index, { address: '2020 Oregon St', zip: 'bad' } }
       
       it "returns success" do
         expect(response).to be_success
@@ -31,10 +29,8 @@ describe V1::DistrictsController do
     end
 
     context "foreign address" do
-      before do
-        FactoryGirl.create(:campaign)
-        get :index, { address: '2020 Oregon St', zip: 'canada' }
-      end
+      before { FactoryGirl.create(:campaign) }
+      subject(:response) { get :index, { address: '2020 Oregon St', zip: 'canada' } }
       
       it "returns success" do
         expect(response).to be_success
@@ -48,9 +44,14 @@ describe V1::DistrictsController do
     context "good address, not in campaign" do
       before do
         FactoryGirl.create(:campaign)
+        state = FactoryGirl.create(:state, abbrev: 'CA')
+        FactoryGirl.create(:district, state: state, district: '13')
+      end
+
+      subject(:response) do
         get :index, { address: '2020 Oregon St', zip: '94703' }
       end
-      
+
       it "returns success" do
         expect(response).to be_success
       end
@@ -79,7 +80,7 @@ describe V1::DistrictsController do
         campaign = FactoryGirl.create(:campaign)
         campaign.districts = [district]
         get :index, { address: '2020 Oregon St', zip: '94703' }
-        
+
         expect(parsed(response)['targeted']).to be true
       end
     end
@@ -95,9 +96,12 @@ describe V1::DistrictsController do
       context "zip in one district, targeted" do
         before do
           zip.districts = [district]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
-      
+
         it "returns success" do
           expect(response).to be_success
         end
@@ -118,17 +122,23 @@ describe V1::DistrictsController do
       context "zip in one district, not targeted" do
         before do
           zip.districts = [FactoryGirl.create(:district)]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
         it "returns not targeted" do
-          expect(parsed(response)['targeted']).to be false
+          expect(parsed(response)['targeted']).to be_falsey
         end
       end
 
       context "zip in multiple districts, including targeted district" do
         before do
           zip.districts = [district, FactoryGirl.create(:district)]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
@@ -141,28 +151,31 @@ describe V1::DistrictsController do
         end
 
         it "returns targeted == nil" do
-          expect(parsed(response)['targeted']).to be_nil
+          expect(parsed(response)['targeted']).to be_falsey
         end
       end
 
       context "zip in multiple districts, none targeted" do
         before do
           zip.districts = [FactoryGirl.create(:district), FactoryGirl.create(:district)]
+        end
+
+        subject(:response) do
           get :index, { zip: '94703' }
         end
 
         it "returns targeted == false" do
-          expect(parsed(response)['targeted']).to be false
+          expect(parsed(response)['targeted']).to be_falsey
         end
       end
 
       context "zip not found" do
-        before do
+        subject(:response) do
           get :index, { zip: '99999' }
         end
 
         it "returns targeted == nil" do
-          expect(parsed(response)['targeted']).to be_nil
+          expect(parsed(response)['targeted']).to be_falsey
         end
 
         it "returns state == nil" do
