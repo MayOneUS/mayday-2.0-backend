@@ -34,9 +34,10 @@ class V1::DistrictsController < V1::BaseController
 
     def mcommons_district(coords)
       results = Integration::MobileCommons.district_from_coords(coords)
-      state = State.find_by(abbrev: results[:state])
-      district = District.find_by(state: state, district: results[:district])
-      targeted =  Campaign.first.districts.include?(district)
+
+      district = District.includes(:campaigns, :state).where('states.abbrev': results[:state]).find_by(district: results[:district])
+      targeted = district.present? && district.targeted_by_campaign?(targeted_campaign)
+
       results.merge({ targeted: targeted })
     end
 

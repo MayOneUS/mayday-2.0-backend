@@ -20,4 +20,8 @@ class District < ActiveRecord::Base
   def to_s
     state.abbrev + district
   end
+
+  def targeted_by_campaign?(campaign)
+    campaigns.include?(campaign)
+  end
 end

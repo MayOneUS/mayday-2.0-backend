@@ -18,6 +18,10 @@ describe V1::DistrictsController do
     context "good address, not in campaign" do
       before do
         FactoryGirl.create(:campaign)
+        state = FactoryGirl.create(:state, abbrev: 'CA')
+        FactoryGirl.create(:district, state: state, district: '13')
+      end
+
         get :index, { address: '2020 Oregon St', zip: '94703' }
       end
       
@@ -92,7 +96,7 @@ describe V1::DistrictsController do
         end
 
         it "returns not targeted" do
-          expect(parsed(response)['targeted']).to be false
+          expect(parsed(response)['targeted']).to be_falsey
         end
       end
 
@@ -111,7 +115,7 @@ describe V1::DistrictsController do
         end
 
         it "returns targeted == nil" do
-          expect(parsed(response)['targeted']).to be_nil
+          expect(parsed(response)['targeted']).to be_falsey
         end
       end
 
@@ -122,7 +126,7 @@ describe V1::DistrictsController do
         end
 
         it "returns targeted == false" do
-          expect(parsed(response)['targeted']).to be false
+          expect(parsed(response)['targeted']).to be_falsey
         end
       end
 
@@ -132,7 +136,7 @@ describe V1::DistrictsController do
         end
 
         it "returns targeted == nil" do
-          expect(parsed(response)['targeted']).to be_nil
+          expect(parsed(response)['targeted']).to be_falsey
         end
 
         it "returns state == nil" do
