@@ -11,11 +11,11 @@ describe Integration::Here do
                                            zip:    '94703' )
       end
 
-      it "returns address" do 
+      it "returns address" do
         expect(response[:address_name]).to eq '2020 Oregon St, Berkeley, CA 94703, United States'
       end
 
-      it "returns coordinates" do 
+      it "returns coordinates" do
         expect(response[:coordinates]).to eq [37.8570709, -122.2673874]
       end
 
@@ -29,7 +29,7 @@ describe Integration::Here do
         Integration::Here.geocode_address(address: '2020 Oregon St')
       end
 
-      it "returns address" do 
+      it "returns address" do
         expect(response[:address_name]).to eq 'Oregon St, Fall River, MA 02720, United States'
       end
 
@@ -43,7 +43,7 @@ describe Integration::Here do
         Integration::Here.geocode_address(address: '2020 Oregon St', zip: 'bad')
       end
 
-      it "returns no address" do 
+      it "returns no address" do
         expect(response[:address_name]).to be_nil
       end
 

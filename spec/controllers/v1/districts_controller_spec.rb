@@ -24,7 +24,7 @@ describe V1::DistrictsController do
 
         get :index, { address: '2020 Oregon St', zip: '94703' }
       end
-      
+
       it "returns success" do
         expect(response).to be_success
       end
@@ -53,7 +53,7 @@ describe V1::DistrictsController do
         campaign = FactoryGirl.create(:campaign)
         campaign.districts = [district]
         get :index, { address: '2020 Oregon St', zip: '94703' }
-        
+
         expect(parsed(response)['targeted']).to be true
       end
     end
@@ -71,7 +71,7 @@ describe V1::DistrictsController do
           zip.districts = [district]
           get :index, { zip: '94703' }
         end
-      
+
         it "returns success" do
           expect(response).to be_success
         end
