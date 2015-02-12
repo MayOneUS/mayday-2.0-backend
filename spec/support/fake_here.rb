@@ -7,6 +7,8 @@ class FakeHere < Sinatra::Base
       file = 'geocoder_house_number_bad.json'
     elsif params[:postalcode] == 'bad'
       file = 'geocoder_address_not_found.json'
+    elsif params[:postalcode] == 'canada'
+      file = 'geocoder_canada.json'
     else
       file = 'geocoder_house_number.json'
     end

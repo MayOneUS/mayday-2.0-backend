@@ -9,9 +9,9 @@ class Integration::Here
     response = get_json(geocoder_url(address, city, state, zip))
     address_name, coordinates, confidence = parse_response(response)
 
-    { address_name: address_name,
-      coordinates:  coordinates,
-      confidence:   confidence }
+    { address:     address_name,
+      coordinates: coordinates,
+      confidence:  confidence }
   end
 
   private
@@ -28,7 +28,7 @@ class Integration::Here
     end
 
     def self.parse_response(response)
-      address_name, coordinates, confidence = nil, nil, 0
+      address_name, coordinates, confidence = nil
       if result = response['Response']['View'].first.try(:fetch, 'Result').try(:first)
         location = result['Location'] || {}
         coords = location['DisplayPosition'] || {}

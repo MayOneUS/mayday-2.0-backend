@@ -6,6 +6,10 @@ class District < ActiveRecord::Base
   validates :state, presence: true
   validates :district, uniqueness: { scope: :state }
 
+  def self.find_by_hash(state:, district:)
+    District.find_by(state: State.find_by(abbrev: state), district: district)
+  end
+
   def to_s
     state.abbrev + district
   end

@@ -1,56 +1,54 @@
 class V1::DistrictsController < V1::BaseController
   def index
     if address = params[:address].presence
-      results = here_coords(address, params[:city], params[:state], params[:zip])
-      coords = results[:coordinates]
-      district_info = coords ? mcommons_district(coords) : {}
-      
-      render json: { address:    results[:address_name],
-                     confidence: results[:confidence],
-                     coords: coords
-                   }.merge(district_info)
-    
+      output = get_coords(address, params[:city], params[:state], params[:zip])
+      if coords = output[:coordinates]
+        district_info  = get_district(coords)
+        district = District.find_by_hash(district_info)
+        output[:targeted] = targeted_campaign.districts.include?(district)
+        output = output.merge(district_info)
+      end
+
     elsif zip = params[:zip].presence
-      render json: district_info_for_zip(zip),
-              status: 200
+      output =  district_info_for_zip(zip)
     else
-      render json: { error: 'zip code is required' }
+      output = { error: 'zip code is required' }
     end
+
+    render json: output, status: 200
   end
 
   private
+
+    def targeted_campaign
+      @targeted_campaign ||= Campaign.first
+    end
+
     def district_info_for_zip(zip)
-      targeted, district, city, state = nil
-      if zip_code = ZipCode.find_by(zip_code: zip)
-        city = zip_code.city
-        state = zip_code.state.abbrev
-        if zip_code.campaigns.include?(Campaign.first)
-          if zip_code.districts.count == 1
-            district = zip_code.districts.first
-            state = district.state.abbrev
-            district = district.district
-            targeted = true  
+      output = {}
+      if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
+        if zip_code.targeted_by_campaign?(targeted_campaign) 
+          if district = zip_code.single_district
+            output[:district] = district.district
+            output[:state]    = district.state.abbrev
+            output[:targeted] = true
+          else
+            output[:state]    = zip_code.state.abbrev
+            output[:city]     = zip_code.city
+            output[:targeted] = nil
           end
         else
-          targeted = false
+          output[:targeted] = false
         end
       end
-      { targeted: targeted, district: district, city: city, state: state }
+      output
     end
 
-    def mcommons_district(coords)
-      results = Integration::MobileCommons.district_from_coords(coords)
-      state = State.find_by(abbrev: results[:state])
-      district = District.find_by(state: state, district: results[:district])
-      if Campaign.first.districts.include?(district)
-        targeted = true
-      else
-        targeted = false
-      end
-      results.merge({ targeted: targeted })
+    def get_district(coords)
+      Integration::MobileCommons.district_from_coords(coords)
     end
 
-    def here_coords(address, city, state, zip)
+    def get_coords(address, city, state, zip)
       Integration::Here.geocode_address( address: address,
                                          city:    city,
                                          state:   state,
