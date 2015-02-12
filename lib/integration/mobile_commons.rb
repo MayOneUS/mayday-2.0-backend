@@ -12,9 +12,7 @@ class Integration::MobileCommons
     if district_info = response[CONGRESSIONAL_DISTRICT_KEY]
       state = district_info['state']
       district = district_info['district'].to_i.to_s
-      if SINGLE_DISTRICT_STATES.include?(state) && district == '1'
-        district = '0'
-      end
+      district = '0' if at_large?(district: district, state: state)
       { state:    state,
         district: district }
     else
@@ -24,5 +22,9 @@ class Integration::MobileCommons
 
   def self.district_lookup_url(coords)
     'http://' + DOMAIN + (DISTRICT_LOOKUP_PATH % coords)
+  end
+
+  def self.at_large?(district:, state:)
+    SINGLE_DISTRICT_STATES.include?(state) && district == '1'
   end
 end
