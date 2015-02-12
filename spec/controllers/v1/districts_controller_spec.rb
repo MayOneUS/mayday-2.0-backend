@@ -16,22 +16,24 @@ describe V1::DistrictsController do
     end
 
     context "bad address" do
-      before  { FactoryGirl.create(:campaign) }
-      subject(:response) { get :index, { address: '2020 Oregon St', zip: 'bad' } }
-      
+      subject(:response) do
+        get :index, { address: '2020 Oregon St', zip: 'bad' }
+      end
+
       it "returns success" do
         expect(response).to be_success
       end
 
-      it "returns no confidence" do
+      it "returns confidence == nil" do
         expect(parsed(response)['confidence']).to be_nil
       end
     end
 
     context "foreign address" do
-      before { FactoryGirl.create(:campaign) }
-      subject(:response) { get :index, { address: '2020 Oregon St', zip: 'canada' } }
-      
+      subject(:response) do
+        get :index, { address: '2020 Oregon St', zip: 'canada' }
+      end
+
       it "returns success" do
         expect(response).to be_success
       end
@@ -74,13 +76,18 @@ describe V1::DistrictsController do
     end
 
     context "good address, in campaign" do
-      it "returns targeted == true" do
+      before do
         state = FactoryGirl.create(:state, abbrev: 'CA')
         district = FactoryGirl.create(:district, state: state, district: '13')
         campaign = FactoryGirl.create(:campaign)
         campaign.districts = [district]
-        get :index, { address: '2020 Oregon St', zip: '94703' }
+      end
 
+      subject(:response) do
+        get :index, { address: '2020 Oregon St', zip: '94703' }
+      end
+
+      it "returns targeted == true" do
         expect(parsed(response)['targeted']).to be true
       end
     end

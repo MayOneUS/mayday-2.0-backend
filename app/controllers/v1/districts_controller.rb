@@ -5,7 +5,7 @@ class V1::DistrictsController < V1::BaseController
       if coords = output[:coordinates]
         district_info  = get_district(coords)
         district = District.find_by_hash(district_info)
-        output[:targeted] = targeted_campaign.districts.include?(district)
+        output[:targeted] = district.try(:targeted?)
         output = output.merge(district_info)
       end
 
@@ -20,14 +20,10 @@ class V1::DistrictsController < V1::BaseController
 
   private
 
-  def targeted_campaign
-    @targeted_campaign ||= Campaign.first
-  end
-
   def district_info_for_zip(zip)
     output = {}
     if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
-      if zip_code.targeted_by_campaign?(targeted_campaign) 
+      if zip_code.targeted?
         if district = zip_code.single_district
           output[:district] = district.district
           output[:state]    = district.state.abbrev

@@ -21,6 +21,10 @@ class District < ActiveRecord::Base
     District.find_by(state: State.find_by(abbrev: state), district: district)
   end
 
+  def targeted?
+    campaigns.active.any?
+  end
+
   def targeted_by_campaign?(campaign)
     campaigns.include?(campaign)
   end
