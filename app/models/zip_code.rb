@@ -21,4 +21,17 @@ class ZipCode < ActiveRecord::Base
   validates :state, presence: true
   validates :zip_code, presence: true, uniqueness: { case_sensitive: false },
       format: { with: /\A\d{5}\z/ }
+
+  def single_district?
+    districts.size == 1
+  end
+
+  def single_district
+    districts.first
+  end
+
+  def targeted_by_campaign?(campaign)
+    campaigns.include?(campaign)
+  end
+
 end

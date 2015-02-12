@@ -20,22 +20,16 @@ class V1::DistrictsController < V1::BaseController
 
   private
     def district_info_for_zip(zip)
-      targeted, district, city, state = nil
-      if zip_code = ZipCode.find_by(zip_code: zip)
-        city = zip_code.city
-        state = zip_code.state.abbrev
-        if zip_code.campaigns.include?(Campaign.first)
-          if zip_code.districts.count == 1
-            district = zip_code.districts.first
-            state = district.state.abbrev
-            district = district.district
-            targeted = true
-          end
-        else
-          targeted = false
+      output = {targeted: false}
+      if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
+        output[:city]  = zip_code.city
+        output[:state] = zip_code.state.abbrev
+        if zip_code.targeted_by_campaign?(targeted_campaign) && zip_code.single_district?
+            output[:district] = zip_code.single_district.district
+            output[:targeted] = true
         end
       end
-      { targeted: targeted, district: district, city: city, state: state }
+      output
     end
 
     def mcommons_district(coords)
@@ -51,5 +45,9 @@ class V1::DistrictsController < V1::BaseController
                                          city:    city,
                                          state:   state,
                                          zip:     zip )
+    end
+
+    def targeted_campaign
+      @targeted_campaign ||= Campaign.first
     end
 end
