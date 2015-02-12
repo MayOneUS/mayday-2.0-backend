@@ -27,7 +27,7 @@ class ZipCode < ActiveRecord::Base
   end
 
   def single_district
-    districts.first
+    districts.first if single_district?
   end
 
   def targeted_by_campaign?(campaign)

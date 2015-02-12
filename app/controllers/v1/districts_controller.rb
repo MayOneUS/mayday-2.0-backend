@@ -20,13 +20,19 @@ class V1::DistrictsController < V1::BaseController
 
   private
     def district_info_for_zip(zip)
-      output = {targeted: false}
+      output = {}
       if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
         output[:city]  = zip_code.city
         output[:state] = zip_code.state.abbrev
-        if zip_code.targeted_by_campaign?(targeted_campaign) && zip_code.single_district?
-          output[:district] = zip_code.single_district.district
-          output[:targeted] = true
+        output[:targeted] = if zip_code.targeted_by_campaign?(targeted_campaign)
+          if zip_code.single_district?
+            output[:district] = zip_code.single_district.district
+            true
+          else
+            nil
+          end
+        else
+          false
         end
       end
       output

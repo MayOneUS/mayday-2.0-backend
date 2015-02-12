@@ -125,7 +125,7 @@ describe V1::DistrictsController do
         end
 
         it "returns targeted == nil" do
-          expect(parsed(response)['targeted']).to be_falsey
+          expect(parsed(response)['targeted']).to eq(nil)
         end
       end
 
