@@ -8,16 +8,15 @@ class Integration::MobileCommons
   SINGLE_DISTRICT_STATES = ["AK", "DE", "MT", "ND", "SD", "VI", "VT", "WY", "AS", "DC", "GU", "MP", "PR"]
 
   def self.district_from_coords(coords)
+    state, district = nil
     response = JSON.parse(RestClient.get(district_lookup_url(coords)))
     if district_info = response[CONGRESSIONAL_DISTRICT_KEY]
       state = district_info['state']
       district = district_info['district'].to_i.to_s
       district = '0' if at_large?(district: district, state: state)
-      { state:    state,
-        district: district }
-    else
-      {}
     end
+    { state:    state,
+      district: district }
   end
 
   private
