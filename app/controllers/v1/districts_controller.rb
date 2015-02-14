@@ -4,7 +4,7 @@ class V1::DistrictsController < V1::BaseController
       output = get_coords(address, params[:city], params[:state], params[:zip])
       if coords = output[:coordinates]
         district_info  = get_district(coords)
-        district = District.find_by_hash(district_info)
+        district = District.find_by_state_and_district(district_info)
         output[:targeted] = district.try(:targeted?)
         output = output.merge(district_info)
       end
