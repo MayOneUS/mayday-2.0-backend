@@ -47,6 +47,7 @@ group :test do
   gem 'sinatra'
   gem 'webmock'
   gem "fakeredis", :require => "fakeredis/rspec"
+  gem 'timecop'
 end
 
 ruby "2.2.0"
