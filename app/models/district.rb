@@ -17,11 +17,19 @@ class District < ActiveRecord::Base
   validates :state, presence: true
   validates :district, uniqueness: { scope: :state }
 
-  def to_s
-    state.abbrev + district
+  def self.find_by_state_and_district(state:, district:)
+    joins(:state).where('states.abbrev': state).find_by(district: district)
+  end
+
+  def targeted?
+    campaigns.active.any?
   end
 
   def targeted_by_campaign?(campaign)
     campaigns.include?(campaign)
+  end
+
+  def to_s
+    state.abbrev + district
   end
 end

@@ -13,4 +13,10 @@ class Campaign < ActiveRecord::Base
   has_many :zip_codes, through: :districts
 
   validates :name, presence: true
+
+  scope :active, -> { all } # need to implement active
+
+  def active?
+    true
+  end
 end
