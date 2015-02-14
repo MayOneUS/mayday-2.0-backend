@@ -9,27 +9,27 @@ describe Integration::Sunlight do
       end
 
       it "returns results count == 1" do 
-        expect(response[:results_count]).to eq 1
+        expect(response['results_count']).to eq 1
       end
 
       it "returns correct first name" do 
-        expect(response[:first_name]).to eq 'Barbara'
+        expect(response['legislator']['first_name']).to eq 'Barbara'
       end
 
       it "returns correct last name" do 
-        expect(response[:last_name]).to eq 'Lee'
+        expect(response['legislator']['last_name']).to eq 'Lee'
       end
 
       it "returns correct phone number" do 
-        expect(response[:phone]).to eq '202-225-2661'
+        expect(response['legislator']['phone']).to eq '202-225-2661'
       end
 
       it "returns bioguide id" do 
-        expect(response[:bioguide_id]).to eq 'L000551'
+        expect(response['legislator']['bioguide_id']).to eq 'L000551'
       end
 
       it "doesn't return senate rank" do 
-        expect(response[:senate_rank]).to be_nil
+        expect(response['legislator']['state_rank']).to be_nil
       end
     end
 
@@ -39,11 +39,11 @@ describe Integration::Sunlight do
       end
 
       it "returns bioguide id" do 
-        expect(response[:bioguide_id]).to eq 'F000062'
+        expect(response['legislator']['bioguide_id']).to eq 'F000062'
       end
 
       it "returns senate rank" do 
-        expect(response[:senate_rank]).to eq 'senior'
+        expect(response['legislator']['state_rank']).to eq 'senior'
       end
     end
 
@@ -53,7 +53,7 @@ describe Integration::Sunlight do
       end
 
       it "returns results count > 1" do 
-        expect(response[:results_count]).to be > 0
+        expect(response['results_count']).to be > 0
       end
     end
 
@@ -63,7 +63,17 @@ describe Integration::Sunlight do
       end
 
       it "returns results count == 0" do 
-        expect(response[:results_count]).to eq 0
+        expect(response['results_count']).to eq 0
+      end
+    end
+
+    context "Bad key" do
+      subject(:response) do
+        Integration::Sunlight.get_legislator(state: 'badkey')
+      end
+
+      it "returns results count == nil" do 
+        expect(response['results_count']).to be_nil
       end
     end
   end
