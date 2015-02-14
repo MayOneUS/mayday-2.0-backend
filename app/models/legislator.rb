@@ -7,23 +7,47 @@ class Legislator < ActiveRecord::Base
   scope :senate, -> { where(chamber: 'senate') }
   scope :house,  -> { where(chamber: 'house') }
 
-  def self.fetch(bioguide_id: nil, state: nil, district: nil, senate_class: nil)
-    if district
-      state = district.state.abbrev
-      district = district.district
+  def self.fetch(bioguide_id: nil, district: nil, state: nil, senate_class: nil)
+    params = sunlight_params(bioguide_id, district, state, senate_class) or return
+
+    results = Integration::Sunlight.get_legislator(params)
+
+    if stats = results['legislator']
+      bioguide_id = stats.delete('bioguide_id')
+      stats = replace_state_and_district(stats)
+      create_with(stats).find_or_create_by(bioguide_id: bioguide_id)
+    end
+  end
+
+  def update_stats
+    results = Integration::Sunlight.get_legislator(bioguide_id: bioguide_id)
+    if stats = results['legislator']
+      stats = self.class.replace_state_and_district(stats)
+      update(stats)
+    end
+  end
+
+  private
+
+  def self.sunlight_params(bioguide_id, district, state, senate_class)
+    if bioguide_id
+      { bioguide_id: bioguide_id }
+    elsif district
+      { state:    district.state.abbrev,
+        district: district.district }
     elsif state
-      state = state.abbrev
+      { state:        state.abbrev,
+        senate_class: senate_class }
     end
-    results = Integration::Sunlight.get_legislator(district: district,
-                                                   state: state,
-                                                   senate_class: senate_class,
-                                                   bioguide_id: bioguide_id)
-    if info = results['legislator']
-      bioguide_id = info.delete('bioguide_id')
-      state = State.find_by(abbrev: info['state'])
-      info['state'] = state
-      info['district'] = District.find_by(state: state, district: info['district'])
-      create_with(info).find_or_create_by(bioguide_id: bioguide_id)
+  end
+
+  def self.replace_state_and_district(stats)
+    if stats['district'] = District.find_by_state_and_district(state: stats['state'],
+                                                  district: stats['district'])
+      stats['state'] = nil
+    else
+      stats['state'] = State.find_by(abbrev: stats['state'])
     end
+    stats
   end
 end
