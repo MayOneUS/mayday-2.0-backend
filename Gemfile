@@ -42,7 +42,13 @@ group :development, :test do
   gem 'database_cleaner'
 end
 
+group :development do
+  gem 'rack-mini-profiler'
+  gem "bullet"
+end
+
 group :test do
+  gem "codeclimate-test-reporter"
   gem 'factory_girl_rails'
   gem 'ffaker'
   gem 'sinatra'
