@@ -1,0 +1,8 @@
+{
+  "details":"invalid credentials for myappid",
+  "additionalData":[
+
+  ],
+  "type":"PermissionError",
+  "subtype":"InvalidCredentials"
+}

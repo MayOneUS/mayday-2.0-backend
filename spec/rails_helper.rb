@@ -34,6 +34,7 @@ RSpec.configure do |config|
     stub_request(:any, /#{ENV['NATION_BUILDER_DOMAIN']}/).to_rack(FakeNationBuilder)
     stub_request(:any, /#{Integration::MobileCommons::DOMAIN}/).to_rack(FakeMobileCommons)
     stub_request(:any, /#{Integration::Here::DOMAIN}/).to_rack(FakeHere)
+    stub_request(:any, /#{Integration::Sunlight::DOMAIN}/).to_rack(FakeSunlight)
   end
 
   config.before(:suite) do

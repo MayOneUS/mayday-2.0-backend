@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150211190204) do
+ActiveRecord::Schema.define(version: 20150213202428) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,36 @@ ActiveRecord::Schema.define(version: 20150211190204) do
   add_index "districts_zip_codes", ["district_id", "zip_code_id"], name: "index_districts_zip_codes_on_district_id_and_zip_code_id", using: :btree
   add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", using: :btree
 
+  create_table "legislators", force: :cascade do |t|
+    t.string   "bioguide_id",  null: false
+    t.date     "birthday"
+    t.string   "chamber"
+    t.integer  "district_id"
+    t.string   "facebook_id"
+    t.string   "first_name"
+    t.string   "gender"
+    t.boolean  "in_office"
+    t.string   "last_name"
+    t.string   "middle_name"
+    t.string   "name_suffix"
+    t.string   "nickname"
+    t.string   "office"
+    t.string   "party"
+    t.string   "phone"
+    t.integer  "senate_class"
+    t.integer  "state_id"
+    t.string   "state_rank"
+    t.date     "term_end"
+    t.date     "term_start"
+    t.string   "title"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "legislators", ["bioguide_id"], name: "index_legislators_on_bioguide_id", unique: true, using: :btree
+  add_index "legislators", ["district_id"], name: "index_legislators_on_district_id", using: :btree
+  add_index "legislators", ["state_id"], name: "index_legislators_on_state_id", using: :btree
+
   create_table "states", force: :cascade do |t|
     t.string   "name"
     t.string   "abbrev"
@@ -73,5 +103,7 @@ ActiveRecord::Schema.define(version: 20150211190204) do
   add_index "zip_codes", ["zip_code"], name: "index_zip_codes_on_zip_code", unique: true, using: :btree
 
   add_foreign_key "districts", "states"
+  add_foreign_key "legislators", "districts"
+  add_foreign_key "legislators", "states"
   add_foreign_key "zip_codes", "states"
 end

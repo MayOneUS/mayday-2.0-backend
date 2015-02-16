@@ -13,6 +13,7 @@
 class State < ActiveRecord::Base
   has_many :districts
   has_many :zip_codes
+  has_many :legislators
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
   validates :abbrev, presence: true, uniqueness: { case_sensitive: false }
