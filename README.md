@@ -3,6 +3,8 @@ mayday-2.0
 
 [![Build Status](https://travis-ci.org/MayOneUS/mayday-2.0-backend.svg?branch=master)](https://travis-ci.org/MayOneUS/mayday-2.0-backend)
 
+[![Code Climate](https://codeclimate.com/github/MayOneUS/mayday-2.0-backend/badges/gpa.svg)](https://codeclimate.com/github/MayOneUS/mayday-2.0-backend)
+
 The API-driven next-generation MAYDAY site
 
 Overview
