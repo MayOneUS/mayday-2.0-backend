@@ -40,30 +40,54 @@ class Integration::Sunlight
     # 'website',
     # 'youtube_id',
     'bioguide_id'
-]
+  ]
+  FIELD_NAMES = { 'district' => 'district_code', 'state' => 'state_abbrev' }
 
   def self.get_legislator(bioguide_id: nil, state: nil, district: nil, senate_class: nil)
-    response = get_json(rep_url(bioguide_id, state, district, senate_class))
-    results_count = response[RESULTS_COUNT_KEY]
-    results = response[RESULTS_KEY]
-    output = { 'results_count' => results_count }
-    if results_count == 1
-      output['legislator'] = parse_legislator(results.first)
+    if params = legislator_params(bioguide_id, district, state, senate_class)
+      response = get_json(rep_url(params))
+      results_count = response[RESULTS_COUNT_KEY]
+      results = response[RESULTS_KEY]
+      output = { 'results_count' => results_count }
+      if results_count == 1
+        output['legislator'] = parse_legislator(results.first)
+      end
+      output
+    else
+      {}
     end
-    output
   end
 
   private
 
+  def self.legislator_params(bioguide_id, district, state, senate_class)
+    if bioguide_id
+      { bioguide_id: bioguide_id }
+    elsif district
+      { state:    district.state.abbrev,
+        district: district.district }
+    elsif state
+      { state:        state.abbrev,
+        senate_class: senate_class }
+    end
+  end
+
   def self.parse_legislator(results)
-    results.slice(*RELEVANT_KEYS)
+    rename_fields(results.slice(*RELEVANT_KEYS))
+  end
+
+  def self.rename_fields(legislator_hash)
+    FIELD_NAMES.each do |sunlight_name, new_name|
+      legislator_hash[new_name] = legislator_hash.delete(sunlight_name)
+    end
+    legislator_hash
   end
 
   def self.get_json(endpoint_query)
     JSON.parse(RestClient.get(endpoint_query))
   end
 
-  def self.rep_url(bioguide_id, state, district, senate_class)
+  def self.rep_url(bioguide_id: nil, state: nil, district: nil, senate_class: nil)
     query_string = {
       apikey:       ENV['SUNLIGHT_KEY'],
       bioguide_id:  bioguide_id,

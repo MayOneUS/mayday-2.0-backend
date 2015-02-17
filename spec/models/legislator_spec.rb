@@ -20,6 +20,23 @@ describe Legislator do
       end
     end
 
+    context "by state and senate_class" do
+      let(:state) { FactoryGirl.create(:state, abbrev: 'CA') }
+      subject(:new_senator) { Legislator.fetch(state: state, senate_class: 1) }
+
+      it "returns correct bioguide_id" do
+        expect(new_senator.bioguide_id).to eq 'F000062'
+      end
+
+      it "returns district == nil" do
+        expect(new_senator.district).to be_nil
+      end
+
+      it "associates senator with correct state" do
+        expect(new_senator.state).to eq state
+      end
+    end
+
     context "no args" do
       subject(:new_rep) { Legislator.fetch() }
 
@@ -35,6 +52,19 @@ describe Legislator do
       it "returns nil" do
         expect(new_rep).to be_nil
       end
+    end
+  end
+
+  describe "#refetch" do
+    let(:state) { FactoryGirl.create(:state, abbrev: 'CA') }
+    subject(:senator) { Legislator.fetch(state: state, senate_class: 1) }
+    before do
+      senator.first_name = 'foo'
+      senator.refetch
+    end
+
+    it "returns correct name" do
+      expect(senator.first_name).to eq 'Dianne'
     end
   end
 end

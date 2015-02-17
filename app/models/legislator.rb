@@ -4,40 +4,46 @@ class Legislator < ActiveRecord::Base
 
   validates :bioguide_id, presence: true, uniqueness: true
 
+  attr_accessor :district_code, :state_abbrev
+  before_save :assign_district, :assign_state
+
   scope :senate, -> { where(chamber: 'senate') }
   scope :house,  -> { where(chamber: 'house') }
 
   def self.fetch(bioguide_id: nil, district: nil, state: nil, senate_class: nil)
-    params = sunlight_params(bioguide_id, district, state, senate_class) or return
-
-    results = Integration::Sunlight.get_legislator(params)
+    results = Integration::Sunlight.get_legislator(bioguide_id:  bioguide_id,
+                                                   district:     district,
+                                                   state:        state,
+                                                   senate_class: senate_class)
 
     if stats = results['legislator']
       bioguide_id = stats.delete('bioguide_id')
-      stats = replace_state_and_district(stats)
       create_with(stats).find_or_create_by(bioguide_id: bioguide_id)
     end
   end
 
-  def update_stats
+  def refetch
     results = Integration::Sunlight.get_legislator(bioguide_id: bioguide_id)
     if stats = results['legislator']
-      stats = self.class.replace_state_and_district(stats)
       update(stats)
     end
   end
 
   private
 
-  def self.sunlight_params(bioguide_id, district, state, senate_class)
-    if bioguide_id
-      { bioguide_id: bioguide_id }
-    elsif district
-      { state:    district.state.abbrev,
-        district: district.district }
-    elsif state
-      { state:        state.abbrev,
-        senate_class: senate_class }
+  def assign_district
+    if @district_code && @state_abbrev
+      if district = District.find_by_state_and_district(state: @state_abbrev,
+                                                     district: @district_code)
+        self.district = district
+        @state_abbrev = nil
+      end
+    end
+  end
+
+  def assign_state
+    if @state_abbrev
+      self.state = State.find_by(abbrev: @state_abbrev)
     end
   end
 

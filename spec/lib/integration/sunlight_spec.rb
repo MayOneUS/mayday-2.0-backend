@@ -24,6 +24,10 @@ describe Integration::Sunlight do
         expect(response['legislator']['phone']).to eq '202-225-2661'
       end
 
+      it "returns district_code" do 
+        expect(response['legislator']['district_code']).to eq 13
+      end
+
       it "returns bioguide id" do 
         expect(response['legislator']['bioguide_id']).to eq 'L000551'
       end
@@ -44,6 +48,10 @@ describe Integration::Sunlight do
 
       it "returns senate rank" do 
         expect(response['legislator']['state_rank']).to eq 'senior'
+      end
+
+      it "returns state_abbrev" do 
+        expect(response['legislator']['state_abbrev']).to eq 'CA'
       end
     end
 

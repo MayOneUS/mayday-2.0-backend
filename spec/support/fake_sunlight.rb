@@ -5,9 +5,9 @@ class FakeSunlight < Sinatra::Base
   get Integration::Sunlight::LEGISLATORS_ENDPOINT do
     file = if params[:district].presence && params[:senate_class].presence
              'not_found'
-           elsif params[:senate_class].presence
+           elsif params[:senate_class].presence || params[:bioguide_id] == 'F000062'
              'found_senator'
-           elsif params[:district].presence
+           elsif params[:district].presence || params[:bioguide_id] == 'L000551'
              'found_rep'
            elsif params[:state] == 'badkey'
              'bad_key'
