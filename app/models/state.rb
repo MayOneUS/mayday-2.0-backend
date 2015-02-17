@@ -13,7 +13,7 @@
 class State < ActiveRecord::Base
   has_many :districts
   has_many :zip_codes
-  has_many :senators, class_name: 'Legislator'
+  has_many :senators, class_name: "Legislator"
   has_many :campaigns, through: :senators
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }

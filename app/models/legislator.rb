@@ -5,10 +5,10 @@ class Legislator < ActiveRecord::Base
 
   validates :bioguide_id, presence: true, uniqueness: true
   validates :chamber, inclusion: { in: %w(house senate) }
-  validates_presence_of :district, if: :representative?
-  validates_absence_of  :state,    if: :representative?
-  validates_presence_of :state,    if: :senator?
-  validates_absence_of  :district, if: :senator?
+  validates :district, presence: true, if: :representative?
+  validates :state,    absence:  true, if: :representative?
+  validates :state,    presence: true, if: :senator?
+  validates :district, absence:  true, if: :senator?
 
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
