@@ -48,11 +48,12 @@ class Legislator < ActiveRecord::Base
   end
 
   def self.replace_state_and_district(stats)
-    if stats['district'] = District.find_by_state_and_district(state: stats['state'],
-                                                  district: stats['district'])
-      stats['state'] = nil
+    stats['district'] = District.find_by_state_and_district(state: stats['state'], district: stats['district'])
+
+    stats['state'] = if stats['district'].present?
+      nil
     else
-      stats['state'] = State.find_by(abbrev: stats['state'])
+      State.find_by(abbrev: stats['state'])
     end
     stats
   end
