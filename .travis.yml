@@ -9,3 +9,6 @@ before_script:
 notifications:
   slack:
     secure: Ch4pUyN0ynOfaRQ9rjm4Qnu6w7c87P/yofZXNcSJ6o1FOC9VQkzurvs1sDEOxYsHm8voMGSzDd+fiEJNQeBXet3LhwZAHQbTkWihMNNHAYdN7P5oI8j7qEl6R9lhaGnTyjBUrvlXS1cK1fWYQYjx8KEgP+TUEZ7aGdiQBjGaQVE=
+addons:
+  code_climate:
+    repo_token: bcb1ad395bf1649ba736f2023ad248d686249845aaa0109b96713bfd175aca49
