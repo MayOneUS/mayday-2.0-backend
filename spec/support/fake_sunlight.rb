@@ -3,7 +3,7 @@ require 'sinatra/base'
 class FakeSunlight < Sinatra::Base
 
   get Integration::Sunlight::LEGISLATORS_ENDPOINT do
-    file = if params[:district].presence && params[:senate_class].presence
+    file = if params[:state] == 'bad'
              'not_found'
            elsif params[:senate_class].presence || params[:bioguide_id] == 'F000062'
              'found_senator'

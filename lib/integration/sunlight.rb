@@ -64,10 +64,10 @@ class Integration::Sunlight
     if bioguide_id
       { bioguide_id: bioguide_id }
     elsif district
-      { state:    district.state.abbrev,
-        district: district.district }
+      { state:    state,
+        district: district }
     elsif state
-      { state:        state.abbrev,
+      { state:        state,
         senate_class: senate_class }
     end
   end

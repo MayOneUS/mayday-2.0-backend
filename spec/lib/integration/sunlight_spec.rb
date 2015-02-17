@@ -67,7 +67,7 @@ describe Integration::Sunlight do
 
     context "Not found" do
       subject(:response) do
-        Integration::Sunlight.get_legislator(state: 'CA', district: 13, senate_class: 1)
+        Integration::Sunlight.get_legislator(state: 'bad')
       end
 
       it "returns results count == 0" do 

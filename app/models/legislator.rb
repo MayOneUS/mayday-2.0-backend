@@ -12,9 +12,9 @@ class Legislator < ActiveRecord::Base
 
   def self.fetch(bioguide_id: nil, district: nil, state: nil, senate_class: nil)
     results = Integration::Sunlight.get_legislator(bioguide_id:  bioguide_id,
-                                                   district:     district,
-                                                   state:        state,
-                                                   senate_class: senate_class)
+                                             district: district.try(:district),
+                                             state:    state.try(:abbrev),
+                                             senate_class: senate_class)
 
     if stats = results['legislator']
       bioguide_id = stats.delete('bioguide_id')
@@ -45,16 +45,5 @@ class Legislator < ActiveRecord::Base
     if @state_abbrev
       self.state = State.find_by(abbrev: @state_abbrev)
     end
-  end
-
-  def self.replace_state_and_district(stats)
-    stats['district'] = District.find_by_state_and_district(state: stats['state'], district: stats['district'])
-
-    stats['state'] = if stats['district'].present?
-      nil
-    else
-      State.find_by(abbrev: stats['state'])
-    end
-    stats
   end
 end

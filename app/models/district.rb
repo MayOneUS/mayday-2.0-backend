@@ -23,7 +23,7 @@ class District < ActiveRecord::Base
   end
 
   def fetch_rep
-    self.legislator = Legislator.fetch(district: self)
+    self.representative = Legislator.fetch(district: self)
   end
 
   def targeted?
