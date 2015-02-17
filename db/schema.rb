@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150213202428) do
+ActiveRecord::Schema.define(version: 20150217021557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,13 +22,13 @@ ActiveRecord::Schema.define(version: 20150213202428) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "campaigns_districts", id: false, force: :cascade do |t|
-    t.integer "campaign_id", null: false
-    t.integer "district_id", null: false
+  create_table "campaigns_legislators", id: false, force: :cascade do |t|
+    t.integer "campaign_id",   null: false
+    t.integer "legislator_id", null: false
   end
 
-  add_index "campaigns_districts", ["campaign_id", "district_id"], name: "index_campaigns_districts_on_campaign_id_and_district_id", using: :btree
-  add_index "campaigns_districts", ["district_id", "campaign_id"], name: "index_campaigns_districts_on_district_id_and_campaign_id", using: :btree
+  add_index "campaigns_legislators", ["campaign_id", "legislator_id"], name: "index_campaigns_legislators_on_campaign_id_and_legislator_id", using: :btree
+  add_index "campaigns_legislators", ["legislator_id", "campaign_id"], name: "index_campaigns_legislators_on_legislator_id_and_campaign_id", using: :btree
 
   create_table "districts", force: :cascade do |t|
     t.string   "district"
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 20150213202428) do
   add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", using: :btree
 
   create_table "legislators", force: :cascade do |t|
-    t.string   "bioguide_id",  null: false
+    t.string   "bioguide_id",         null: false
     t.date     "birthday"
     t.string   "chamber"
     t.integer  "district_id"
@@ -69,8 +69,10 @@ ActiveRecord::Schema.define(version: 20150213202428) do
     t.date     "term_end"
     t.date     "term_start"
     t.string   "title"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.string   "verified_first_name"
+    t.string   "verified_last_name"
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
   end
 
   add_index "legislators", ["bioguide_id"], name: "index_legislators_on_bioguide_id", unique: true, using: :btree

@@ -1,48 +1,92 @@
 class Legislator < ActiveRecord::Base
   belongs_to :district
   belongs_to :state
+  has_and_belongs_to_many :campaigns
 
   validates :bioguide_id, presence: true, uniqueness: true
+  validates :chamber, inclusion: { in: %w(house senate) }
+  validates_presence_of :district, if: :representative?
+  validates_absence_of  :state,    if: :representative?
+  validates_presence_of :state,    if: :senator?
+  validates_absence_of  :district, if: :senator?
 
   attr_accessor :district_code, :state_abbrev
-  before_save :assign_district, :assign_state
+  before_validation :assign_district, :assign_state
 
-  scope :senate, -> { where(chamber: 'senate') }
-  scope :house,  -> { where(chamber: 'house') }
+  scope :senate,   -> { where(district: nil) }
+  scope :house,    -> { where(state: nil) }
+  scope :eligible, -> { where('term_end < ?', 2.years.from_now) }
 
-  def self.fetch(bioguide_id: nil, district: nil, state: nil, senate_class: nil)
-    results = Integration::Sunlight.get_legislator(bioguide_id:  bioguide_id,
-                                             district: district.try(:district),
-                                             state:    state.try(:abbrev),
-                                             senate_class: senate_class)
+  def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
+                                                    senate_class: nil)
+    if district
+      state = district.state.abbrev
+      district = district.district
+    else
+      state = state.abbrev
+    end
 
-    if stats = results['legislator']
-      bioguide_id = stats.delete('bioguide_id')
-      create_with(stats).find_or_create_by(bioguide_id: bioguide_id)
+    results = Integration::Sunlight.get_legislators(bioguide_id:  bioguide_id,
+                                                    district: district,
+                                                    state:    state,
+                                                    senate_class: senate_class)
+
+    if stats = results['legislators'].try(:first)
+      find_or_create_by_hash(stats)
     end
   end
 
+  def self.fetch_all
+    results = Integration::Sunlight.get_legislators(get_all: true)
+
+    if legislators = results['legislators']
+      legislators.each do |stats|
+        find_or_create_by_hash(stats)
+      end
+    end
+  end
+
+  def self.find_or_create_by_hash(hash)
+    bioguide_id = hash.delete('bioguide_id')
+    create_with(hash).find_or_create_by(bioguide_id: bioguide_id)
+  end
+
   def refetch
-    results = Integration::Sunlight.get_legislator(bioguide_id: bioguide_id)
-    if stats = results['legislator']
+    results = Integration::Sunlight.get_legislators(bioguide_id: bioguide_id)
+    if stats = results['legislators'].try(:first)
       update(stats)
     end
+  end
+
+  def senator?
+    chamber == 'senate'
+  end
+
+  def representative?
+    chamber == 'house'
+  end
+
+  def name
+    first = self.verified_first_name || nickname || first_name
+    last  = self.verified_last_name  || last_name
+    first + ' ' + last
+  end
+
+  def serializable_hash(options)
+    super( options.merge(methods: [:name], only: [:phone]))
   end
 
   private
 
   def assign_district
-    if @district_code && @state_abbrev
-      if district = District.find_by_state_and_district(state: @state_abbrev,
-                                                     district: @district_code)
-        self.district = district
-        @state_abbrev = nil
-      end
+    if @district_code && representative?
+      self.district = District.find_by_state_and_district(state: @state_abbrev,
+                                                       district: @district_code)
     end
   end
 
   def assign_state
-    if @state_abbrev
+    if @state_abbrev && senator?
       self.state = State.find_by(abbrev: @state_abbrev)
     end
   end

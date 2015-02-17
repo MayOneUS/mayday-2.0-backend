@@ -27,6 +27,7 @@ class V1::DistrictsController < V1::BaseController
         if district = zip_code.single_district
           output[:state]    = district.state.abbrev
           output[:district] = district.district
+          output[:target_legislators] = { representative: district.representative }
           output[:targeted] = true
         else
           output[:state]    = zip_code.state.abbrev
