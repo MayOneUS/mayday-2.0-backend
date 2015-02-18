@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "bioguide_id": "L000551",
+      "birthday": "1946-07-16",
+      "chamber": "house",
+      "contact_form": "http://lee.house.gov/contact-the-office/email-me",
+      "crp_id": "N00008046",
+      "district": 13,
+      "facebook_id": "92190287786",
+      "fax": "202-225-9817",
+      "fec_ids": [
+        "H8CA09060"
+      ],
+      "first_name": "Barbara",
+      "gender": "F",
+      "govtrack_id": "400237",
+      "icpsr_id": 29778,
+      "in_office": true,
+      "last_name": "Lee",
+      "middle_name": null,
+      "name_suffix": null,
+      "nickname": null,
+      "oc_email": "Rep.Lee@opencongress.org",
+      "ocd_id": "ocd-division/country:us/state:ca/cd:13",
+      "office": "2267 Rayburn House Office Building",
+      "party": "D",
+      "phone": "202-225-2661",
+      "state": "CA",
+      "state_name": "California",
+      "term_end": "2017-01-03",
+      "term_start": "2015-01-06",
+      "thomas_id": "01501",
+      "title": "Rep",
+      "twitter_id": "RepBarbaraLee",
+      "votesmart_id": 8315,
+      "website": "http://lee.house.gov",
+      "youtube_id": "RepLee"
+    }
+  ],
+  "count": 1,
+  "page": {
+    "count": 1,
+    "per_page": 20,
+    "page": 1
+  }
+}

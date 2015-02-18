@@ -79,8 +79,9 @@ describe V1::DistrictsController do
       before do
         state = FactoryGirl.create(:state, abbrev: 'CA')
         district = FactoryGirl.create(:district, state: state, district: '13')
+        rep = FactoryGirl.create(:representative, district: district)
         campaign = FactoryGirl.create(:campaign)
-        campaign.districts = [district]
+        campaign.legislators = [rep]
       end
 
       subject(:response) do
@@ -95,10 +96,11 @@ describe V1::DistrictsController do
     context "zip only" do
       let (:state) { FactoryGirl.create(:state, abbrev: 'CA') }
       let (:district) { FactoryGirl.create(:district, state: state, district: '13') }
+      let (:rep) { FactoryGirl.create(:representative, district: district) }
       let (:zip) { FactoryGirl.create(:zip_code, state: state, zip_code: '94703', city: 'Berkeley') }
       let (:campaign) { FactoryGirl.create(:campaign) }
 
-      before { campaign.districts = [district] }
+      before { campaign.legislators = [rep] }
 
       context "zip in one district, targeted" do
         before do
