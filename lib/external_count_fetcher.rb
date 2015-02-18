@@ -63,7 +63,7 @@
   end
 
   def fetch_supporter_counts(reset: false)
-    if !@previously_called && !reset || (!redis_counter(:supporter_count).exists? || !redis_counter(:volunteer_count).exists?) 
+    if !@previously_called && !reset || (!redis_counter(:supporter_count).exists? || !redis_counter(:volunteer_count).exists?)
       Integration::NationBuilder.list_counts.each do |key,count|
         redis_counter(key).value = count
       end
