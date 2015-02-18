@@ -13,11 +13,20 @@
 class State < ActiveRecord::Base
   has_many :districts
   has_many :zip_codes
-  has_many :legislators
+  has_many :senators, class_name: "Legislator"
+  has_many :campaigns, through: :senators
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
   validates :abbrev, presence: true, uniqueness: { case_sensitive: false }
 
+  def eligible_senator
+    senators.eligible.first
+  end
+
+  def targeted?
+    campaigns.active.any?
+  end
+  
   def to_s
     abbrev
   end

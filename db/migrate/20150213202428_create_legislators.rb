@@ -36,6 +36,9 @@ class CreateLegislators < ActiveRecord::Migration
       # t.string :website
       # t.string :youtube_id
 
+      t.string :verified_first_name
+      t.string :verified_last_name
+
       t.timestamps null: false
     end
     add_foreign_key :legislators, :districts

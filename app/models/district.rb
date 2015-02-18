@@ -12,8 +12,8 @@
 class District < ActiveRecord::Base
   belongs_to :state
   has_and_belongs_to_many :zip_codes
-  has_and_belongs_to_many :campaigns
-  has_one :legislator#, dependent: :delete
+  has_one :representative, class_name: "Legislator"
+  has_many :campaigns, through: :representative
 
   validates :state, presence: true
   validates :district, uniqueness: { scope: :state }
@@ -23,7 +23,7 @@ class District < ActiveRecord::Base
   end
 
   def fetch_rep
-    self.legislator = Legislator.fetch(district: self)
+    self.representative = Legislator.fetch_one(district: self)
   end
 
   def targeted?

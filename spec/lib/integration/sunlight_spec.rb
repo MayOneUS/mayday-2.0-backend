@@ -2,64 +2,89 @@ require 'rails_helper'
 
 describe Integration::Sunlight do
 
-  describe "#get_legislator" do
+  describe "#get_legislators" do
     context "district" do
       subject(:response) do
-        Integration::Sunlight.get_legislator(state: 'CA', district: '13')
+        Integration::Sunlight.get_legislators(state: 'CA', district: '13')
       end
+      subject(:legislator) { response['legislators'].first }
 
       it "returns results count == 1" do 
         expect(response['results_count']).to eq 1
       end
 
       it "returns correct first name" do 
-        expect(response['legislator']['first_name']).to eq 'Barbara'
+        expect(legislator['first_name']).to eq 'Barbara'
       end
 
       it "returns correct last name" do 
-        expect(response['legislator']['last_name']).to eq 'Lee'
+        expect(legislator['last_name']).to eq 'Lee'
       end
 
       it "returns correct phone number" do 
-        expect(response['legislator']['phone']).to eq '202-225-2661'
+        expect(legislator['phone']).to eq '202-225-2661'
+      end
+
+      it "returns district_code" do 
+        expect(legislator['district_code']).to eq 13
       end
 
       it "returns bioguide id" do 
-        expect(response['legislator']['bioguide_id']).to eq 'L000551'
+        expect(legislator['bioguide_id']).to eq 'L000551'
       end
 
       it "doesn't return senate rank" do 
-        expect(response['legislator']['state_rank']).to be_nil
+        expect(legislator['state_rank']).to be_nil
       end
     end
 
-    context "Senate" do
-      subject(:response) do
-        Integration::Sunlight.get_legislator(state: 'CA', senate_class: 1)
-      end
-
-      it "returns bioguide id" do 
-        expect(response['legislator']['bioguide_id']).to eq 'F000062'
+    context "senate" do
+      subject(:legislator) do
+        response = Integration::Sunlight.get_legislators(state: 'CA',
+                                                        senate_class: 1)
+        response['legislators'].first
       end
 
       it "returns senate rank" do 
-        expect(response['legislator']['state_rank']).to eq 'senior'
+        expect(legislator['state_rank']).to eq 'senior'
+      end
+
+      it "returns state_abbrev" do 
+        expect(legislator['state_abbrev']).to eq 'CA'
+      end
+
+      it "doesn't return district_code" do 
+        expect(legislator['district_code']).to be_nil
       end
     end
 
-    context "Multiple results" do
+    context "get all" do
       subject(:response) do
-        Integration::Sunlight.get_legislator(state: 'VT')
+        Integration::Sunlight.get_legislators(get_all: true)
+      end
+
+      it "returns correct number of legislators" do 
+        expect(response['legislators'].count).to eq 6
+      end
+    end
+
+    context "multiple results" do
+      subject(:response) do
+        Integration::Sunlight.get_legislators(state: 'VT')
       end
 
       it "returns results count > 1" do 
         expect(response['results_count']).to be > 0
       end
+
+      it "returns correct number of legislators" do 
+        expect(response['legislators'].count).to eq 3
+      end
     end
 
-    context "Not found" do
+    context "not found" do
       subject(:response) do
-        Integration::Sunlight.get_legislator(state: 'CA', district: 13, senate_class: 1)
+        Integration::Sunlight.get_legislators(state: 'not_found')
       end
 
       it "returns results count == 0" do 
@@ -67,9 +92,9 @@ describe Integration::Sunlight do
       end
     end
 
-    context "Bad key" do
+    context "bad key" do
       subject(:response) do
-        Integration::Sunlight.get_legislator(state: 'badkey')
+        Integration::Sunlight.get_legislators(state: 'bad_key')
       end
 
       it "returns results count == nil" do 

@@ -57,7 +57,7 @@ describe ExternalCountFetcher do
     context "with empty redis counter cache" do
       it "calls fetch_count with correct keys" do
         allow(count_fetcher).to receive(:fetch_count)
-        
+
         count_fetcher.fetch_empty_counts!
 
         expect(count_fetcher).to have_received(:fetch_count).exactly(ExternalCountFetcher::REDIS_KEYS.length).times
