@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150217021557) do
+ActiveRecord::Schema.define(version: 20150218003607) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 20150217021557) do
     t.integer "legislator_id", null: false
   end
 
-  add_index "campaigns_legislators", ["campaign_id", "legislator_id"], name: "index_campaigns_legislators_on_campaign_id_and_legislator_id", using: :btree
+  add_index "campaigns_legislators", ["campaign_id", "legislator_id"], name: "index_campaigns_legislators_on_campaign_id_and_legislator_id", unique: true, using: :btree
   add_index "campaigns_legislators", ["legislator_id", "campaign_id"], name: "index_campaigns_legislators_on_legislator_id_and_campaign_id", using: :btree
 
   create_table "districts", force: :cascade do |t|
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20150217021557) do
   end
 
   add_index "districts_zip_codes", ["district_id", "zip_code_id"], name: "index_districts_zip_codes_on_district_id_and_zip_code_id", using: :btree
-  add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", using: :btree
+  add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", unique: true, using: :btree
 
   create_table "legislators", force: :cascade do |t|
     t.string   "bioguide_id",         null: false
