@@ -9,9 +9,8 @@
 #
 
 class Campaign < ActiveRecord::Base
-  has_and_belongs_to_many :legislators
-  has_and_belongs_to_many :representatives, -> { house }, class_name: "Legislator"
-  has_and_belongs_to_many :senators, -> { senate }, class_name: "Legislator"
+  has_many :targets
+  has_many :legislators, through: :targets
   has_many :districts, through: :representatives
   has_many :zip_codes, through: :districts
   has_many :states, through: :senators

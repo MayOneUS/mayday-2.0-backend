@@ -1,7 +1,8 @@
 class Legislator < ActiveRecord::Base
   belongs_to :district
   belongs_to :state
-  has_and_belongs_to_many :campaigns
+  has_many :targets
+  has_many :campaigns, through: :targets
 
   validates :bioguide_id, presence: true, uniqueness: true
   validates :chamber, inclusion: { in: %w(house senate) }
