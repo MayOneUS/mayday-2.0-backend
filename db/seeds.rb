@@ -1,14 +1,7 @@
 connection = ActiveRecord::Base.connection
 
 %w[states districts zip_codes districts_zip_codes legislators].each do |table|
-  sql = File.read("db/seed_data/#{table}.sql")
-  statements = sql.split(/;$/)
-
-  ActiveRecord::Base.transaction do
-    statements.each do |statement|
-      connection.execute(statement)
-    end
-  end
+  connection.execute(IO.read("db/seed_data/#{table}.sql"))
 end
 
 %w[states districts zip_codes legislators].each do |table|
