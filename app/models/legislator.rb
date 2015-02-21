@@ -16,6 +16,7 @@ class Legislator < ActiveRecord::Base
   scope :senate,   -> { where(district: nil) }
   scope :house,    -> { where(state: nil) }
   scope :eligible, -> { where('term_end < ?', 2.years.from_now) }
+  scope :targeted, -> { joins(:campaigns).merge(Campaign.active) }
 
   def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
                                                     senate_class: nil)
@@ -67,16 +68,25 @@ class Legislator < ActiveRecord::Base
   end
 
   def name
-    first = self.verified_first_name || nickname || first_name
-    last  = self.verified_last_name  || last_name
+    first = verified_first_name || nickname || first_name
+    last  = verified_last_name  || last_name
     first + ' ' + last
   end
 
-  def serializable_hash(options)
-    super( options.merge(methods: [:name], only: [:phone]))
+  def state_abbrev
+    state ? state.abbrev : district.state.abbrev
+  end
+
+  def district_code
+    district.district if district
   end
 
   private
+
+  def serializable_hash(options)
+    super(methods: [:name, :state_abbrev, :district_code],
+            only: [:phone, :party, :chamber, :state_rank]).merge(options || {})
+  end
 
   def assign_district
     if @district_code && representative?

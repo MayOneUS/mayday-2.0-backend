@@ -1,45 +1,19 @@
 class V1::DistrictsController < V1::BaseController
   def index
+    @results = {}
     if address = params[:address].presence
-      output = get_coords(address, params[:city], params[:state], params[:zip])
-      if coords = output[:coordinates]
-        district_info  = get_district(coords)
-        district = District.find_by_state_and_district(district_info)
-        output[:targeted] = district.try(:targeted?)
-        output = output.merge(district_info)
+      @results = get_coords(address, params[:city], params[:state], params[:zip])
+      if coords = @results[:coordinates]
+        @district = District.find_by_state_and_district(get_district(coords))
       end
-
     elsif zip = params[:zip].presence
-      output =  district_info_for_zip(zip)
-    else
-      output = { error: 'zip code is required' }
+      @zip_code = ZipCode.includes(:target_reps, :target_senators).find_by(zip_code: params[:zip])
+      @district = @zip_code.try(:single_district)
     end
-
-    render json: output, status: 200
+    render
   end
 
   private
-
-  def district_info_for_zip(zip)
-    output = {}
-    if zip_code = ZipCode.includes(:districts, :campaigns).find_by(zip_code: zip)
-      if zip_code.targeted?
-        if district = zip_code.single_district
-          output[:state]    = district.state.abbrev
-          output[:district] = district.district
-          output[:target_legislators] = { representative: district.representative }
-          output[:targeted] = true
-        else
-          output[:state]    = zip_code.state.abbrev
-          output[:city]     = zip_code.city
-          output[:targeted] = nil
-        end
-      else
-        output[:targeted] = false
-      end
-    end
-    output
-  end
 
   def get_district(coords)
     Integration::MobileCommons.district_from_coords(coords)

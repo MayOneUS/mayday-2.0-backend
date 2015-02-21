@@ -15,7 +15,11 @@
 
 class ZipCode < ActiveRecord::Base
   belongs_to :state
+  has_many :senators, through: :state
+  has_many :target_senators, -> { targeted }, through: :state
   has_and_belongs_to_many :districts
+  has_many :representatives, through: :districts
+  has_many :target_reps, -> { targeted }, through: :districts
   has_many :campaigns, through: :districts
 
   validates :state, presence: true
@@ -32,6 +36,10 @@ class ZipCode < ActiveRecord::Base
 
   def targeted?
     campaigns.active.any?
+  end
+
+  def target_legislators
+    target_senators + target_reps
   end
 
   def targeted_by_campaign?(campaign)

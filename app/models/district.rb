@@ -11,8 +11,11 @@
 
 class District < ActiveRecord::Base
   belongs_to :state
+  has_many :senators, through: :state
+  has_many :target_senators, -> { targeted }, through: :state
   has_and_belongs_to_many :zip_codes
   has_one :representative, class_name: "Legislator"
+  has_one :target_rep, -> { targeted }, class_name: "Legislator"
   has_many :campaigns, through: :representative
 
   validates :state, presence: true
@@ -28,6 +31,10 @@ class District < ActiveRecord::Base
 
   def targeted?
     campaigns.active.any?
+  end
+
+  def target_legislators
+    target_senators + [target_rep].compact
   end
 
   def targeted_by_campaign?(campaign)

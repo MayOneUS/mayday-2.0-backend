@@ -73,4 +73,21 @@ describe Legislator do
       expect(senator.first_name).to eq 'Dianne'
     end
   end
+
+  describe "#serializable_hash" do
+    let(:senator) { FactoryGirl.create(:senator) }
+    let(:keys) { keys = ["chamber", "party", "phone", "state_rank", "name", "state_abbrev", "district_code"] }
+
+    context "no args" do
+      it "returns proper fields" do
+        expect(senator.as_json.keys).to match_array keys
+      end
+    end
+
+    context "with args" do
+      it "returns proper fields" do
+        expect(senator.as_json(extra_key: false).keys).to match_array(keys + [:extra_key])
+      end
+    end
+  end
 end

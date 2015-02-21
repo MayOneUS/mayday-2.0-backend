@@ -24,12 +24,17 @@ FactoryGirl.define do
   factory :legislator do
     sequence(:bioguide_id) { |n| "F#{n}" }
     first_name 'Barbara'
-    last_name 'Lee'
+    last_name 'Boxer'
+    phone '202-224-3553'
+    party 'D'
+
     factory :senator do
       chamber 'senate'
+      state_rank 'junior'
       senate_class 1
       state
     end
+    
     factory :representative do
       chamber 'house'
       district
