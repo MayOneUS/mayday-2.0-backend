@@ -1,14 +1,24 @@
-if @district
-  json.state(@district.state.abbrev)
-  json.district(@district.district)
-  json.target_legislators(@district.target_legislators.as_json(local: true))
-  json.targeted(@district.targeted? || @district.state.targeted?)
-  json.address(@results[:address])
-  json.confidence(@results[:confidence])
-elsif @zip_code && @zip_code.targeted?
-  json.address_required(true)
-  json.city(@zip_code.city)
-  json.state(@zip_code.state)
+if @zip_code || @district
+  if @target_legislators.any?
+    json.target_legislators(@target_legislators.as_json(local: true))
+    json.targeted(true)
+    if @rep_targeted
+      if @district
+        json.state(@district.state.abbrev)
+        json.district(@district.district)
+      else
+        json.targeted(nil)
+        json.city(@zip_code.city)
+        json.state(@zip_code.state.abbrev)
+      end
+    end
+  else
+    json.targeted(false)
+  end
 else
   json.address_required(true)
+end
+if @results
+  json.confidence(@results[:confidence])
+  json.address(@results[:address])
 end
