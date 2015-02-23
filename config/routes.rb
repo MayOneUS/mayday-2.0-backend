@@ -5,4 +5,8 @@ Rails.application.routes.draw do
     resources :people, only: :create
     post '/events/create_rsvp', to: 'events#create_rsvp'
   end
+  get  '/calls/start',                    to: 'calls#start'
+  get  '/calls/new_connection',           to: 'calls#new_connection'
+  post '/calls/connection_gather_prompt', to: 'calls#connection_gather_prompt'
+  post '/calls/connection_gather',        to: 'calls#connection_gather'
 end

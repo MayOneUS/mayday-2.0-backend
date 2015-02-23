@@ -11,10 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150218003607) do
+ActiveRecord::Schema.define(version: 20150220064708) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "calls", force: :cascade do |t|
+    t.string   "remote_id"
+    t.integer  "district_id"
+    t.integer  "phone_origin"
+    t.string   "state"
+    t.datetime "ended_at"
+    t.string   "source"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
 
   create_table "campaigns", force: :cascade do |t|
     t.string   "name"
@@ -29,6 +40,17 @@ ActiveRecord::Schema.define(version: 20150218003607) do
 
   add_index "campaigns_legislators", ["campaign_id", "legislator_id"], name: "index_campaigns_legislators_on_campaign_id_and_legislator_id", unique: true, using: :btree
   add_index "campaigns_legislators", ["legislator_id", "campaign_id"], name: "index_campaigns_legislators_on_legislator_id_and_campaign_id", using: :btree
+
+  create_table "connections", force: :cascade do |t|
+    t.string   "remote_id"
+    t.integer  "call_id"
+    t.integer  "legislator_id"
+    t.integer  "campaign_id"
+    t.string   "state_from_user"
+    t.string   "state"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+  end
 
   create_table "districts", force: :cascade do |t|
     t.string   "district"
