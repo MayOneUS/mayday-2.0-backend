@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150218003607) do
+ActiveRecord::Schema.define(version: 20150221093349) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,14 +21,6 @@ ActiveRecord::Schema.define(version: 20150218003607) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
-
-  create_table "campaigns_legislators", id: false, force: :cascade do |t|
-    t.integer "campaign_id",   null: false
-    t.integer "legislator_id", null: false
-  end
-
-  add_index "campaigns_legislators", ["campaign_id", "legislator_id"], name: "index_campaigns_legislators_on_campaign_id_and_legislator_id", unique: true, using: :btree
-  add_index "campaigns_legislators", ["legislator_id", "campaign_id"], name: "index_campaigns_legislators_on_legislator_id_and_campaign_id", using: :btree
 
   create_table "districts", force: :cascade do |t|
     t.string   "district"
@@ -90,6 +82,18 @@ ActiveRecord::Schema.define(version: 20150218003607) do
   add_index "states", ["abbrev"], name: "index_states_on_abbrev", unique: true, using: :btree
   add_index "states", ["name"], name: "index_states_on_name", unique: true, using: :btree
 
+  create_table "targets", force: :cascade do |t|
+    t.integer  "campaign_id"
+    t.integer  "legislator_id"
+    t.integer  "priority"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "targets", ["campaign_id"], name: "index_targets_on_campaign_id", using: :btree
+  add_index "targets", ["legislator_id", "campaign_id"], name: "index_targets_on_legislator_id_and_campaign_id", unique: true, using: :btree
+  add_index "targets", ["legislator_id"], name: "index_targets_on_legislator_id", using: :btree
+
   create_table "zip_codes", force: :cascade do |t|
     t.string   "zip_code"
     t.string   "city"
@@ -107,5 +111,7 @@ ActiveRecord::Schema.define(version: 20150218003607) do
   add_foreign_key "districts", "states"
   add_foreign_key "legislators", "districts"
   add_foreign_key "legislators", "states"
+  add_foreign_key "targets", "campaigns"
+  add_foreign_key "targets", "legislators"
   add_foreign_key "zip_codes", "states"
 end
