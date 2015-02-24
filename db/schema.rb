@@ -33,14 +33,6 @@ ActiveRecord::Schema.define(version: 20150224001912) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "campaigns_legislators", id: false, force: :cascade do |t|
-    t.integer "campaign_id",   null: false
-    t.integer "legislator_id", null: false
-  end
-
-  add_index "campaigns_legislators", ["campaign_id", "legislator_id"], name: "index_campaigns_legislators_on_campaign_id_and_legislator_id", unique: true, using: :btree
-  add_index "campaigns_legislators", ["legislator_id", "campaign_id"], name: "index_campaigns_legislators_on_legislator_id_and_campaign_id", using: :btree
-
   create_table "connections", force: :cascade do |t|
     t.string   "remote_id"
     t.integer  "call_id"
@@ -102,12 +94,12 @@ ActiveRecord::Schema.define(version: 20150224001912) do
   add_index "legislators", ["state_id"], name: "index_legislators_on_state_id", using: :btree
 
   create_table "locations", force: :cascade do |t|
-    t.string   "level"
+    t.string   "match_level"
     t.string   "address_1"
     t.string   "address_2"
     t.string   "city"
     t.string   "state"
-    t.string   "postal_code"
+    t.string   "zip_code"
     t.integer  "person_id"
     t.integer  "district_id"
     t.datetime "created_at",  null: false
@@ -132,6 +124,18 @@ ActiveRecord::Schema.define(version: 20150224001912) do
   add_index "states", ["abbrev"], name: "index_states_on_abbrev", unique: true, using: :btree
   add_index "states", ["name"], name: "index_states_on_name", unique: true, using: :btree
 
+  create_table "targets", force: :cascade do |t|
+    t.integer  "campaign_id"
+    t.integer  "legislator_id"
+    t.integer  "priority"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "targets", ["campaign_id"], name: "index_targets_on_campaign_id", using: :btree
+  add_index "targets", ["legislator_id", "campaign_id"], name: "index_targets_on_legislator_id_and_campaign_id", unique: true, using: :btree
+  add_index "targets", ["legislator_id"], name: "index_targets_on_legislator_id", using: :btree
+
   create_table "zip_codes", force: :cascade do |t|
     t.string   "zip_code"
     t.string   "city"
@@ -149,5 +153,7 @@ ActiveRecord::Schema.define(version: 20150224001912) do
   add_foreign_key "districts", "states"
   add_foreign_key "legislators", "districts"
   add_foreign_key "legislators", "states"
+  add_foreign_key "targets", "campaigns"
+  add_foreign_key "targets", "legislators"
   add_foreign_key "zip_codes", "states"
 end
