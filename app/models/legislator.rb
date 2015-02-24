@@ -14,10 +14,11 @@ class Legislator < ActiveRecord::Base
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
 
-  scope :senate,   -> { where(district: nil) }
-  scope :house,    -> { where(state: nil) }
-  scope :eligible, -> { where('term_end < ?', 2.years.from_now) }
-  scope :targeted, -> { joins(:campaigns).merge(Campaign.active) }
+  scope :senate,       -> { where(district: nil) }
+  scope :house,        -> { where(state: nil) }
+  scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
+  scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
+  scope :top_priority, -> { targeted.merge(Target.top_priority) }
 
   def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
                                                     senate_class: nil)
@@ -53,6 +54,15 @@ class Legislator < ActiveRecord::Base
     create_with(hash).find_or_create_by(bioguide_id: bioguide_id)
   end
 
+  def self.default_targets(excluding: nil, count: 5)
+    if excluding
+      output = where.not(id: excluding)
+    else
+      output = all
+    end
+    output.top_priority.first(count)
+  end
+
   def refetch
     results = Integration::Sunlight.get_legislators(bioguide_id: bioguide_id)
     if stats = results['legislators'].try(:first)
@@ -86,7 +96,7 @@ class Legislator < ActiveRecord::Base
 
   def serializable_hash(options)
     super(methods: [:name, :state_abbrev, :district_code],
-            only: [:phone, :party, :chamber, :state_rank]).merge(options || {})
+            only: [:id, :party, :chamber, :state_rank]).merge(options || {})
   end
 
   def assign_district

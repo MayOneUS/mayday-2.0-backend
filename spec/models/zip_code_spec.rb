@@ -51,14 +51,14 @@ describe ZipCode do
         zip.districts = [district, rep2.district]
       end
 
-      it "returns the representative" do
-        expect(zip.target_legislators).to eq [rep]
+      it "returns empty array" do
+        expect(zip.target_legislators).to eq []
       end
 
       context "and senator is targeted" do
         before { campaign.legislators << senator }
-        it "returns the senator and representative" do
-          expect(zip.target_legislators).to match_array [rep, senator]
+        it "returns the empty array" do
+          expect(zip.target_legislators).to match_array []
         end
       end
     end

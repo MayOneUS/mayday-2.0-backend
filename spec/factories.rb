@@ -2,23 +2,6 @@ FactoryGirl.define do
   factory :state do
     sequence(:name) { |n| "State#{n}" }
     sequence(:abbrev) { |n| (n % 676).divmod(26).map{ |i| ('A'..'Z').to_a[i] }.join }
-    single_district false
-
-    factory :single_district_state do
-      single_district true
-      after(:create) do |state|
-        state.districts.create(district: '0')
-      end
-    end
-    factory :multi_district_state do
-      transient do
-        districts_count 2
-      end
-
-      after(:create) do |state, evaluator|
-        create_list(:district, evaluator.districts_count, state: state)
-      end
-    end
   end
 
   factory :legislator do
@@ -50,16 +33,29 @@ FactoryGirl.define do
     state
   end
 
+  factory :target do
+
+    campaign
+
+    factory :rep_target do
+      association :legislator, factory: :representative
+    end
+    factory :senator_target do
+      association :legislator, factory: :senator
+    end
+  end
+
   factory :campaign do
     sequence(:name) { |n| "Campaign #{n}" }
 
-    factory :campaign_with_districts do
+    factory :campaign_with_reps do
       transient do
-        districts_count 1
+        count 1
+        priority nil
       end
 
       after(:create) do |campaign, evaluator|
-        campaign.districts = create_list(:district, evaluator.districts_count)
+        campaign.targets = create_list(:rep_target, evaluator.count, priority: evaluator.priority)
       end
     end
   end

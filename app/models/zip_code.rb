@@ -34,12 +34,20 @@ class ZipCode < ActiveRecord::Base
     districts.first if single_district?
   end
 
+  def address_required?
+    targeted? && !single_district?
+  end
+
   def targeted?
-    campaigns.active.any?
+    target_reps.any?
   end
 
   def target_legislators
-    target_senators + target_reps
+    if single_district?
+      target_senators + target_reps
+    else
+      []
+    end
   end
 
   def targeted_by_campaign?(campaign)

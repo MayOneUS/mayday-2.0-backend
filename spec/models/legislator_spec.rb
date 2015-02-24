@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Legislator do
-  describe "#fetch_one" do
+  describe ".fetch_one" do
     context "by district" do
       let(:state) { FactoryGirl.create(:state, abbrev: 'CA') }
       let(:district) { FactoryGirl.create(:district, district: '13', state: state) }
@@ -47,7 +47,7 @@ describe Legislator do
     end
   end
 
-  describe "#fetch_all" do
+  describe ".fetch_all" do
     before do
       state = FactoryGirl.create(:state, abbrev: 'CA')
       [11, 25, 31, 33, 35, 45].each do |district|
@@ -59,6 +59,42 @@ describe Legislator do
     it "creates correct number of legislators" do
       expect(Legislator.count).to eq 6
     end
+  end
+
+  describe ".default_targets" do
+    context "no args" do
+      let(:rep) { FactoryGirl.create(:representative) }
+      it "only returns top priority targets" do
+        FactoryGirl.create(:target, legislator: rep, priority: 1)
+        FactoryGirl.create(:rep_target)
+        expect(Legislator.default_targets).to eq [rep]
+      end
+
+      it "returns 5 targets" do
+        FactoryGirl.create(:campaign_with_reps, count: 6, priority: 1)
+        expect(Legislator.default_targets.count).to eq 5
+      end
+    end
+    context "with args" do
+      let(:rep)     { FactoryGirl.create(:representative) }
+      let(:senator) { FactoryGirl.create(:senator) }
+      before do
+        FactoryGirl.create(:target, legislator: rep, priority: 1)
+        FactoryGirl.create(:target, legislator: senator, priority: 1)
+        FactoryGirl.create(:rep_target, priority: 1)
+      end
+      it "returns given number of targets" do
+        expect(Legislator.default_targets(count: 2).count).to eq 2
+      end
+      it "excludes single legislator" do
+        expect(Legislator.default_targets(excluding: rep.id)).not_to include(rep)
+        expect(Legislator.default_targets(excluding: rep.id).count).to eq 2
+      end
+      it "excludes multiple legislators" do
+        expect(Legislator.default_targets(excluding: [rep.id, senator.id]).count).to eq 1
+      end
+    end
+
   end
 
   describe "#refetch" do
@@ -76,7 +112,7 @@ describe Legislator do
 
   describe "#serializable_hash" do
     let(:senator) { FactoryGirl.create(:senator) }
-    let(:keys) { keys = ["chamber", "party", "phone", "state_rank", "name", "state_abbrev", "district_code"] }
+    let(:keys) { keys = ["id", "chamber", "party", "state_rank", "name", "state_abbrev", "district_code"] }
 
     context "no args" do
       it "returns proper fields" do
