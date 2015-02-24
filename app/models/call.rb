@@ -16,7 +16,6 @@
 class Call < ActiveRecord::Base
   has_many :connections
   belongs_to :zip_code
-  #belongs_to district?
 
   def create_connection!
     connections.create(legislator: random_target)

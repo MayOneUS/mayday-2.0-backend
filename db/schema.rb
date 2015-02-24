@@ -94,7 +94,7 @@ ActiveRecord::Schema.define(version: 20150224001912) do
   add_index "legislators", ["state_id"], name: "index_legislators_on_state_id", using: :btree
 
   create_table "locations", force: :cascade do |t|
-    t.string   "match_level"
+    t.string   "location_type"
     t.string   "address_1"
     t.string   "address_2"
     t.string   "city"
@@ -102,8 +102,8 @@ ActiveRecord::Schema.define(version: 20150224001912) do
     t.string   "zip_code"
     t.integer  "person_id"
     t.integer  "district_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
   create_table "people", force: :cascade do |t|
