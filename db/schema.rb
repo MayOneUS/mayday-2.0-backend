@@ -73,6 +73,32 @@ ActiveRecord::Schema.define(version: 20150224192259) do
   add_index "legislators", ["district_id"], name: "index_legislators_on_district_id", using: :btree
   add_index "legislators", ["state_id"], name: "index_legislators_on_state_id", using: :btree
 
+  create_table "locations", force: :cascade do |t|
+    t.string   "location_type"
+    t.string   "address_1"
+    t.string   "address_2"
+    t.string   "city"
+    t.integer  "state_id"
+    t.string   "zip_code"
+    t.integer  "person_id"
+    t.integer  "district_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "locations", ["district_id"], name: "index_locations_on_district_id", using: :btree
+  add_index "locations", ["person_id"], name: "index_locations_on_person_id", using: :btree
+  add_index "locations", ["state_id"], name: "index_locations_on_state_id", using: :btree
+
+  create_table "people", force: :cascade do |t|
+    t.string   "email"
+    t.string   "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "people", ["email"], name: "index_people_on_email", unique: true, using: :btree
+
   create_table "states", force: :cascade do |t|
     t.string   "name"
     t.string   "abbrev"
@@ -113,6 +139,9 @@ ActiveRecord::Schema.define(version: 20150224192259) do
   add_foreign_key "districts", "states"
   add_foreign_key "legislators", "districts"
   add_foreign_key "legislators", "states"
+  add_foreign_key "locations", "districts"
+  add_foreign_key "locations", "people"
+  add_foreign_key "locations", "states"
   add_foreign_key "targets", "campaigns"
   add_foreign_key "targets", "legislators"
   add_foreign_key "zip_codes", "states"
