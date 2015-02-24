@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150224001912) do
+ActiveRecord::Schema.define(version: 20150224192259) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20150224001912) do
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "ended_at"
   end
 
   create_table "districts", force: :cascade do |t|
@@ -40,7 +41,7 @@ ActiveRecord::Schema.define(version: 20150224001912) do
   add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", unique: true, using: :btree
 
   create_table "legislators", force: :cascade do |t|
-    t.string   "bioguide_id",         null: false
+    t.string   "bioguide_id",                         null: false
     t.date     "birthday"
     t.string   "chamber"
     t.integer  "district_id"
@@ -63,8 +64,9 @@ ActiveRecord::Schema.define(version: 20150224001912) do
     t.string   "title"
     t.string   "verified_first_name"
     t.string   "verified_last_name"
-    t.datetime "created_at",          null: false
-    t.datetime "updated_at",          null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.boolean  "with_us",             default: false
   end
 
   add_index "legislators", ["bioguide_id"], name: "index_legislators_on_bioguide_id", unique: true, using: :btree
@@ -76,13 +78,17 @@ ActiveRecord::Schema.define(version: 20150224001912) do
     t.string   "address_1"
     t.string   "address_2"
     t.string   "city"
-    t.string   "state"
-    t.string   "postal_code"
+    t.integer  "state_id"
+    t.string   "zip_code"
     t.integer  "person_id"
     t.integer  "district_id"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
+
+  add_index "locations", ["district_id"], name: "index_locations_on_district_id", using: :btree
+  add_index "locations", ["person_id"], name: "index_locations_on_person_id", using: :btree
+  add_index "locations", ["state_id"], name: "index_locations_on_state_id", using: :btree
 
   create_table "people", force: :cascade do |t|
     t.string   "email"
@@ -90,6 +96,8 @@ ActiveRecord::Schema.define(version: 20150224001912) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_index "people", ["email"], name: "index_people_on_email", unique: true, using: :btree
 
   create_table "states", force: :cascade do |t|
     t.string   "name"
@@ -131,6 +139,9 @@ ActiveRecord::Schema.define(version: 20150224001912) do
   add_foreign_key "districts", "states"
   add_foreign_key "legislators", "districts"
   add_foreign_key "legislators", "states"
+  add_foreign_key "locations", "districts"
+  add_foreign_key "locations", "people"
+  add_foreign_key "locations", "states"
   add_foreign_key "targets", "campaigns"
   add_foreign_key "targets", "legislators"
   add_foreign_key "zip_codes", "states"
