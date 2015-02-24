@@ -12,7 +12,6 @@
 class District < ActiveRecord::Base
   belongs_to :state
   has_many :senators, through: :state
-  has_many :target_senators, -> { targeted }, through: :state
   has_and_belongs_to_many :zip_codes
   has_one :representative, class_name: "Legislator"
   has_one :target_rep, -> { targeted }, class_name: "Legislator"
@@ -41,12 +40,20 @@ class District < ActiveRecord::Base
     self.representative = Legislator.fetch_one(district: self)
   end
 
+  def unconvinced_rep
+    representative unless representative.with_us?
+  end
+
+  def unconvinced_legislators
+    senators.eligible.unconvinced + [unconvinced_rep].compact
+  end
+
   def targeted?
     campaigns.active.any?
   end
 
   def target_legislators
-    target_senators + [target_rep].compact
+    senators.targeted + [target_rep].compact
   end
 
   def targeted_by_campaign?(campaign)

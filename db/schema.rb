@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150224015050) do
+ActiveRecord::Schema.define(version: 20150224192259) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,7 +41,7 @@ ActiveRecord::Schema.define(version: 20150224015050) do
   add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", unique: true, using: :btree
 
   create_table "legislators", force: :cascade do |t|
-    t.string   "bioguide_id",         null: false
+    t.string   "bioguide_id",                         null: false
     t.date     "birthday"
     t.string   "chamber"
     t.integer  "district_id"
@@ -64,8 +64,9 @@ ActiveRecord::Schema.define(version: 20150224015050) do
     t.string   "title"
     t.string   "verified_first_name"
     t.string   "verified_last_name"
-    t.datetime "created_at",          null: false
-    t.datetime "updated_at",          null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.boolean  "with_us",             default: false
   end
 
   add_index "legislators", ["bioguide_id"], name: "index_legislators_on_bioguide_id", unique: true, using: :btree

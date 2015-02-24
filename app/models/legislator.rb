@@ -19,6 +19,7 @@ class Legislator < ActiveRecord::Base
   scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
   scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
   scope :top_priority, -> { targeted.merge(Target.top_priority) }
+  scope :unconvinced,  -> { where(with_us: false) }
 
   def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
                                                     senate_class: nil)
