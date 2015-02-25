@@ -21,9 +21,9 @@ class Connection < ActiveRecord::Base
   # validates :legislator, uniqueness: { scope: :call }
 
   RESPONSE_CODES = {
-    '1': 'success',
-    '2': 'hungup',
-    '3': 'no answer'
+    '1' => 'success',
+    '2' => 'hungup',
+    '3' => 'no answer'
   }
 
   scope :uncompleted, -> { where(state: nil, remote_id: nil) }

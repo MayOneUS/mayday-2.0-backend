@@ -9,7 +9,7 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       r.Say 'We need you to connect with your congressperson and legislator. We are going to put you in touch with '
       r.Say 'Whatever other intro text'
-      r.redirect new_connection_path
+      r.redirect calls_new_connection_url
     end
 
     render_twiml response
@@ -21,10 +21,8 @@ class CallsController < ApplicationController
   def new_connection
     response = Twilio::TwiML::Response.new do |r|
       if active_call.targeted_legislators.any?
-        r.Dial action: calls_connection_gather_prompt_url do |dial|
-          connection = active_call.create_connection!
-          dial.Dial connection.legislator.phone
-        end
+        connection = active_call.create_connection!
+        r.Dial connection.legislator.phone, action: calls_connection_gather_prompt_url
       else
         r.Say 'We don\'t have any targets for you. Please try again later.'
         r.Hangup
@@ -39,10 +37,10 @@ class CallsController < ApplicationController
   # CallSid - active_call's remote_id from twilio(required)
   # DialCallSid - dialed call's remote_id from twilio (required)
   def connection_gather_prompt
-    active_connection = active_call.connections.uncompleted.last
+    active_connection = active_call.last_connection
     active_connection.update(remote_id: params['DialCallSid'])
     response = Twilio::TwiML::Response.new do |r|
-      r.Gather action: calls_connection_gather_url(connection_id: connection.id) do |gather|
+      r.Gather action: calls_connection_gather_url(connection_id: active_connection.id) do |gather|
         gather.Say 'How did the senator respond? Press 1 for positively, press 2 for negatively'
       end
     end

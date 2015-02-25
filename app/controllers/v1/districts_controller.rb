@@ -1,4 +1,5 @@
 class V1::DistrictsController < V1::BaseController
+
   def index
     if address = params[:address].presence
       output = get_coords(address, params[:city], params[:state], params[:zip])

@@ -58,4 +58,12 @@ FactoryGirl.define do
       end
     end
   end
+
+  factory :call do
+    zip_code
+  end
+
+  factory :connection do
+    call
+  end
 end

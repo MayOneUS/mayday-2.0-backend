@@ -15,7 +15,9 @@
 
 class Call < ActiveRecord::Base
   has_many :connections
+  has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Connection'
   belongs_to :zip_code
+  belongs_to :person
 
   def create_connection!
     connections.create(legislator: random_target)
@@ -32,4 +34,5 @@ class Call < ActiveRecord::Base
   def random_target
     (targeted_legislators - called_legislators).sample
   end
+
 end

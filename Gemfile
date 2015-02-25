@@ -41,6 +41,7 @@ end
 
 group :test do
   gem "codeclimate-test-reporter"
+  gem 'oga' #xml parsing
   gem 'factory_girl_rails'
   gem 'ffaker'
   gem 'sinatra'
