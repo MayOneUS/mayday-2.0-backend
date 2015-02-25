@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150224192259) do
+ActiveRecord::Schema.define(version: 20150224001912) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,19 +19,17 @@ ActiveRecord::Schema.define(version: 20150224192259) do
   create_table "calls", force: :cascade do |t|
     t.string   "remote_id"
     t.integer  "district_id"
-    t.integer  "phone_origin"
+    t.integer  "person_id"
     t.string   "state"
     t.datetime "ended_at"
-    t.string   "source"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "campaigns", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "ended_at"
   end
 
   create_table "connections", force: :cascade do |t|
@@ -63,7 +61,7 @@ ActiveRecord::Schema.define(version: 20150224192259) do
   add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", unique: true, using: :btree
 
   create_table "legislators", force: :cascade do |t|
-    t.string   "bioguide_id",                         null: false
+    t.string   "bioguide_id",         null: false
     t.date     "birthday"
     t.string   "chamber"
     t.integer  "district_id"
@@ -86,9 +84,8 @@ ActiveRecord::Schema.define(version: 20150224192259) do
     t.string   "title"
     t.string   "verified_first_name"
     t.string   "verified_last_name"
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.boolean  "with_us",             default: false
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
   end
 
   add_index "legislators", ["bioguide_id"], name: "index_legislators_on_bioguide_id", unique: true, using: :btree

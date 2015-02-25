@@ -43,6 +43,7 @@ FactoryGirl.define do
 
   factory :zip_code do
     state
+    sequence(:zip_code) { |n| "2#{n.to_s.rjust(4,'0')}" }
   end
 
   factory :campaign do
@@ -59,8 +60,14 @@ FactoryGirl.define do
     end
   end
 
+  factory :person do
+    sequence(:email) { |n| "name_#{n}@gmail.com" }
+    sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
+  end
+
   factory :call do
-    zip_code
+    district
+    person
   end
 
   factory :connection do
