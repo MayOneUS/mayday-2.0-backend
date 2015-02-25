@@ -11,15 +11,15 @@ class Legislator < ActiveRecord::Base
   validates :state,    presence: true, if: :senator?
   validates :district, absence:  true, if: :senator?
 
-  attr_accessor :district_code, :state_abbrev
-  before_validation :assign_district, :assign_state
-
-  scope :senate,       -> { where(district: nil) }
-  scope :house,        -> { where(state: nil) }
+  scope :senate,       -> { where(chamber: 'senate') }
+  scope :house,        -> { where(chamber: 'house') }
   scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
   scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
   scope :top_priority, -> { targeted.merge(Target.top_priority) }
   scope :unconvinced,  -> { where(with_us: false) }
+
+  attr_accessor :district_code, :state_abbrev
+  before_validation :assign_district, :assign_state
 
   def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
                                                     senate_class: nil)
@@ -57,7 +57,7 @@ class Legislator < ActiveRecord::Base
 
   def self.default_targets(excluding: nil, count: 5)
     if excluding
-      output = where.not(id: excluding)
+      output = where.not(id: excluding.map(&:id))
     else
       output = all
     end

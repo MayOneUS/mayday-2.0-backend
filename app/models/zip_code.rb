@@ -14,7 +14,7 @@
 #
 
 class ZipCode < ActiveRecord::Base
-  belongs_to :state
+  belongs_to :state, required: true
   has_many :senators, through: :state
   has_many :target_senators, -> { targeted }, through: :state
   has_and_belongs_to_many :districts
@@ -22,7 +22,6 @@ class ZipCode < ActiveRecord::Base
   has_many :target_reps, -> { targeted }, through: :districts
   has_many :campaigns, through: :districts
 
-  validates :state, presence: true
   validates :zip_code, presence: true, uniqueness: { case_sensitive: false },
       format: { with: /\A\d{5}\z/ }
 

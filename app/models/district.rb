@@ -10,14 +10,13 @@
 #
 
 class District < ActiveRecord::Base
-  belongs_to :state
+  belongs_to :state, required: true
   has_many :senators, through: :state
   has_and_belongs_to_many :zip_codes
   has_one :representative, class_name: "Legislator"
   has_one :target_rep, -> { targeted }, class_name: "Legislator"
   has_many :campaigns, through: :representative
 
-  validates :state, presence: true
   validates :district, uniqueness: { scope: :state }
 
   def self.find_by_state_and_district(state:, district:)
