@@ -13,7 +13,7 @@ class Person < ActiveRecord::Base
   before_save { self.email = email.downcase }
 
   alias_method :location_association, :location
-  delegate :zip_code, :district, :state, :address_1, to: :location
+  delegate :zip_code, :city, :address_1, to: :location
 
   def location
     location_association || build_location
@@ -21,11 +21,12 @@ class Person < ActiveRecord::Base
 
   def update_location(address: nil, city: nil, state: nil, zip: nil)
     if address
-      if district = District.find_by_address( address: address,
-                                              city:    city,
-                                              state:   state,
-                                              zip:     zip )
+      if district = District.find_by_address(address: address,
+                                             city:    city,
+                                             state:   state,
+                                             zip:     zip)
         location.address_1 = address
+        location.city      = city
         location.district  = district
         location.state     = district.state
         location.zip_code  = zip if zip = ZipCode.valid_zip_5(zip)
@@ -33,6 +34,7 @@ class Person < ActiveRecord::Base
     elsif zip = ZipCode.valid_zip_5(zip) and zip != location.zip_code
       zip_code = ZipCode.find_by(zip_code: zip)
       location.address_1 = nil
+      location.city      = nil
       location.zip_code  = zip
       location.state     = zip_code.try(:state)
       location.district  = zip_code.try(:single_district)
