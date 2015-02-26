@@ -9,10 +9,22 @@ web:
     - "3000:3000"
   links:
     - db
+    - redis
   environment:
     - DATABASE_URL=postgres://postgres@db:5432/postgres
+    - REDIS_URL=redis://redis@redis:6379/
+    - NATION_BUILDER_ID
+    - NATION_BUILDER_SECRET
+    - NATION_BUILDER_DOMAIN
+    - NATION_BUILDER_API_TOKEN
+    - NATION_BUILDER_LIST_IDS
 
 db:
   image: postgres:9.4
   ports:
     - "5432"
+
+redis:
+  image: redis:2.6
+  ports:
+    - "6379"
