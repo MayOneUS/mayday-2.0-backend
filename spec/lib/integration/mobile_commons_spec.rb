@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe Integration::MobileCommons do
-  describe "#district_from_coords" do
+  describe ".district_from_coords" do
     context "good coords" do
       subject(:response) do
         Integration::MobileCommons.district_from_coords([35.75, 86.88])

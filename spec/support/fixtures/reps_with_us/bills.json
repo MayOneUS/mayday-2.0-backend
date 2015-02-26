@@ -1,0 +1,79 @@
+{
+  "bills":[
+    {
+      "chamber":"senate",
+      "cosponsors":[
+        "B001230",
+        "B000711",
+        "W000817"
+      ],
+      "congressUrl":"http://beta.congress.gov/bill/113th/senate-bill/2023",
+      "popularTitle":null,
+      "govtrackUrl":"https://www.govtrack.us/congress/bills/113/s2023",
+      "reform":4,
+      "shortTitle":"Fair Elections Now Act",
+      "id":"s2023-113",
+      "billType":"s",
+      "introducedOn":"2014-02-12",
+      "opencongressUrl":"http://www.opencongress.org/bill/s2023-113",
+      "sponsor":"D000563"
+    },
+    {
+      "chamber":"house",
+      "cosponsors":[
+        "B001279",
+        "B001281",
+        "K000382",
+        "L000559",
+        "L000570",
+        "Y000062"
+      ],
+      "congressUrl":"http://beta.congress.gov/bill/113th/house-bill/20",
+      "popularTitle":null,
+      "govtrackUrl":"https://www.govtrack.us/congress/bills/113/hr20",
+      "reform":0,
+      "shortTitle":"Government By the People Act of 2014",
+      "id":"hr20-113",
+      "billType":"hr",
+      "introducedOn":"2014-02-05",
+      "opencongressUrl":"http://www.opencongress.org/bill/hr20-113",
+      "sponsor":"S001168"
+    },
+    {
+      "chamber":"house",
+      "cosponsors":[
+
+      ],
+      "congressUrl":"http://beta.congress.gov/bill/113th/house-bill/3586",
+      "popularTitle":null,
+      "govtrackUrl":"https://www.govtrack.us/congress/bills/113/hr3586",
+      "reform":1,
+      "shortTitle":"Citizen Involvement in Campaigns Act of 2013",
+      "id":"hr3586-113",
+      "billType":"hr",
+      "introducedOn":"2013-11-21",
+      "opencongressUrl":"http://www.opencongress.org/bill/hr3586-113",
+      "sponsor":"P000265"
+    },
+    {
+      "chamber":"house",
+      "cosponsors":[
+        "B000574",
+        "C001037",
+        "C001080",
+        "C001069",
+        "W000808"
+      ],
+      "congressUrl":"http://beta.congress.gov/bill/113th/house-bill/269",
+      "popularTitle":null,
+      "govtrackUrl":"https://www.govtrack.us/congress/bills/113/hr269",
+      "reform":4,
+      "shortTitle":"Fair Elections Now Act",
+      "id":"hr269-113",
+      "billType":"hr",
+      "introducedOn":"2013-01-15",
+      "opencongressUrl":"http://www.opencongress.org/bill/hr269-113",
+      "sponsor":"Y000062"
+    }
+  ]
+}
