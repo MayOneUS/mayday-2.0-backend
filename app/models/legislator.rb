@@ -21,8 +21,7 @@ class Legislator < ActiveRecord::Base
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
 
-  def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
-                                                    senate_class: nil)
+  def self.fetch_one(bioguide_id: nil, district: nil, state: nil, senate_class: nil)
     if district
       state = district.state.abbrev
       district = district.district
@@ -50,6 +49,13 @@ class Legislator < ActiveRecord::Base
     end
   end
 
+  def self.recheck_reps_with_us
+    if ids = Integration::RepsWithUs.all_reps_with_us.presence
+      where.not(bioguide_id: ids).update_all(with_us: false)
+      where(bioguide_id: ids).update_all(with_us: true)
+    end
+  end
+
   def self.find_or_create_by_hash(hash)
     bioguide_id = hash.delete('bioguide_id')
     create_with(hash).find_or_create_by(bioguide_id: bioguide_id)
@@ -64,6 +70,10 @@ class Legislator < ActiveRecord::Base
     if stats = results['legislators'].try(:first)
       update(stats)
     end
+  end
+
+  def update_reform_status # what's a better name?
+    update(with_us: Integration::RepsWithUs.rep_with_us?(bioguide_id))
   end
 
   def senator?
