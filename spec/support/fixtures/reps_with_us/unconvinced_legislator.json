@@ -1,0 +1,13 @@
+{
+  "legislator":{
+    "chamber":"house",
+    "stateName":"Florida",
+    "candidates":null,
+    "lastName":"Clawson",
+    "firstName":"Curtis",
+    "district":19,
+    "id":"C001102",
+    "state":"FL",
+    "party":"R"
+  }
+}

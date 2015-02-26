@@ -9,10 +9,15 @@ web:
     - "3000:3000"
   links:
     - db
+    - redis
+  env_file:
+    - .env
   environment:
     - DATABASE_URL=postgres://postgres@db:5432/postgres
+    - REDIS_URL=redis://redis@redis:6379/
 
 db:
   image: postgres:9.4
-  ports:
-    - "5432"
+
+redis:
+  image: redis:2.6
