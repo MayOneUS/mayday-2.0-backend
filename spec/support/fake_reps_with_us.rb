@@ -7,16 +7,14 @@ class FakeRepsWithUs < Sinatra::Base
   end
 
   get "/legislators/:id" do
-    file = case params[:id]
-           when 'S001168'
-             'rep_with_us.json'
-           when 'bad'
-             'not_found.html'
-           else
-             'unconvinced_legislator.json'
-           end
-
-    json_response 200, file
+    case params[:id]
+    when 'S001168'
+      json_response 200, 'rep_with_us.json'
+    when 'bad'
+      json_response 404, 'not_found.html'
+    else
+      json_response 200, 'unconvinced_legislator.json'
+    end
   end
 
   private

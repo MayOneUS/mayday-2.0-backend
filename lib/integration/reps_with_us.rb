@@ -24,6 +24,8 @@ class Integration::RepsWithUs
     reps.uniq
   rescue JSON::ParserError
     nil
+  rescue RestClient::ResourceNotFound
+    nil
   end
 
   def self.rep_with_us?(bioguide_id)
@@ -32,6 +34,8 @@ class Integration::RepsWithUs
       legislator[SPONSORED_KEY].present? || legislator[COSPONSORED_KEY].present?
     end
   rescue JSON::ParserError
+    nil
+  rescue RestClient::ResourceNotFound
     nil
   end
 
