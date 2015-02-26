@@ -1,5 +1,5 @@
 class Person < ActiveRecord::Base
-  has_one :location, autosave: true
+  has_one :location
   has_one :district, through: :location
   has_one :representative, through: :district
   has_one :target_rep, -> { targeted }, through: :district
