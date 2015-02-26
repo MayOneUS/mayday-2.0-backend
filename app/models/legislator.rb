@@ -55,13 +55,8 @@ class Legislator < ActiveRecord::Base
     create_with(hash).find_or_create_by(bioguide_id: bioguide_id)
   end
 
-  def self.default_targets(excluding: nil, count: 5)
-    if excluding
-      output = where.not(id: excluding.map(&:id))
-    else
-      output = all
-    end
-    output.top_priority.first(count)
+  def self.default_targets(excluding: [], count: 5)
+    where.not(id: excluding.map(&:id)).top_priority.first(count)
   end
 
   def refetch

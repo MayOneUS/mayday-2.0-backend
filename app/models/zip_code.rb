@@ -25,16 +25,17 @@ class ZipCode < ActiveRecord::Base
   validates :zip_code, presence: true, uniqueness: { case_sensitive: false },
       format: { with: /\A\d{5}\z/ }
 
+  def self.valid_zip_5(string)
+    /\A(?<zip>\d{5})[^\w]?(\d{4})?\z/ =~ string
+    zip
+  end
+
   def single_district?
     districts.size == 1
   end
 
   def single_district
     districts.first if single_district?
-  end
-
-  def address_required?
-    targeted? && !single_district?
   end
 
   def targeted?

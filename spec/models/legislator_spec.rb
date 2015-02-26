@@ -87,11 +87,10 @@ describe Legislator do
         expect(Legislator.default_targets(count: 2).count).to eq 2
       end
       it "excludes single legislator" do
-        expect(Legislator.default_targets(excluding: rep.id)).not_to include(rep)
-        expect(Legislator.default_targets(excluding: rep.id).count).to eq 2
+        expect(Legislator.default_targets(excluding: [rep])).not_to include(rep)
       end
       it "excludes multiple legislators" do
-        expect(Legislator.default_targets(excluding: [rep.id, senator.id]).count).to eq 1
+        expect(Legislator.default_targets(excluding: [rep, senator]).count).to eq 1
       end
     end
 
@@ -121,8 +120,14 @@ describe Legislator do
     end
 
     context "with args" do
+      subject(:response) { senator.as_json(extra_key: 'foo') }
+
       it "returns proper fields" do
-        expect(senator.as_json(extra_key: false).keys).to match_array(keys + [:extra_key])
+        expect(response.keys).to match_array(keys + [:extra_key])
+      end
+      
+      it "returns proper value for extra field" do
+        expect(response[:extra_key]).to eq 'foo'
       end
     end
   end

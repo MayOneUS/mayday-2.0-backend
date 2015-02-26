@@ -1,7 +1,6 @@
 FactoryGirl.define do
-  factory :state do
-    sequence(:name) { |n| "State#{n}" }
-    sequence(:abbrev) { |n| (n % 676).divmod(26).map{ |i| ('A'..'Z').to_a[i] }.join }
+  factory :person do
+    sequence(:email) { |n| "user#{n}@example.com" }
   end
 
   factory :legislator do
@@ -10,6 +9,7 @@ FactoryGirl.define do
     last_name 'Boxer'
     phone '202-224-3553'
     party 'D'
+    term_end 1.year.from_now
 
     factory :senator do
       chamber 'senate'
@@ -29,12 +29,16 @@ FactoryGirl.define do
     state
   end
 
+  factory :state do
+    sequence(:name) { |n| "State#{n}" }
+    sequence(:abbrev) { |n| (n % 529).divmod(23).map{ |i| ('D'..'Z').to_a[i] }.join }
+  end
+
   factory :zip_code do
     state
   end
 
   factory :target do
-
     campaign
 
     factory :rep_target do

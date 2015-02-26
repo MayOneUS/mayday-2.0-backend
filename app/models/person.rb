@@ -6,15 +6,41 @@ class Person < ActiveRecord::Base
   has_one :state, through: :location
   has_many :senators, through: :state
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+  validates :email, presence: true, uniqueness: { case_sensitive: false },
+                    format: { with: VALID_EMAIL_REGEX }
 
   before_save { self.email = email.downcase }
 
-  alias_method :original_location, :location
-  delegate :zip_code, :zip_code=, :district, :district=, :state, :state=, to: :location
+  alias_method :location_association, :location
+  delegate :zip_code,  :zip_code=,
+           :district,  :district=,
+           :state,     :state=,
+           :address_1, :address_1=, to: :location
 
   def location
-    original_location || build_location
+    location_association || build_location
+  end
+
+  def update_location(address: nil, city: nil, state: nil, zip: nil)
+    if address
+      if district = District.find_by_address( address: address,
+                                              city:    city,
+                                              state:   state,
+                                              zip:     zip )
+        self.address_1 = address
+        self.district  = district
+        self.state     = district.state
+        self.zip_code = zip if zip = ZipCode.valid_zip_5(zip)
+      end
+    elsif zip = ZipCode.valid_zip_5(zip) and zip != self.zip_code
+      self.address_1 = nil
+      self.zip_code = zip
+      zip_code = ZipCode.find_by(zip_code: zip)
+      self.state = zip_code.try(:state)
+      self.district = zip_code.try(:single_district)
+    end
+    self.save
   end
 
   def address_required?
@@ -43,6 +69,6 @@ class Person < ActiveRecord::Base
 
   def target_legislators_json(count: 5)
     locals = unconvinced_legislators
-    locals.as_json(local: true) + other_targets(count: count, excluding: locals)
+    locals.as_json('local' => true) + other_targets(count: count, excluding: locals).as_json('local' => false)
   end
 end
