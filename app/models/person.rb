@@ -62,13 +62,13 @@ class Person < ActiveRecord::Base
     Legislator.default_targets(excluding: excluding, count: num_to_fetch)
   end
 
-  def target_legislators(count: 5)
+  def target_legislators(json: false, count: 5)
     locals = unconvinced_legislators
-    locals + other_targets(count: count, excluding: locals)
-  end
-
-  def target_legislators_json(count: 5)
-    locals = unconvinced_legislators
-    locals.as_json('local' => true) + other_targets(count: count, excluding: locals).as_json('local' => false)
+    others = other_targets(count: count, excluding: locals)
+    if json
+      locals.as_json('local' => true) + others.as_json('local' => false)
+    else
+      locals + others
+    end
   end
 end
