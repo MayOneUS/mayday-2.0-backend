@@ -24,7 +24,7 @@ describe Integration::Here do
       end
     end
 
-    context "insufficitent address" do
+    context "insufficient address" do
       subject(:response) do
         Integration::Here.geocode_address(address: '2020 Oregon St')
       end

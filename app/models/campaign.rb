@@ -11,15 +11,15 @@
 class Campaign < ActiveRecord::Base
   has_many :targets
   has_many :legislators, through: :targets
-  has_many :districts, through: :representatives
-  has_many :zip_codes, through: :districts
-  has_many :states, through: :senators
+  has_many :districts,   through: :representatives
+  has_many :zip_codes,   through: :districts
+  has_many :states,      through: :senators
 
   validates :name, presence: true
 
-  scope :active, -> { all } # need to implement active
+  scope :active, -> { where(ended_at: nil) }
 
   def active?
-    true
+    ended_at.blank?
   end
 end

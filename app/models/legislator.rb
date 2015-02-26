@@ -11,12 +11,15 @@ class Legislator < ActiveRecord::Base
   validates :state,    presence: true, if: :senator?
   validates :district, absence:  true, if: :senator?
 
+  scope :senate,       -> { where(chamber: 'senate') }
+  scope :house,        -> { where(chamber: 'house') }
+  scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
+  scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
+  scope :top_priority, -> { targeted.merge(Target.top_priority) }
+  scope :unconvinced,  -> { where(with_us: false) }
+
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
-
-  scope :senate,   -> { where(district: nil) }
-  scope :house,    -> { where(state: nil) }
-  scope :eligible, -> { where('term_end < ?', 2.years.from_now) }
 
   def self.fetch_one(bioguide_id: nil, district: nil, state: nil,
                                                     senate_class: nil)
@@ -52,6 +55,10 @@ class Legislator < ActiveRecord::Base
     create_with(hash).find_or_create_by(bioguide_id: bioguide_id)
   end
 
+  def self.default_targets(excluding: [], count: 5)
+    where.not(id: excluding.map(&:id)).top_priority.first(count)
+  end
+
   def refetch
     results = Integration::Sunlight.get_legislators(bioguide_id: bioguide_id)
     if stats = results['legislators'].try(:first)
@@ -68,16 +75,25 @@ class Legislator < ActiveRecord::Base
   end
 
   def name
-    first = self.verified_first_name || nickname || first_name
-    last  = self.verified_last_name  || last_name
+    first = verified_first_name || nickname || first_name
+    last  = verified_last_name  || last_name
     first + ' ' + last
   end
 
-  def serializable_hash(options)
-    super( options.merge(methods: [:name], only: [:phone]))
+  def state_abbrev
+    state ? state.abbrev : district.state.abbrev
+  end
+
+  def district_code
+    district.district if district
   end
 
   private
+
+  def serializable_hash(options)
+    super(methods: [:name, :state_abbrev, :district_code],
+            only: [:id, :party, :chamber, :state_rank]).merge(options || {})
+  end
 
   def assign_district
     if @district_code && representative?

@@ -14,13 +14,21 @@
 #
 
 class ZipCode < ActiveRecord::Base
-  belongs_to :state
+  belongs_to :state, required: true
+  has_many :senators, through: :state
+  has_many :target_senators, -> { targeted }, through: :state
   has_and_belongs_to_many :districts
+  has_many :representatives, through: :districts
+  has_many :target_reps, -> { targeted }, through: :districts
   has_many :campaigns, through: :districts
 
-  validates :state, presence: true
   validates :zip_code, presence: true, uniqueness: { case_sensitive: false },
       format: { with: /\A\d{5}\z/ }
+
+  def self.valid_zip_5(string)
+    /\A(?<zip>\d{5})[^\w]?(\d{4})?\z/ =~ string
+    zip
+  end
 
   def single_district?
     districts.size == 1
@@ -31,7 +39,15 @@ class ZipCode < ActiveRecord::Base
   end
 
   def targeted?
-    campaigns.active.any?
+    target_reps.any?
+  end
+
+  def target_legislators
+    if single_district?
+      target_senators + target_reps
+    else
+      []
+    end
   end
 
   def targeted_by_campaign?(campaign)
