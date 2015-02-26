@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Integration::MobileCommons do
+describe Integration::RepsWithUs do
   describe ".all_reps_with_us" do
     subject(:response) do
       Integration::RepsWithUs.all_reps_with_us
