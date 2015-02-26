@@ -40,7 +40,7 @@ class District < ActiveRecord::Base
   end
 
   def unconvinced_rep
-    representative unless representative.with_us?
+    representative if representative && !representative.with_us?
   end
 
   def unconvinced_legislators

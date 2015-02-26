@@ -2,9 +2,6 @@ require 'rails_helper'
 
 describe V1::LegislatorsController do
   describe "GET index" do
-    let(:campaign) { FactoryGirl.create(:campaign) }
-    let(:rep)      { FactoryGirl.create(:representative) }
-
     context "no params" do
       before { get :index }
 
@@ -22,38 +19,60 @@ describe V1::LegislatorsController do
     end
 
     context "good email" do
-      context "new user" do
-        before { get :index, { email: 'user@example.com' } }
-
-        it "returns valid user" do
-          expect(assigns(:user).valid?).to be true
-        end
-
-        it "sets user email" do
-          expect(assigns(:user).email).to eq 'user@example.com'
-        end
-      end
-
-      context "existing user" do
-        let!(:user) { FactoryGirl.create(:person, email: 'user@example.com') }
-        before { get :index, { email: 'user@example.com' } }
-
-        it "returns correct user" do
-          expect(assigns(:user)).to eq user
-        end
-      end
-    end
-
-    context "good email and address" do
+      let!(:campaign) { FactoryGirl.create(:campaign_with_reps, count: 3, priority: 1) }
       let (:state)    { FactoryGirl.create(:state, abbrev: 'CA') }
-      let!(:district) { FactoryGirl.create(:district, district: '13', state: state) }
-      
-      before do
-        get :index, { email: 'user@example.com', address: '2020 Oregon St', zip: '94703' }
+      let (:district) { FactoryGirl.create(:district, district: '13', state: state) }
+      let!(:senator)  { FactoryGirl.create(:senator, state: state, with_us: false) }
+      let!(:rep)      { FactoryGirl.create(:representative, district: district,
+                                                            with_us: true) }
+      let(:campaign_ids) { campaign.legislators.pluck(:id) }
+      let(:returned_ids) { assigns(:target_legislators).map{|tl| tl['id']} }
+
+      context "no address" do
+        context "new user" do
+          before { get :index, { email: 'user@example.com' } }
+
+          it "returns address required" do
+            expect(assigns(:address_required)).to be true
+          end
+
+          it "returns correct targets" do
+            expect(returned_ids).to eq campaign_ids
+          end
+
+          it "doesn't return local targets" do
+            expect(assigns(:target_legislators).first['local']).to be false
+          end
+        end
+
+        context "existing user with address info" do
+          let!(:user) { FactoryGirl.create(:person, email: 'user@example.com',
+                                                    district: district) }
+          before { get :index, { email: 'user@example.com' } }
+
+          it "returns address not required" do
+            expect(assigns(:address_required)).to be false
+          end
+
+          it "returns correct targets" do
+            expect(returned_ids).to eq [senator.id] + campaign_ids
+          end
+
+          it "sets local attribute for all targets" do
+            locals = assigns(:target_legislators).map{|tl| tl['local']}
+            expect(locals).to eq [true, false, false, false]
+          end
+        end
       end
 
-      it "assigns proper district to user" do
-        expect(assigns(:user).district).to eq district
+      context "good address" do
+        before do
+          get :index, { email: 'user@example.com', address: '2020 Oregon St', zip: '94703' }
+        end
+
+        it "returns correct targets" do
+          expect(returned_ids).to eq [senator.id] + campaign_ids
+        end
       end
     end
   end

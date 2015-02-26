@@ -1,6 +1,16 @@
 FactoryGirl.define do
   factory :person do
+    transient do
+      district nil
+      state nil
+      zip_code nil
+    end
     sequence(:email) { |n| "user#{n}@example.com" }
+    after(:create) do |person, evaluator|
+      person.create_location(district: evaluator.district,
+                             state:    evaluator.state,
+                             zip_code: evaluator.zip_code)
+    end
   end
 
   factory :legislator do
