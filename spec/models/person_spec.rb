@@ -64,6 +64,13 @@ describe Person do
       end
 
       context "different from zip already stored for person" do
+        context "bad zip" do
+          it "doesn't change location" do
+            expect {
+              person.update_location(zip: '999999')
+            }.to_not change { person.location }
+          end
+        end
         context "zip found" do
           let!(:zip) { FactoryGirl.create(:zip_code, zip_code: '94703') }
           let!(:new_district)  { FactoryGirl.create(:district) }

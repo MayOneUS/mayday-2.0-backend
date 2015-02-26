@@ -7,7 +7,7 @@ class V1::LegislatorsController < V1::BaseController
                              state:   params[:state],
                              zip:     params[:zip] )
     else
-      @error = 'user not found'
+      @error = "user not found"
     end
     render
   end

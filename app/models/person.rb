@@ -31,14 +31,14 @@ class Person < ActiveRecord::Base
         self.address_1 = address
         self.district  = district
         self.state     = district.state
-        self.zip_code = zip if zip = ZipCode.valid_zip_5(zip)
+        self.zip_code  = zip if zip = ZipCode.valid_zip_5(zip)
       end
     elsif zip = ZipCode.valid_zip_5(zip) and zip != self.zip_code
-      self.address_1 = nil
-      self.zip_code = zip
       zip_code = ZipCode.find_by(zip_code: zip)
-      self.state = zip_code.try(:state)
-      self.district = zip_code.try(:single_district)
+      self.address_1 = nil
+      self.zip_code  = zip
+      self.state     = zip_code.try(:state)
+      self.district  = zip_code.try(:single_district)
     end
     self.save
   end
