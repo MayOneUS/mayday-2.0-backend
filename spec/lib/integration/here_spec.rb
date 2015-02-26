@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Integration::Here do
 
-  describe "#geocode_address" do
+  describe ".geocode_address" do
     context "good address" do
       subject(:response) do
         Integration::Here.geocode_address( address:'2020 Oregon St',
@@ -24,7 +24,7 @@ describe Integration::Here do
       end
     end
 
-    context "insufficitent address" do
+    context "insufficient address" do
       subject(:response) do
         Integration::Here.geocode_address(address: '2020 Oregon St')
       end

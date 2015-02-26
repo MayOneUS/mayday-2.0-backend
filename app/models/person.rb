@@ -1,6 +1,74 @@
 class Person < ActiveRecord::Base
-  has_one :location
+  has_one :location, autosave: true
   has_one :district, through: :location
+  has_one :representative, through: :district
+  has_one :target_rep, -> { targeted }, through: :district
+  has_one :state, through: :location
+  has_many :senators, through: :state
 
-  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+  validates :email, presence: true, uniqueness: { case_sensitive: false },
+                    format: { with: VALID_EMAIL_REGEX }
+
+  before_save { self.email = email.downcase }
+
+  alias_method :location_association, :location
+  delegate :zip_code,  :zip_code=,
+           :district,  :district=,
+           :state,     :state=,
+           :address_1, :address_1=, to: :location
+
+  def location
+    location_association || build_location
+  end
+
+  def update_location(address: nil, city: nil, state: nil, zip: nil)
+    if address
+      if district = District.find_by_address( address: address,
+                                              city:    city,
+                                              state:   state,
+                                              zip:     zip )
+        self.address_1 = address
+        self.district  = district
+        self.state     = district.state
+        self.zip_code  = zip if zip = ZipCode.valid_zip_5(zip)
+      end
+    elsif zip = ZipCode.valid_zip_5(zip) and zip != self.zip_code
+      zip_code = ZipCode.find_by(zip_code: zip)
+      self.address_1 = nil
+      self.zip_code  = zip
+      self.state     = zip_code.try(:state)
+      self.district  = zip_code.try(:single_district)
+    end
+    self.save
+  end
+
+  def address_required?
+    district.blank?
+  end
+
+  def unconvinced_legislators
+    if district
+      district.unconvinced_legislators
+    elsif state
+      state.senators.eligible.unconvinced
+    else
+      []
+    end
+  end
+
+  def other_targets(count: 5, excluding: nil)
+    num_to_fetch = count - excluding.count
+    Legislator.default_targets(excluding: excluding, count: num_to_fetch)
+  end
+
+  def target_legislators(json: false, count: 5)
+    locals = unconvinced_legislators
+    others = other_targets(count: count, excluding: locals)
+    if json
+      locals.as_json('local' => true) + others.as_json('local' => false)
+    else
+      locals + others
+    end
+  end
 end
