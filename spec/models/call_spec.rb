@@ -2,14 +2,14 @@
 #
 # Table name: calls
 #
-#  id          :integer          not null, primary key
-#  remote_id   :string
-#  district_id :integer
-#  person_id   :integer
-#  state       :string
-#  ended_at    :datetime
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
+#  id         :integer          not null, primary key
+#  remote_id  :string
+#  person_id  :integer
+#  status     :string
+#  duration   :integer
+#  ended_at   :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 
 require 'rails_helper'

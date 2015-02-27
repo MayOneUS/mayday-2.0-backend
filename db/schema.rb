@@ -18,13 +18,12 @@ ActiveRecord::Schema.define(version: 20150224192259) do
 
   create_table "calls", force: :cascade do |t|
     t.string   "remote_id"
-    t.integer  "district_id"
     t.integer  "person_id"
     t.string   "status"
     t.integer  "duration"
     t.datetime "ended_at"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "campaigns", force: :cascade do |t|
@@ -38,7 +37,6 @@ ActiveRecord::Schema.define(version: 20150224192259) do
     t.string   "remote_id"
     t.integer  "call_id"
     t.integer  "legislator_id"
-    t.integer  "campaign_id"
     t.string   "status_from_user"
     t.string   "status"
     t.integer  "duration"

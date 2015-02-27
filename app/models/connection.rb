@@ -2,15 +2,15 @@
 #
 # Table name: connections
 #
-#  id              :integer          not null, primary key
-#  remote_id       :string
-#  call_id         :integer
-#  legislator_id   :integer
-#  campaign_id     :integer
-#  state_from_user :string
-#  state           :string
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id               :integer          not null, primary key
+#  remote_id        :string
+#  call_id          :integer
+#  legislator_id    :integer
+#  status_from_user :string
+#  status           :string
+#  duration         :integer
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
 #
 
 class Connection < ActiveRecord::Base
