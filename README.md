@@ -62,7 +62,7 @@ Once you are connected to heroku, you can use the following to help testing
     heroku run rake seed:purge      # Purge DB of all data
     heroku run rake seed:purge:api  # Purge DB of API generated data
 
-Note: only run `rake db:seed` and `rake db:dummy_data` after full purge
+Note: only run `rake db:seed` and `rake seed:dummy_data` after full purge
 
 ### Deploying to Production
 
