@@ -1,7 +1,7 @@
 mayday-2.0
 ==========
 
-[![Build Status](https://travis-ci.org/MayOneUS/mayday-2.0-backend.svg?branch=master)](https://travis-ci.org/MayOneUS/mayday-2.0-backend) 
+[![Build Status](https://travis-ci.org/MayOneUS/mayday-2.0-backend.svg?branch=master)](https://travis-ci.org/MayOneUS/mayday-2.0-backend)
 [![Code Climate](https://codeclimate.com/github/MayOneUS/mayday-2.0-backend/badges/gpa.svg)](https://codeclimate.com/github/MayOneUS/mayday-2.0-backend)
 
 The API-driven next-generation MAYDAY site
@@ -23,13 +23,20 @@ Getting started
 
 The app is a standard Rails app right now, so getting started should be straightforward for those with Rails experience.
 
-### Docker
+## Development Environment: Docker
 
 If you want to use [Docker](https://www.docker.com/) for local development, this repo comes with a `Dockerfile` and a [Docker Compose](https://docs.docker.com/compose/) configuration file (`docker-compose.yml`).
 
 If you already have Docker and Docker Compose installed, starting this app is as easy as `docker-compose up`.
 
-### Heroku
+*If you don't want to use Docker* for some reason, you can also just install ruby and all dependencies on your own:
+
+1. Install [RVM](https://rvm.io/rvm/install).
+1. Install Redis
+1. Install Posgres and set up a user account.
+1. Install gems w/ `bundle install`
+
+## Staging Environment:  Heroku
 
 To hook up this app with Heroku's command line tool in your development environment, follow these instructions:
 
@@ -41,14 +48,6 @@ To hook up this app with Heroku's command line tool in your development environm
 
 You can test if it works by running a command like `heroku logs`.
 
-## Continuous Integration
-
-The site currently uses [Travis CI](https://travis-ci.org/) for Continuous Integration (CI). Whenever new code is pushed to the master branch (or included in a pull request), Travis will start a new build for that code.
-
-Watch the builds here: https://travis-ci.org/MayOneUS/mayday-2.0-backend
-
-**All successful builds of the master branch will be automatically deployed to the mayone-staging Herkou app.**
-
 ## Deploying to production
 
 Deployments to production are still manual for now. If you have already configured Heroku as specified in the development section above, you're halfway there:
@@ -59,6 +58,14 @@ Deployments to production are still manual for now. If you have already configur
 You can now deploy to production the standard Heroku way. Example: `git push prod master`
 
 You can also look at production logs with `heroku logs --app mayone-prod`.
+
+## Continuous Integration
+
+The site currently uses [Travis CI](https://travis-ci.org/) for Continuous Integration (CI). Whenever new code is pushed to the master branch (or included in a pull request), Travis will start a new build for that code.
+
+Watch the builds here: https://travis-ci.org/MayOneUS/mayday-2.0-backend
+
+**All successful builds of the master branch will be automatically deployed to the mayone-staging Herkou app.**
 
 ## Application monitoring
 
@@ -72,14 +79,14 @@ The easiest way to access the monitoring data is through the Heroku dashboard:
 
 You will be automatically signed in to the New Relic dashboard.
 
-## Code Review Process
+## Contributing / Code Review Process
 
-Goal: Ensure at least two parties have reviewed any code commited for "production."
+Key Goal: Ensure at least two parties have reviewed any code commited for "production."
 
-### Process:
-1. Branch off any new feature development 
+## Process:
+1. Fork/Branch off any new feature development
 2. Regularly commit to your branch.
-3. When code is ready to be merged, create merge request from your branch into master.  Your merge request should be able to be merged by github and all/any tests should be passing.
+3. When done, create merge request into master. Your merge request should be conflict freeand all tests should be passing.
 4. Assign another developer to review your merge request.
 5. Merge request is reviewed and made on github.
 
