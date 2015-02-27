@@ -30,11 +30,13 @@ class Person < ActiveRecord::Base
         location.district  = district
         location.state     = district.state
         location.zip_code  = zip if zip = ZipCode.valid_zip_5(zip)
+      else
+        return nil
       end
     elsif zip = ZipCode.valid_zip_5(zip) and zip != location.zip_code
       zip_code = ZipCode.find_by(zip_code: zip)
       location.address_1 = nil
-      location.city      = nil
+      location.city      = city
       location.zip_code  = zip
       location.state     = zip_code.try(:state)
       location.district  = zip_code.try(:single_district)

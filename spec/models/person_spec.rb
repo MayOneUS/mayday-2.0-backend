@@ -19,7 +19,6 @@ describe Person do
       it "returns 5 legislators" do
         expect(legislators.count).to eq 5
       end
-
     end
 
     context "json" do

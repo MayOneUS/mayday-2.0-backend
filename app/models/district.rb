@@ -17,7 +17,7 @@ class District < ActiveRecord::Base
   has_one :target_rep, -> { targeted }, class_name: "Legislator"
   has_many :campaigns, through: :representative
 
-  validates :district, uniqueness: { scope: :state }
+  validates :district, presence: true, uniqueness: { scope: :state }
 
   def self.find_by_state_and_district(state:, district:)
     joins(:state).where('states.abbrev': state).find_by(district: district)
