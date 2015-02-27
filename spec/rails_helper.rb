@@ -35,6 +35,7 @@ RSpec.configure do |config|
     stub_request(:any, /#{Integration::MobileCommons::DOMAIN}/).to_rack(FakeMobileCommons)
     stub_request(:any, /#{Integration::Here::DOMAIN}/).to_rack(FakeHere)
     stub_request(:any, /#{Integration::Sunlight::DOMAIN}/).to_rack(FakeSunlight)
+    stub_request(:any, /#{Integration::RepsWithUs::DOMAIN}/).to_rack(FakeRepsWithUs)
   end
 
   config.before(:suite) do

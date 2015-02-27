@@ -9,7 +9,7 @@ The API-driven next-generation MAYDAY site
 Overview
 --------
 
-This is a [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database.
+This is a [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http://www.postgresql.org/) database and a [Redis](http://redis.io/) server.
 
 This is currently deployed on [Heroku](https://www.heroku.com/) in two environments:
 
@@ -25,9 +25,9 @@ The app is a standard Rails app right now, so getting started should be straight
 
 ### Docker
 
-If you want to use [Docker](https://www.docker.com/) for local development, this repo comes with a `Dockerfile` and a [Fig](http://www.fig.sh/index.html) configuration file (`fig.yml`).
+If you want to use [Docker](https://www.docker.com/) for local development, this repo comes with a `Dockerfile` and a [Docker Compose](https://docs.docker.com/compose/) configuration file (`docker-compose.yml`).
 
-If you already have Docker and Fig installed, starting this app is as easy as `fig up`.
+If you already have Docker and Docker Compose installed, starting this app is as easy as `docker-compose up`.
 
 ### Heroku
 
@@ -41,17 +41,15 @@ To hook up this app with Heroku's command line tool in your development environm
 
 You can test if it works by running a command like `heroku logs`.
 
-Continuous Integration
-----------------------
+## Continuous Integration
 
 The site currently uses [Travis CI](https://travis-ci.org/) for Continuous Integration (CI). Whenever new code is pushed to the master branch (or included in a pull request), Travis will start a new build for that code.
 
 Watch the builds here: https://travis-ci.org/MayOneUS/mayday-2.0-backend
 
-All successful builds of the master branch will be automatically deployed to the mayone-staging Herkou app.
+**All successful builds of the master branch will be automatically deployed to the mayone-staging Herkou app.**
 
-Deploying to production
------------------------
+## Deploying to production
 
 Deployments to production are still manual for now. If you have already configured Heroku as specified in the development section above, you're halfway there:
 
@@ -62,8 +60,7 @@ You can now deploy to production the standard Heroku way. Example: `git push pro
 
 You can also look at production logs with `heroku logs --app mayone-prod`.
 
-Application monitoring
-----------------------
+## Application monitoring
 
 This app is configured to use [New Relic](http://newrelic.com/)'s application monitoring.
 

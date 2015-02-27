@@ -1,0 +1,21 @@
+{
+  "legislator":{
+    "chamber":"house",
+    "stateName":"Maryland",
+    "candidates":[
+      "H6MD03292"
+    ],
+    "lastName":"Sarbanes",
+    "cosponsoredBills":[
+      "hr269-113"
+    ],
+    "firstName":"John",
+    "district":3,
+    "id":"S001168",
+    "state":"MD",
+    "party":"D",
+    "sponsoredBills":[
+      "hr20-113"
+    ]
+  }
+}
