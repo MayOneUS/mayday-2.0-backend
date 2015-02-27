@@ -1,7 +1,10 @@
 namespace :seed do
   desc "Seed Dummy Data"
   task dummy_data: :environment do
-    #load dummy data
+    Legislator.recheck_reps_with_us
+    campaign = Campaign.create(name: 'test campaign')
+    campaign.legislators = Legislator.unconvinced.first(20)
+    campaign.targets.limit(5).update_all(priority: 1)
   end
 
   desc "Purge DB of all data"
