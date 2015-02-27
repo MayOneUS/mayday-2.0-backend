@@ -57,7 +57,9 @@ You can test if it works by running a command like `heroku logs`.
 
 Once you are connected to heroku, you can use the following to help testing
 
-    heroku run rake db:seed #=> seeds the db w/ legislators, states, zips
+    heroku run rake db:seed        # seeds the db w/ legislators, states, zips
+    heroku run rake seed:purge     # Purge DB of all data
+    heroku run rake seed:purge:api # Purge DB of API generated data
 
 ### Deploying to Production
 
