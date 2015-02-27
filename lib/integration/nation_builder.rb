@@ -9,7 +9,7 @@ class Integration::NationBuilder
   }
   ALLOWED_PARAMS_PERSON = %w[birthdate do_not_call first_name last_name email email_opt_in employer is_volunteer mobile_opt_in
     mobile occupation phone primary_address recruiter_id sex tags request_ip skills rootstrikers_subscription uuid
-    pledge_page_slug fundraising email subscription maydayin30_entry_url voting_district_id map_lookup_district]
+    pledge_page_slug fundraising email_subscription maydayin30_entry_url voting_district_id map_lookup_district]
 
   def self.query_people_by_email(email)
     rescue_oauth_errors do

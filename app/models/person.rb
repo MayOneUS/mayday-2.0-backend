@@ -11,6 +11,7 @@ class Person < ActiveRecord::Base
                     format: { with: VALID_EMAIL_REGEX }
 
   before_save { self.email = email.downcase }
+  after_save :update_nation_builder
 
   alias_method :location_association, :location
   delegate :update_location, :zip_code, :city, :address_1, to: :location
@@ -46,5 +47,12 @@ class Person < ActiveRecord::Base
     else
       locals + others
     end
+  end
+
+  private
+
+  def update_nation_builder
+    nb_attributes = { attributes: self.slice(:email, *(changed)) }
+    Integration::NationBuilder.create_or_update_person(nb_attributes)
   end
 end
