@@ -13,35 +13,10 @@ class Person < ActiveRecord::Base
   before_save { self.email = email.downcase }
 
   alias_method :location_association, :location
-  delegate :zip_code, :city, :address_1, to: :location
+  delegate :update_location, :zip_code, :city, :address_1, to: :location
 
   def location
     location_association || build_location
-  end
-
-  def update_location(address: nil, city: nil, state: nil, zip: nil)
-    if address
-      if district = District.find_by_address(address: address,
-                                             city:    city,
-                                             state:   state,
-                                             zip:     zip)
-        location.address_1 = address
-        location.city      = city
-        location.district  = district
-        location.state     = district.state
-        location.zip_code  = zip if zip = ZipCode.valid_zip_5(zip)
-      else
-        return nil
-      end
-    elsif zip = ZipCode.valid_zip_5(zip) and zip != location.zip_code
-      zip_code = ZipCode.find_by(zip_code: zip)
-      location.address_1 = nil
-      location.city      = city
-      location.zip_code  = zip
-      location.state     = zip_code.try(:state)
-      location.district  = zip_code.try(:single_district)
-    end
-    location.save
   end
 
   def address_required?
