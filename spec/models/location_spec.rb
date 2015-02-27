@@ -15,10 +15,13 @@
 #  updated_at    :datetime         not null
 #
 
-class Location < ActiveRecord::Base
-  belongs_to :person
-  belongs_to :district
-  belongs_to :state
+require 'rails_helper'
 
-  validates :person, presence: true
+RSpec.describe Location, type: :model do
+  it "validates required associations" do
+    connection = Location.new
+    connection.valid?
+
+    expect(connection.errors).to have_key(:person)
+  end
 end

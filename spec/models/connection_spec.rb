@@ -16,5 +16,11 @@
 require 'rails_helper'
 
 RSpec.describe Connection, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it "validates required associations" do
+    connection = Connection.new
+    connection.valid?
+
+    expect(connection.errors).to have_key(:legislator)
+    expect(connection.errors).to have_key(:call)
+  end
 end

@@ -6,6 +6,7 @@ FactoryGirl.define do
       zip_code nil
     end
     sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
     after(:create) do |person, evaluator|
       person.create_location(district: evaluator.district,
                              state:    evaluator.state,
@@ -27,10 +28,14 @@ FactoryGirl.define do
       senate_class 1
       state
     end
-    
+
     factory :representative do
       chamber 'house'
       district
+    end
+
+    trait :targeted do
+      targets { build_list :target, 1, priority: 1 }
     end
   end
 
@@ -75,17 +80,16 @@ FactoryGirl.define do
     end
   end
 
-  factory :person do
-    sequence(:email) { |n| "name_#{n}@gmail.com" }
-    sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
-  end
-
   factory :call do
-    district
     person
   end
 
   factory :connection do
     call
+    association :legislator, factory: :senator
+
+    trait :completed do
+      status Call::CALL_STATUSES[:completed]
+    end
   end
 end

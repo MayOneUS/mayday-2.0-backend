@@ -97,9 +97,9 @@ describe CallsController,  type: :controller do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
       expect(Connection).to have_received(:find).with('1')
     end
-    it "sets the correct connection state" do
+    it "sets the correct connection status" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
-      expect(@connection).to have_received(:update).with(state_from_user: Connection::RESPONSE_CODES['1'])
+      expect(@connection).to have_received(:update).with(status_from_user: Connection::RESPONSE_CODES['1'])
     end
     it "redirects to new_connection_path" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1

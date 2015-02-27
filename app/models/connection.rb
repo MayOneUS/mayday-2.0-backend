@@ -18,7 +18,8 @@ class Connection < ActiveRecord::Base
   belongs_to :legislator
   belongs_to :campaign
 
-  # validates :legislator, uniqueness: { scope: :call }
+  validates :call, presence: true
+  validates :legislator, presence: true
 
   RESPONSE_CODES = {
     '1' => 'success',
@@ -26,5 +27,5 @@ class Connection < ActiveRecord::Base
     '3' => 'no answer'
   }
 
-  scope :uncompleted, -> { where(state: nil, remote_id: nil) }
+  scope :uncompleted, -> { where(status: nil, remote_id: nil) }
 end

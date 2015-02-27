@@ -4,9 +4,9 @@ class CreateConnections < ActiveRecord::Migration
       t.string :remote_id
       t.integer :call_id
       t.integer :legislator_id
-      t.integer :campaign_id
-      t.string :state_from_user
-      t.string :state
+      t.string :status_from_user
+      t.string :status
+      t.integer :duration
 
       t.timestamps null: false
     end

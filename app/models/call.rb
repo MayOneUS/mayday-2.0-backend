@@ -15,23 +15,35 @@
 class Call < ActiveRecord::Base
   has_many :connections
   has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Connection'
-  belongs_to :district
   belongs_to :person
+
+  delegate :target_legislators, to: :person
+
+  validates :person, presence: true
+
+  CALL_STATUSES = {
+    completed: 'completed',
+    no_answer: 'no-answer',
+    busy:      'busy',
+    canceled:  'canceled',
+    failed:    'failed'
+  }
 
   def create_connection!
     connections.create(legislator: random_target)
   end
 
-  def targeted_legislators
-    Legislator.limit(3).all
-  end
-
   def called_legislators
-    connections.where(state: 'completed').map(&:legislator)
+    connections.where(status: CALL_STATUSES[:completed]).map(&:legislator)
   end
 
   def random_target
-    (targeted_legislators - called_legislators).sample
+    (target_legislators - called_legislators).sample
   end
 
 end
+
+
+
+
+
