@@ -23,11 +23,13 @@ Getting started
 
 The app is a standard Rails app right now, so getting started should be straightforward for those with Rails experience.
 
-## Development Environment: Docker
+### Docker
 
 If you want to use [Docker](https://www.docker.com/) for local development, this repo comes with a `Dockerfile` and a [Docker Compose](https://docs.docker.com/compose/) configuration file (`docker-compose.yml`).
 
 If you already have Docker and Docker Compose installed, starting this app is as easy as `docker-compose up`.
+
+### RVM
 
 *If you don't want to use Docker* for some reason, you can also just install ruby and all dependencies on your own:
 
@@ -36,7 +38,10 @@ If you already have Docker and Docker Compose installed, starting this app is as
 1. Install Posgres and set up a user account.
 1. Install gems w/ `bundle install`
 
-## Staging Environment:  Heroku
+Deployment & Hosting Environments
+---------------------------------
+
+### Staging
 
 To hook up this app with Heroku's command line tool in your development environment, follow these instructions:
 
@@ -48,7 +53,14 @@ To hook up this app with Heroku's command line tool in your development environm
 
 You can test if it works by running a command like `heroku logs`.
 
-## Deploying to production
+#### Common Staging Commands
+
+Once you are connected to heroku, you can use the following to help testing
+
+    heroku run rake db:seed #=> seeds the db w/ legislators, states, zips
+
+### Deploying to Production
+
 
 Deployments to production are still manual for now. If you have already configured Heroku as specified in the development section above, you're halfway there:
 
