@@ -49,7 +49,7 @@ class Location < ActiveRecord::Base
     if fields.any?
       attributes = self.as_json.slice(*fields)
       nb_attributes = Hash[attributes.map {|k, v| [mappings[k] || k, v] }]
-      nb_args = { attributes: { email: person.email, primary_address: nb_attributes } }
+      nb_args = { attributes: { email: person.email, registered_address: nb_attributes } }
       Integration::NationBuilder.create_or_update_person(nb_args)
     end
   end

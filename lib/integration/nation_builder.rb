@@ -7,9 +7,10 @@ class Integration::NationBuilder
     people_by_email: '/api/v1/people/match?email=%s',
     rsvps_by_event:  '/api/v1/sites/mayday/pages/events/%s/rsvps'
   }
-  ALLOWED_PARAMS_PERSON = %w[birthdate do_not_call first_name last_name email email_opt_in employer is_volunteer mobile_opt_in
-    mobile occupation phone primary_address recruiter_id sex tags request_ip skills rootstrikers_subscription uuid
-    pledge_page_slug fundraising email_subscription maydayin30_entry_url voting_district_id map_lookup_district]
+  ALLOWED_PARAMS_PERSON = [:birthdate, :do_not_call, :first_name, :last_name, :email, :email_opt_in, :employer, :is_volunteer, :mobile_opt_in,
+    :mobile, :occupation, :phone, :recruiter_id, :sex, :tags, :request_ip, :skills, :rootstrikers_subscription, :uuid,
+    :pledge_page_slug, :fundraising, :email_subscription, :maydayin30_entry_url, :voting_district_id, :map_lookup_district,
+    registered_address: [:address1, :address2, :city, :state, :zip]]
   MAPPINGS_PERSON = {
     email: nil,
     phone: nil
