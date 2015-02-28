@@ -17,6 +17,7 @@ class Legislator < ActiveRecord::Base
   scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
   scope :top_priority, -> { targeted.merge(Target.top_priority) }
   scope :unconvinced,  -> { where(with_us: false) }
+  scope :with_us,      -> { where(with_us: true) }
 
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
