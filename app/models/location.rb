@@ -3,6 +3,8 @@ class Location < ActiveRecord::Base
   belongs_to :district
   belongs_to :state
 
+  after_save :update_nation_builder
+
   def update_location(address: nil, city: nil, state: nil, zip: nil)
     if address
       if district = District.find_by_address(address: address,
@@ -26,5 +28,29 @@ class Location < ActiveRecord::Base
       self.district  = zip_code.try(:single_district)
     end
     self.save
+  end
+
+  def state_abbrev
+    state ? state.abbrev : district.state.abbrev
+  end
+
+  private
+
+  def serializable_hash(options)
+    super(methods: [:state_abbrev],
+             only: [:address_1, :address_2, :city, :zip_code])
+  end
+
+  def update_nation_builder
+    mappings = Integration::NationBuilder::MAPPINGS_LOCATION.stringify_keys
+    fields = changed
+    fields.push('state_abbrev') if fields.delete('state_id')
+    fields = fields & mappings.keys
+    if fields.any?
+      attributes = self.as_json.slice(*fields)
+      nb_attributes = Hash[attributes.map {|k, v| [mappings[k] || k, v] }]
+      nb_args = { attributes: { email: person.email, primary_address: nb_attributes } }
+      Integration::NationBuilder.create_or_update_person(nb_args)
+    end
   end
 end

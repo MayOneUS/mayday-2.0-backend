@@ -10,6 +10,17 @@ class Integration::NationBuilder
   ALLOWED_PARAMS_PERSON = %w[birthdate do_not_call first_name last_name email email_opt_in employer is_volunteer mobile_opt_in
     mobile occupation phone primary_address recruiter_id sex tags request_ip skills rootstrikers_subscription uuid
     pledge_page_slug fundraising email_subscription maydayin30_entry_url voting_district_id map_lookup_district]
+  MAPPINGS_PERSON = {
+    email: nil,
+    phone: nil
+  }
+  MAPPINGS_LOCATION = {
+    address_1:    :address1,
+    address_2:    :address2,
+    city:         nil,
+    state_abbrev: :state,
+    zip_code:     :zip
+  }
 
   def self.query_people_by_email(email)
     rescue_oauth_errors do
@@ -19,7 +30,7 @@ class Integration::NationBuilder
   end
 
   def self.create_person_and_rsvp(event_id:, person_attributes: {}, person_id: nil)
-    raise ArgumentError, ':mising person_id or :person_attributes' if person_id.blank? && (person_attributes.nil? || person_attributes.empty?)
+    raise ArgumentError, 'missing :person_id or :person_attributes' if person_id.blank? && (person_attributes.nil? || person_attributes.empty?)
     person_id ||= create_or_update_person(attributes: person_attributes)['id']
     create_rsvp(event_id: event_id, person_id: person_id)
   end
