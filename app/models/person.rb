@@ -54,9 +54,11 @@ class Person < ActiveRecord::Base
   def update_nation_builder
     mappings = Integration::NationBuilder::MAPPINGS_PERSON.stringify_keys
     relevant_fields = changed & mappings.keys
-    attributes = self.slice(:email, *relevant_fields)
-    nb_attributes = Hash[attributes.map {|k, v| [mappings[k] || k, v] }]
-    nb_args = { attributes: nb_attributes }
-    Integration::NationBuilder.create_or_update_person(nb_args)
+    if relevant_fields.any?
+      attributes = self.slice(:email, *relevant_fields)
+      nb_attributes = Hash[attributes.map {|k, v| [mappings[k] || k, v] }]
+      nb_args = { attributes: nb_attributes }
+      Integration::NationBuilder.create_or_update_person(nb_args)
+    end
   end
 end
