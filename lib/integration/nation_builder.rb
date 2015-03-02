@@ -23,6 +23,16 @@ class Integration::NationBuilder
     zip_code:     :zip
   }
 
+  def self.person_params(person)
+    person = rename_keys(person, MAPPINGS_PERSON.stringify_keys)
+    { attributes: person }
+  end
+
+  def self.location_params(email, location)
+    address = rename_keys(location, MAPPINGS_LOCATION.stringify_keys)
+    { attributes: { email: email, registered_address: address } }
+  end
+
   def self.query_people_by_email(email)
     rescue_oauth_errors do
       response = request_handler(endpoint_path: ENDPOINTS[:people_by_email] % email)
@@ -97,6 +107,10 @@ class Integration::NationBuilder
   def self.parse_person_attributes(raw_parameters)
     parameters = ActionController::Parameters.new(raw_parameters)
     parameters.permit(ALLOWED_PARAMS_PERSON)
+  end
+
+  def self.rename_keys(hash, mappings)
+    Hash[hash.map {|k, v| [mappings[k] || k, v] }]
   end
 
 end

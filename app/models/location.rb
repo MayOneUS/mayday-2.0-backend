@@ -42,14 +42,8 @@ class Location < ActiveRecord::Base
   end
 
   def update_nation_builder
-    mappings = Integration::NationBuilder::MAPPINGS_LOCATION.stringify_keys
-    fields = changed
-    fields.push('state_abbrev') if fields.delete('state_id')
-    fields = fields & mappings.keys
-    if fields.any?
-      attributes = self.as_json.slice(*fields)
-      nb_attributes = Hash[attributes.map {|k, v| [mappings[k] || k, v] }]
-      nb_args = { attributes: { email: person.email, registered_address: nb_attributes } }
+    if (changed - ["district_id", "created_at", "updated_at"]).any?
+      nb_args = Integration::NationBuilder.location_params(person.email, self.as_json)
       Integration::NationBuilder.create_or_update_person(nb_args)
     end
   end
