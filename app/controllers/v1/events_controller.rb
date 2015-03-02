@@ -6,10 +6,8 @@ class V1::EventsController < V1::BaseController
     (1..7).each do |n|
       events << {
         "id":        n,
-        "name":      "Test Event #{n}",
         "starts_at": start + n.days,
         "ends_at":   start + n.days + 2.hours,
-        "time_zone": "Pacific Time (US & Canada)",
       }
     end
     render json: { events: events }, status: 200
@@ -24,5 +22,3 @@ class V1::EventsController < V1::BaseController
   end
 
 end
-
-
