@@ -31,7 +31,11 @@ class Location < ActiveRecord::Base
   end
 
   def state_abbrev
-    state ? state.abbrev : district.state.abbrev
+    if state
+      state.abbrev
+    elsif district
+      district.state.abbrev
+    end
   end
 
   private
