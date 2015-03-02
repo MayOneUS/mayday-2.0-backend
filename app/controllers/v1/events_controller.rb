@@ -1,5 +1,20 @@
 class V1::EventsController < V1::BaseController
 
+  def index
+    start = DateTime.parse("2015-03-14T21:00:00-05:00")
+    events = []
+    (1..7).each do |n|
+      events << {
+        "id":        n,
+        "name":      "Test Event #{n}",
+        "starts_at": start + n.days,
+        "ends_at":   start + n.days + 2.hours,
+        "time_zone": "Pacific Time (US & Canada)",
+      }
+    end
+    render json: { events: events }, status: 200
+  end
+
   def create_rsvp
     # Mario TODO: make following asyc
     response, status = rescue_error_messages do |variable|
