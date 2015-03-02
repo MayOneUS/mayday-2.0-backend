@@ -14,6 +14,7 @@ gem 'twilio-ruby'
 gem 'rails-api'
 gem 'jbuilder', '~> 2.0'
 gem 'versionist'
+gem 'rack-cors', :require => 'rack/cors'
 
 # SysOps + Monitoring
 gem 'rails_12factor', group: :production # Heroku-required

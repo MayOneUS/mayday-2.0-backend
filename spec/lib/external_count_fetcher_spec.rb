@@ -25,17 +25,19 @@ describe ExternalCountFetcher do
         count_fetcher.fetch_empty_counts!
         expect(count_fetcher.house_supporters.ttl).to eq(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
       end
-      new_time = (ExternalCountFetcher::REDIS_EXPIRE_SECONDS-2.hours.to_i)
-      expect(count_fetcher.house_supporters.ttl).to eq(new_time)
+      Timecop.freeze do
+        new_time = (ExternalCountFetcher::REDIS_EXPIRE_SECONDS-2.hours.to_i)
+        expect(count_fetcher.house_supporters.ttl).to eq(new_time)
+      end
     end
 
     it "should extend redis experation times" do
       redis = Redis.new
-      Timecop.freeze(Time.now - 2.hours) do
-        count_fetcher.fetch_empty_counts!
-        expect(count_fetcher.house_supporters.ttl).to eq(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
-      end
       Timecop.freeze do
+        Timecop.freeze(Time.now - 2.hours) do
+          count_fetcher.fetch_empty_counts!
+          expect(count_fetcher.house_supporters.ttl).to eq(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
+        end
         count_fetcher.house_supporters.expire(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
         expect(count_fetcher.house_supporters.ttl).to eq(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
       end
