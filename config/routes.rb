@@ -3,6 +3,8 @@ Rails.application.routes.draw do
     resources :legislators, only: :index
     resources :stats, only: :index
     resources :people, only: :create
-    post '/events/create_rsvp', to: 'events#create_rsvp'
+    resources :events, only: :index do
+      post :create_rsvp, on: :collection
+    end
   end
 end

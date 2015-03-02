@@ -53,8 +53,8 @@
         when :donations_total     then Integration::PledgeService.donations_total
         when :called_voters_count then 0
         when :reps_calls_count    then 0
-        when :house_supporters    then 0
-        when :senate_supporters   then 0
+        when :house_supporters    then Legislator.house.with_us.count
+        when :senate_supporters   then Legislator.senate.with_us.count
         else raise ArgumentError, "Unknown Key: #{key}"
       end
       redis_counter(counter_key).value = count
