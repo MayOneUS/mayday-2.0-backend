@@ -94,16 +94,16 @@ describe Integration::NationBuilder do
 
   describe "#list_counts" do
     it "formats url for target endpoint" do
-      allow(Integration::NationBuilder).to receive(:request_handler).and_call_original
+      allow(RestClient).to receive(:get).and_call_original
 
       Integration::NationBuilder.list_counts
 
-      expect(Integration::NationBuilder).to have_received(:request_handler).with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:lists])
+      expect(RestClient).to have_received(:get).with(ENV['NATION_BUILDER_DOMAIN'] + Integration::NationBuilder::ENDPOINTS[:list_count_page])
 
     end
     it "responds with a parsed list counts" do
       response = Integration::NationBuilder.list_counts
-      expect(response).to include(supporter_count: 2812, volunteer_count: 43949)
+      expect(response).to include(supporter_count: 69087, volunteer_count: 2151)
     end
   end
 

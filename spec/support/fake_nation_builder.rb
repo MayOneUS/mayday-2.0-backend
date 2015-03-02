@@ -3,7 +3,7 @@ require 'sinatra/base'
 
 class FakeNationBuilder < Sinatra::Base
 
-  get '/api/v1/lists/' do
+  get '/supporter_counts_for_website' do
     json_response 200, 'lists.json'
   end
 

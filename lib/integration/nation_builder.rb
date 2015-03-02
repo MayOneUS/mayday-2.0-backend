@@ -2,7 +2,7 @@ class Integration::NationBuilder
 
   STANDARD_HEADERS = {'Accept' => 'application/json', 'Content-Type' => 'application/json'}
   ENDPOINTS = {
-    lists:           '/api/v1/lists/?per_page=100', #100 is max
+    list_count_page: '/supporter_counts_for_website',
     people:          '/api/v1/people/push',
     people_by_email: '/api/v1/people/match?email=%s',
     rsvps_by_event:  '/api/v1/sites/mayday/pages/events/%s/rsvps'
@@ -40,16 +40,12 @@ class Integration::NationBuilder
     end
   end
 
+  # Public: fetches list coutns from a fake NB page with json on it.
+  # Nationbuilder page template is only this:
+  # {"supporter_count": {{ settings.supporters_count }}, "volunteer_count": {{ settings.volunteers_count }} }
   def self.list_counts
-    rescue_oauth_errors do
-      response = request_handler(endpoint_path: ENDPOINTS[:lists])
-      list_ids = eval(ENV['NATION_BUILDER_LIST_IDS'])
-      target_lists = response['results'].select{|list| list_ids.values.include?(list['id']) }
-      target_lists.each_with_object({}) do |list, hash|
-        hash_key = list_ids.invert[list['id']]
-        hash[hash_key] = list['count']
-      end
-    end
+    target_page = ENV['NATION_BUILDER_DOMAIN'] + ENDPOINTS[:list_count_page]
+    JSON.parse(RestClient.get(target_page)).symbolize_keys
   end
 
   private

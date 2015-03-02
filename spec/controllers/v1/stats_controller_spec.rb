@@ -3,7 +3,7 @@ require 'rails_helper'
 describe V1::StatsController,  type: :controller do
 
   before(:all) do
-    @target_counts = {:supporter_count=>2812, :volunteer_count=>43949, :called_voters_count=>0, :reps_calls_count=>0, :house_supporters=>0, :senate_supporters=>0, :donations_total=>748608206, :donations_count=>65136}
+    @target_counts = {:supporter_count=>69087, :volunteer_count=>2151, :called_voters_count=>0, :reps_calls_count=>0, :house_supporters=>0, :senate_supporters=>0, :donations_total=>748608206, :donations_count=>65136}
   end
 
   context 'with redis stored counts' do
