@@ -14,10 +14,11 @@
 
 class Call < ActiveRecord::Base
   has_many :connections
+  has_many :called_legislators, -> { merge(Connection.completed) }, through: :connections, source: :legislator
   has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Connection'
   belongs_to :person, required: true
 
-  delegate :target_legislators, to: :person
+  delegate :target_legislators, :next_target, to: :person
 
   CALL_STATUSES = {
     completed: 'completed',
@@ -31,16 +32,8 @@ class Call < ActiveRecord::Base
     connections.create(legislator: next_target)
   end
 
-  def called_legislators
-    connections.completed.map(&:legislator)
-  end
-
   def random_target
     (target_legislators - person.called_legislators).sample
   end
-
-  def next_target
-    (target_legislators - person.called_legislators).first
-  end
-
+  
 end

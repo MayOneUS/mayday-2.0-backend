@@ -18,6 +18,7 @@ class Person < ActiveRecord::Base
   has_many :senators, through: :state
   has_many :calls
   has_many :connections, through: :calls
+  has_many :called_legislators, through: :calls
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, presence: true, uniqueness: { case_sensitive: false },
@@ -37,6 +38,10 @@ class Person < ActiveRecord::Base
     district.blank?
   end
 
+  def next_target
+    (target_legislators - called_legislators).first
+  end
+
   def unconvinced_legislators
     if district
       district.unconvinced_legislators
@@ -45,10 +50,6 @@ class Person < ActiveRecord::Base
     else
       []
     end
-  end
-
-  def called_legislators
-    connections.includes(:legislator).completed.map(&:legislator)
   end
 
   def other_targets(count: 5, excluding: nil)
