@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: districts
+#
+#  id         :integer          not null, primary key
+#  district   :string
+#  state_id   :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 require 'rails_helper'
 
 describe District do

@@ -6,6 +6,7 @@ FactoryGirl.define do
       zip_code nil
     end
     sequence(:email) { |n| "person#{n}@example.com" }
+    sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
 
     after(:create) do |person, evaluator|
       if evaluator.district || evaluator.state || evaluator.zip_code
@@ -30,10 +31,14 @@ FactoryGirl.define do
       senate_class 1
       state
     end
-    
+
     factory :representative do
       chamber 'house'
       district
+    end
+
+    trait :targeted do
+      targets { build_list :target, 1, priority: 1 }
     end
   end
 
@@ -49,6 +54,7 @@ FactoryGirl.define do
 
   factory :zip_code do
     state
+    sequence(:zip_code) { |n| "2#{n.to_s.rjust(4,'0')}" }
   end
 
   factory :target do
@@ -74,6 +80,19 @@ FactoryGirl.define do
       after(:create) do |campaign, evaluator|
         campaign.targets = create_list(:rep_target, evaluator.count, priority: evaluator.priority)
       end
+    end
+  end
+
+  factory :call, class: Ivr::Call do
+    person
+  end
+
+  factory :connection, class: Ivr::Connection do
+    call
+    association :legislator, factory: :senator
+
+    trait :completed do
+      status Ivr::Call::CALL_STATUSES[:completed]
     end
   end
 end

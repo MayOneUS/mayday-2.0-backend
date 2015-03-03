@@ -1,3 +1,36 @@
+# == Schema Information
+#
+# Table name: legislators
+#
+#  id                  :integer          not null, primary key
+#  bioguide_id         :string           not null
+#  birthday            :date
+#  chamber             :string
+#  district_id         :integer
+#  facebook_id         :string
+#  first_name          :string
+#  gender              :string
+#  in_office           :boolean
+#  last_name           :string
+#  middle_name         :string
+#  name_suffix         :string
+#  nickname            :string
+#  office              :string
+#  party               :string
+#  phone               :string
+#  senate_class        :integer
+#  state_id            :integer
+#  state_rank          :string
+#  term_end            :date
+#  term_start          :date
+#  title               :string
+#  verified_first_name :string
+#  verified_last_name  :string
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  with_us             :boolean          default("false")
+#
+
 require 'rails_helper'
 
 describe Legislator do
@@ -177,7 +210,7 @@ describe Legislator do
       it "returns proper fields" do
         expect(response.keys).to match_array(keys + [:extra_key])
       end
-      
+
       it "returns proper value for extra field" do
         expect(response[:extra_key]).to eq 'foo'
       end

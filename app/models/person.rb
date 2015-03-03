@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: people
+#
+#  id         :integer          not null, primary key
+#  email      :string
+#  phone      :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class Person < ActiveRecord::Base
   has_one :location
   has_one :district, through: :location
@@ -5,6 +16,9 @@ class Person < ActiveRecord::Base
   has_one :target_rep, -> { targeted }, through: :district
   has_one :state, through: :location
   has_many :senators, through: :state
+  has_many :calls, class_name: 'Ivr::Call'
+  has_many :connections, through: :calls
+  has_many :called_legislators, through: :calls
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, presence: true, uniqueness: { case_sensitive: false },
@@ -22,6 +36,10 @@ class Person < ActiveRecord::Base
 
   def address_required?
     district.blank?
+  end
+
+  def next_target
+    (target_legislators - called_legislators).first
   end
 
   def unconvinced_legislators

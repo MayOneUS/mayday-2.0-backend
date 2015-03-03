@@ -36,11 +36,12 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.3.6)
+    addressable (2.3.7)
     annotate (2.6.5)
       activerecord (>= 2.3.0)
       rake (>= 0.8.7)
     arel (6.0.0)
+    ast (2.0.0)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
@@ -56,7 +57,7 @@ GEM
     columnize (0.9.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
-    database_cleaner (1.3.0)
+    database_cleaner (1.4.0)
     debug_inspector (0.0.2)
     debugger-linecache (1.2.0)
     diff-lcs (1.2.5)
@@ -74,12 +75,12 @@ GEM
       redis (~> 3.0)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    ffaker (1.32.0)
+    ffaker (1.32.1)
     globalid (0.3.3)
       activesupport (>= 4.1.0)
     hike (1.2.3)
     i18n (0.7.0)
-    jbuilder (2.2.6)
+    jbuilder (2.2.7)
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
     json (1.8.2)
@@ -96,7 +97,7 @@ GEM
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     netrc (0.10.2)
-    newrelic_rpm (3.9.9.275)
+    newrelic_rpm (3.10.0.279)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     oauth2 (1.0.0)
@@ -105,7 +106,11 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
+    oga (0.2.0)
+      ast
+      racc (~> 1.4, >= 1.4.12)
     pg (0.18.1)
+    racc (1.4.12)
     rack (1.6.0)
     rack-cors (0.3.1)
     rack-mini-profiler (0.9.2)
@@ -148,7 +153,7 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.13.0)
     rake (10.4.2)
-    redis (3.2.0)
+    redis (3.2.1)
     redis-objects (1.1.0)
       redis (>= 3.0.2)
     rest-client (1.7.2)
@@ -172,11 +177,11 @@ GEM
       rspec-support (~> 3.2.0)
     rspec-support (3.2.1)
     safe_yaml (1.0.4)
-    simplecov (0.9.1)
+    simplecov (0.9.2)
       docile (~> 1.1.0)
       multi_json (~> 1.0)
-      simplecov-html (~> 0.8.0)
-    simplecov-html (0.8.0)
+      simplecov-html (~> 0.9.0)
+    simplecov-html (0.9.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -198,6 +203,10 @@ GEM
     thread_safe (0.3.4)
     tilt (1.4.1)
     timecop (0.7.1)
+    twilio-ruby (3.14.5)
+      builder (>= 2.1.2)
+      jwt (~> 1.0)
+      multi_json (>= 1.3.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unicorn (4.8.3)
@@ -235,6 +244,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   newrelic_rpm
   oauth2
+  oga
   pg
   rack-cors
   rack-mini-profiler
@@ -249,6 +259,7 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   timecop
+  twilio-ruby
   unicorn
   versionist
   web-console (~> 2.0)

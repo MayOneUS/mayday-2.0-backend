@@ -1,6 +1,30 @@
+# == Schema Information
+#
+# Table name: locations
+#
+#  id            :integer          not null, primary key
+#  location_type :string
+#  address_1     :string
+#  address_2     :string
+#  city          :string
+#  state_id      :integer
+#  zip_code      :string
+#  person_id     :integer
+#  district_id   :integer
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+
 require 'rails_helper'
 
 describe Location do
+  it "validates required associations" do
+    location = Location.new
+    location.valid?
+
+    expect(location.errors).to have_key(:person)
+  end
+
   describe "#update_location" do
     let(:district) { FactoryGirl.create(:district) }
     let(:person)   { FactoryGirl.create(:person, district: district,
@@ -147,7 +171,7 @@ describe Location do
           .with(args)
         location.update(city: 'Keene')
       end
-      
+
       it "doesn't send call to update Nation if no relevant field changed" do
         expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
         location.update(city: 'Berkeley')

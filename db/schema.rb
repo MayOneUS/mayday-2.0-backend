@@ -11,10 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150224192259) do
+ActiveRecord::Schema.define(version: 20150303080720) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "calls", force: :cascade do |t|
+    t.string   "remote_id"
+    t.integer  "person_id"
+    t.string   "status"
+    t.integer  "duration"
+    t.datetime "ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "calls", ["person_id"], name: "index_calls_on_person_id", using: :btree
 
   create_table "campaigns", force: :cascade do |t|
     t.string   "name"
@@ -22,6 +34,20 @@ ActiveRecord::Schema.define(version: 20150224192259) do
     t.datetime "updated_at", null: false
     t.datetime "ended_at"
   end
+
+  create_table "connections", force: :cascade do |t|
+    t.string   "remote_id"
+    t.integer  "call_id"
+    t.integer  "legislator_id"
+    t.string   "status_from_user"
+    t.string   "status"
+    t.integer  "duration"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "connections", ["call_id"], name: "index_connections_on_call_id", using: :btree
+  add_index "connections", ["legislator_id"], name: "index_connections_on_legislator_id", using: :btree
 
   create_table "districts", force: :cascade do |t|
     t.string   "district"
@@ -136,6 +162,9 @@ ActiveRecord::Schema.define(version: 20150224192259) do
   add_index "zip_codes", ["state_id"], name: "index_zip_codes_on_state_id", using: :btree
   add_index "zip_codes", ["zip_code"], name: "index_zip_codes_on_zip_code", unique: true, using: :btree
 
+  add_foreign_key "calls", "people"
+  add_foreign_key "connections", "calls"
+  add_foreign_key "connections", "legislators"
   add_foreign_key "districts", "states"
   add_foreign_key "legislators", "districts"
   add_foreign_key "legislators", "states"

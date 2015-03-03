@@ -36,7 +36,7 @@ module Mayday
     config.middleware.insert_before 0, "Rack::Cors", :debug => false, :logger => (-> { Rails.logger }) do
       allow do
         origins '*'
-        resource '*.json',
+        resource '*',
           :headers => :any,
           :methods => [:put, :post, :get]
       end

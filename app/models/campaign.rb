@@ -6,6 +6,7 @@
 #  name       :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  ended_at   :datetime
 #
 
 class Campaign < ActiveRecord::Base
