@@ -22,7 +22,8 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       if active_call.target_legislators.any?
         connection = active_call.create_connection!
-        r.Dial connection.legislator.phone, action: calls_connection_gather_prompt_url
+        r.Say 'We will connect you in just a moment.  Press start at any time to disconnect from your legislator.'
+        r.Dial connection.legislator.phone, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
       else
         r.Say 'We don\'t have any targets for you. Please try again later.'
         r.Hangup
