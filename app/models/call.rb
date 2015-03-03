@@ -32,21 +32,15 @@ class Call < ActiveRecord::Base
   end
 
   def called_legislators
-    connections.where(status: CALL_STATUSES[:completed]).map(&:legislator)
+    connections.completed.map(&:legislator)
   end
 
   def random_target
-    (target_legislators - called_legislators).sample
+    (target_legislators - person.called_legislators).sample
   end
 
   def next_target
-    (target_legislators - called_legislators).first
+    (target_legislators - person.called_legislators).first
   end
 
-
 end
-
-
-
-
-

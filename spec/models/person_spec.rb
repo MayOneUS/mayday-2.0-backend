@@ -12,6 +12,15 @@
 require 'rails_helper'
 
 describe Person do
+  describe "#called_legislators" do
+    it "returns those legislators who are called" do
+      connection = FactoryGirl.create(:connection, :completed)
+      person = connection.call.person
+
+      expect(person.called_legislators).to eq([connection.legislator])
+    end
+  end
+
   describe "#target_legislators" do
     let(:district) { FactoryGirl.create(:district) }
     let(:person)   { FactoryGirl.create(:person, district: district,

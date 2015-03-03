@@ -26,10 +26,10 @@ RSpec.describe Call, type: :model do
   end
   describe "#called_legislators" do
     it "returns those legislators who are called" do
-    connection = FactoryGirl.create(:connection, :completed)
-    call = connection.call
+      connection = FactoryGirl.create(:connection, :completed)
+      call = connection.call
 
-    expect(call.called_legislators).to eq([connection.legislator])
+      expect(call.called_legislators).to eq([connection.legislator])
     end
   end
   describe "#random_target" do

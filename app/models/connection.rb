@@ -25,4 +25,5 @@ class Connection < ActiveRecord::Base
   }
 
   scope :uncompleted, -> { where(status: nil, remote_id: nil) }
+  scope :completed, -> { where(status: Call::CALL_STATUSES[:completed]) }
 end

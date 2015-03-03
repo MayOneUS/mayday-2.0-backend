@@ -47,6 +47,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def called_legislators
+    connections.includes(:legislator).completed.map(&:legislator)
+  end
+
   def other_targets(count: 5, excluding: nil)
     num_to_fetch = count - excluding.count
     Legislator.default_targets(excluding: excluding, count: num_to_fetch)
