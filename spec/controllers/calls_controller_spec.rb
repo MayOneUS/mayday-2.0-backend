@@ -2,9 +2,9 @@ require 'rails_helper'
 
 describe CallsController,  type: :controller do
 
-  def setup_active_call_double(targeted_legislators:[])
+  def setup_active_call_double(target_legislators:[])
     @active_call = double('active_call')
-    allow(@active_call).to receive(:targeted_legislators).and_return(targeted_legislators)
+    allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
     allow(controller).to receive(:active_call).and_return(@active_call)
   end
 
@@ -26,7 +26,7 @@ describe CallsController,  type: :controller do
         legislator = double('legislator')
         @phone = '555-555-5555'
         allow(legislator).to receive(:phone).and_return(@phone)
-        setup_active_call_double(targeted_legislators: [legislator])
+        setup_active_call_double(target_legislators: [legislator])
 
         @connection = double('connection')
         allow(@active_call).to receive(:create_connection!).and_return(@connection)
