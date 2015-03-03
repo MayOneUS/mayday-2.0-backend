@@ -51,7 +51,7 @@ class District < ActiveRecord::Base
     join_clause = 'INNER JOIN districts '\
                   'ON (districts.id = legislators.district_id '\
                   'OR districts.state_id = legislators.state_id)'
-    Legislator.joins(join_clause).where(districts: {id: id})
+    Legislator.joins(join_clause).where(districts: { id: id })
   end
 
   def targeted?

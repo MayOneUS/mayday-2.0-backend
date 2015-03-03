@@ -41,8 +41,9 @@ class Location < ActiveRecord::Base
   private
 
   def serializable_hash(options)
-    super(methods: [:state_abbrev],
-             only: [:address_1, :address_2, :city, :zip_code])
+    options ||= { methods: [:state_abbrev],
+                    only: [:address_1, :address_2, :city, :zip_code] }
+    super options
   end
 
   def update_nation_builder
