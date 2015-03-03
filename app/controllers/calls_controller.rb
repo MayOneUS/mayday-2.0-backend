@@ -8,7 +8,6 @@ class CallsController < ApplicationController
   def start
     response = Twilio::TwiML::Response.new do |r|
       r.Say 'We need you to connect with your congressperson and senator. We are going to put you in touch with '
-      r.Say 'Whatever other intro text'
       r.Redirect calls_new_connection_url, method: 'get'
     end
 
@@ -22,8 +21,9 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       if active_call.target_legislators.any?
         connection = active_call.create_connection!
-        r.Say 'We will connect you in just a moment.  Press star at any time to disconnect from your legislator.'
-        r.Dial connection.legislator.phone, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
+        r.Say 'We will connect you in just a moment. Press star at any time to disconnect from your legislator.'
+        target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
+        r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
       else
         r.Say 'We don\'t have any targets for you. Please try again later.'
         r.Hangup
