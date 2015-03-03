@@ -1,12 +1,11 @@
 class Integration::Twilio
 
-  def place_call
-    @call = self.class.client.calls.create(
-      from: '+14159341234',
-      to: '+18004567890',
-      'ApplicationSid': ''
+  def self.initiate_congress_calling(phone:)
+    @client.calls.create(
+      'from' => ENV['TWILIO_APP_PHONE_NUMBER'],
+      'to' => phone,
+      'ApplicationSid' => ENV['TWILIO_APP_SID']
     )
-    @call
   end
 
   private
