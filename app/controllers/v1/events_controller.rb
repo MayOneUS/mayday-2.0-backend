@@ -1,7 +1,7 @@
 class V1::EventsController < V1::BaseController
 
   def index
-    start = DateTime.parse("2015-03-14T21:00:00-05:00")
+    start = DateTime.parse("2015-03-14 6pm EST").utc
     events = []
     (1..7).each do |n|
       events << {
