@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 describe Location do
-  let(:district) { FactoryGirl.create(:district) }
-  let(:person)   { FactoryGirl.create(:person, district: district,
-                                               state:    district.state,
-                                               zip_code: '03431') }
   describe "#update_location" do
+    let(:district) { FactoryGirl.create(:district) }
+    let(:person)   { FactoryGirl.create(:person, district: district,
+                                                 state:    district.state,
+                                                 zip_code: '03431') }
     context "bad address" do
       it "doesn't change location" do
         expect {
@@ -112,6 +112,45 @@ describe Location do
             expect(person.zip_code).to eq '94703'
           end
         end
+      end
+    end
+  end
+  describe "#update_nation_builder" do
+    let(:person) { FactoryGirl.create(:person, email: 'user@example.com') }
+    let(:args) do
+      {
+        attributes: {
+          email: "user@example.com",
+          registered_address: {
+            address1: nil,
+            address2: nil,
+            city:    "Keene",
+            zip:      nil,
+            state:    nil
+          }
+        }
+      }
+    end
+    context "creating new location" do
+      it "sends call to update NationBuilder" do
+        expect_any_instance_of(Location).to receive(:update_nation_builder).and_call_original
+        expect(Integration::NationBuilder).to receive(:create_or_update_person).with(args)
+        person.create_location(city: 'Keene')
+      end
+    end
+    context "updating existing location" do
+      let(:location) { person.create_location(city: 'Berkeley') }
+      before { expect(location).to receive(:update_nation_builder).and_call_original }
+
+      it "sends call to update Nation if relevant field changed" do
+        expect(Integration::NationBuilder).to receive(:create_or_update_person)
+          .with(args)
+        location.update(city: 'Keene')
+      end
+      
+      it "doesn't send call to update Nation if no relevant field changed" do
+        expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
+        location.update(city: 'Berkeley')
       end
     end
   end

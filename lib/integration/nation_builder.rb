@@ -18,7 +18,7 @@ class Integration::NationBuilder
   MAPPINGS_LOCATION = {
     address_1:    :address1,
     address_2:    :address2,
-    city:         nil,
+    city:         :city,
     state_abbrev: :state,
     zip_code:     :zip
   }
