@@ -15,9 +15,9 @@
 
 require 'rails_helper'
 
-RSpec.describe Connection, type: :model do
+describe Ivr::Connection, type: :model do
   it "validates required associations" do
-    connection = Connection.new
+    connection = Ivr::Connection.new
     connection.valid?
 
     expect(connection.errors).to have_key(:legislator)

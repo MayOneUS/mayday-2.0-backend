@@ -13,8 +13,8 @@
 #  updated_at       :datetime         not null
 #
 
-class Connection < ActiveRecord::Base
-  belongs_to :call, required: true
+class Ivr::Connection < ActiveRecord::Base
+  belongs_to :call, required: true, class_name: 'Ivr::Call'
   belongs_to :legislator, required: true
   has_many :campaigns, through: :legislator
 
@@ -24,5 +24,5 @@ class Connection < ActiveRecord::Base
   }
 
   scope :uncompleted, -> { where(status: nil, remote_id: nil) }
-  scope :completed, -> { where(status: Call::CALL_STATUSES[:completed]) }
+  scope :completed, -> { where(status: Ivr::Call::CALL_STATUSES[:completed]) }
 end

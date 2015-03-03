@@ -91,16 +91,16 @@ describe CallsController,  type: :controller do
   describe "POST connection_gather" do
     before do
       @connection = double('connection')
-      allow(Connection).to receive(:find).and_return(@connection)
+      allow(Ivr::Connection).to receive(:find).and_return(@connection)
       allow(@connection).to receive(:update)
     end
     it "finds the correct connection" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
-      expect(Connection).to have_received(:find).with('1')
+      expect(Ivr::Connection).to have_received(:find).with('1')
     end
     it "sets the correct connection status" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
-      expect(@connection).to have_received(:update).with(status_from_user: Connection::USER_RESPONSE_CODES['1'])
+      expect(@connection).to have_received(:update).with(status_from_user: Ivr::Connection::USER_RESPONSE_CODES['1'])
     end
     it "redirects to new_connection_path" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1

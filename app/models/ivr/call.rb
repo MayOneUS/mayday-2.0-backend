@@ -12,10 +12,10 @@
 #  updated_at :datetime         not null
 #
 
-class Call < ActiveRecord::Base
-  has_many :connections
-  has_many :called_legislators, -> { merge(Connection.completed) }, through: :connections, source: :legislator
-  has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Connection'
+class Ivr::Call < ActiveRecord::Base
+  has_many :connections, class_name: 'Ivr::Connection'
+  has_many :called_legislators, -> { merge(Ivr::Connection.completed) }, through: :connections, source: :legislator
+  has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Ivr::Connection'
   belongs_to :person, required: true
 
   delegate :target_legislators, :next_target, to: :person
@@ -35,5 +35,5 @@ class Call < ActiveRecord::Base
   def random_target
     (target_legislators - person.called_legislators).sample
   end
-  
+
 end

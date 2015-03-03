@@ -16,7 +16,7 @@ class Person < ActiveRecord::Base
   has_one :target_rep, -> { targeted }, through: :district
   has_one :state, through: :location
   has_many :senators, through: :state
-  has_many :calls
+  has_many :calls, class_name: 'Ivr::Call'
   has_many :connections, through: :calls
   has_many :called_legislators, through: :calls
 

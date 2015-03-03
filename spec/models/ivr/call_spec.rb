@@ -14,7 +14,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Call, type: :model do
+describe Ivr::Call, type: :model do
   describe "#create_connection!" do
     it "creates a connection" do
       call = FactoryGirl.create(:call)

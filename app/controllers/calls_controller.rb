@@ -55,8 +55,8 @@ class CallsController < ApplicationController
   # Digits - the key pressed user response from twilio (required)
   # remote_id - remote_for the target connection (required)
   def connection_gather
-    active_connection = Connection.find(params[:connection_id])
-    active_connection.update(status_from_user: Connection::USER_RESPONSE_CODES[params['Digits']])
+    active_connection = Ivr::Connection.find(params[:connection_id])
+    active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
     redirect_to calls_new_connection_path
   end
 

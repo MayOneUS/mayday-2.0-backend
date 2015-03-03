@@ -43,7 +43,7 @@ describe Person do
 
     context "json" do
       subject(:legislators) { person.target_legislators(json: true) }
-      
+
       it "returns local senator first" do
         expect(legislators.first['id']).to eq unconvinced_senator.id
       end
@@ -68,13 +68,13 @@ describe Person do
     context "updating existing user" do
       let(:user) { FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234') }
       before { expect(user).to receive(:update_nation_builder).and_call_original }
-      
+
       it "sends call to update Nation if relevant field changed" do
         expect(Integration::NationBuilder).to receive(:create_or_update_person)
           .with({:attributes=>{"email"=>"user@example.com", "phone"=>"510-555-9999"}})
         user.update(phone:'510-555-9999')
       end
-      
+
       it "doesn't send call to update Nation if no relevant field changed" do
         expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
         user.update(phone:'510-555-1234')

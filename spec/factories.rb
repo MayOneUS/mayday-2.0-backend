@@ -83,16 +83,16 @@ FactoryGirl.define do
     end
   end
 
-  factory :call do
+  factory :call, class: Ivr::Call do
     person
   end
 
-  factory :connection do
+  factory :connection, class: Ivr::Connection do
     call
     association :legislator, factory: :senator
 
     trait :completed do
-      status Call::CALL_STATUSES[:completed]
+      status Ivr::Call::CALL_STATUSES[:completed]
     end
   end
 end
