@@ -100,7 +100,7 @@ describe CallsController,  type: :controller do
     end
     it "sets the correct connection status" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
-      expect(@connection).to have_received(:update).with(status_from_user: Connection::RESPONSE_CODES['1'])
+      expect(@connection).to have_received(:update).with(status_from_user: Connection::USER_RESPONSE_CODES['1'])
     end
     it "redirects to new_connection_path" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
