@@ -5,7 +5,7 @@ describe CallsController,  type: :controller do
   def setup_active_call_double(target_legislators:[])
     @active_call = double('active_call')
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
-    allow(controller).to receive(:active_call).and_return(@active_call)
+    allow(Ivr::Call).to receive_message_chain(:includes, :where, :first_or_create).and_return(@active_call)
   end
 
   describe "GET start" do
