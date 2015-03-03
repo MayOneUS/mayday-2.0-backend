@@ -9,7 +9,7 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       r.Say 'We need you to connect with your congressperson and legislator. We are going to put you in touch with '
       r.Say 'Whatever other intro text'
-      r.Redirect calls_new_connection_url
+      r.Redirect calls_new_connection_url, method: 'get'
     end
 
     render_twiml response

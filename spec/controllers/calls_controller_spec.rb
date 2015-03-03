@@ -14,8 +14,9 @@ describe CallsController,  type: :controller do
       xml_response = Oga.parse_xml(response.body)
 
       expect(response).to be_success
-      expect(xml_response.css('redirect')).to be_present
-      expect(xml_response.css('redirect').text).to eq(calls_new_connection_url)
+      expect(xml_response.css('Redirect')).to be_present
+      expect(xml_response.css('Redirect').attribute('method')[0].value).to eq('get')
+      expect(xml_response.css('Redirect').text).to eq(calls_new_connection_url)
     end
   end
 
