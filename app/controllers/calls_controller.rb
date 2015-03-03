@@ -20,7 +20,7 @@ class CallsController < ApplicationController
   # CallSid - default param from twilio (required)
   def new_connection
     response = Twilio::TwiML::Response.new do |r|
-      if active_call.targeted_legislators.any?
+      if active_call.target_legislators.any?
         connection = active_call.create_connection!
         r.Dial connection.legislator.phone, action: calls_connection_gather_prompt_url
       else
