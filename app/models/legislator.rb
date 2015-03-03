@@ -69,7 +69,7 @@ class Legislator < ActiveRecord::Base
                                                     senate_class: senate_class)
 
     if stats = results['legislators'].try(:first)
-      find_or_create_by_hash(stats)
+      create_or_update(stats)
     end
   end
 
@@ -78,7 +78,7 @@ class Legislator < ActiveRecord::Base
 
     if legislators = results['legislators']
       legislators.each do |stats|
-        find_or_create_by_hash(stats)
+        create_or_update(stats)
       end
     end
   end
@@ -90,9 +90,10 @@ class Legislator < ActiveRecord::Base
     end
   end
 
-  def self.find_or_create_by_hash(hash)
-    bioguide_id = hash.delete('bioguide_id')
-    create_with(hash).find_or_create_by(bioguide_id: bioguide_id)
+  def self.create_or_update(legislator_hash)
+    hash = legislator_hash.symbolize_keys
+    bioguide_id = hash.delete(:bioguide_id)
+    find_or_initialize_by(bioguide_id: bioguide_id).tap{|l| l.update(hash)}
   end
 
   def self.default_targets(excluding: [], count: 5)
@@ -106,7 +107,7 @@ class Legislator < ActiveRecord::Base
     end
   end
 
-  def update_reform_status # what's a better name?
+  def update_reform_status
     update(with_us: Integration::RepsWithUs.rep_with_us?(bioguide_id))
   end
 
