@@ -22,9 +22,7 @@ class Integration::RepsWithUs
       end
     end
     reps.uniq
-  rescue JSON::ParserError
-    nil
-  rescue RestClient::ResourceNotFound
+  rescue JSON::ParserError, RestClient::ResourceNotFound
     nil
   end
 
@@ -33,9 +31,7 @@ class Integration::RepsWithUs
     if legislator = response[LEGISLATOR_KEY]
       legislator[SPONSORED_KEY].present? || legislator[COSPONSORED_KEY].present?
     end
-  rescue JSON::ParserError
-    nil
-  rescue RestClient::ResourceNotFound
+  rescue JSON::ParserError, RestClient::ResourceNotFound
     nil
   end
 

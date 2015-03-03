@@ -42,14 +42,6 @@ class ZipCode < ActiveRecord::Base
     target_reps.any?
   end
 
-  def target_legislators
-    if single_district?
-      target_senators + target_reps
-    else
-      []
-    end
-  end
-
   def targeted_by_campaign?(campaign)
     campaigns.include?(campaign)
   end

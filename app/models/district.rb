@@ -17,7 +17,7 @@ class District < ActiveRecord::Base
   has_one :target_rep, -> { targeted }, class_name: "Legislator"
   has_many :campaigns, through: :representative
 
-  validates :district, uniqueness: { scope: :state }
+  validates :district, presence: true, uniqueness: { scope: :state }
 
   def self.find_by_state_and_district(state:, district:)
     joins(:state).where('states.abbrev': state).find_by(district: district)
@@ -45,6 +45,13 @@ class District < ActiveRecord::Base
 
   def unconvinced_legislators
     senators.eligible.unconvinced + [unconvinced_rep].compact
+  end
+
+  def legislators
+    join_clause = 'INNER JOIN districts '\
+                  'ON (districts.id = legislators.district_id '\
+                  'OR districts.state_id = legislators.state_id)'
+    Legislator.joins(join_clause).where(districts: { id: id })
   end
 
   def targeted?

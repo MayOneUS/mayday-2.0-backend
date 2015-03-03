@@ -4,7 +4,9 @@ Rails.application.routes.draw do
     resources :stats, only: :index
     resources :people, only: :create
     resources :calls, only: :create
-    post '/events/create_rsvp', to: 'events#create_rsvp'
+    resources :events, only: :index do
+      post :create_rsvp, on: :collection
+    end
   end
   post  '/calls/start',                    to: 'calls#start'
   get  '/calls/new_connection',           to: 'calls#new_connection'
