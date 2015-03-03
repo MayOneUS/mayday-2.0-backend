@@ -33,12 +33,13 @@ module Mayday
 
     config.autoload_paths << Rails.root.join('lib')
 
+    #this works on most hosts, but not on heroku.  heroku config is in config.ru
     config.middleware.insert_before 0, "Rack::Cors", :debug => false, :logger => (-> { Rails.logger }) do
       allow do
         origins '*'
         resource '*',
           :headers => :any,
-          :methods => [:put, :post, :get]
+          :methods => [:put, :post, :get, :options]
       end
     end
 
