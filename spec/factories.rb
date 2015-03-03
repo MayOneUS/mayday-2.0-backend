@@ -5,11 +5,14 @@ FactoryGirl.define do
       state nil
       zip_code nil
     end
-    sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:email) { |n| "person#{n}@example.com" }
+
     after(:create) do |person, evaluator|
-      person.create_location(district: evaluator.district,
-                             state:    evaluator.state,
-                             zip_code: evaluator.zip_code)
+      if evaluator.district || evaluator.state || evaluator.zip_code
+        person.create_location(district: evaluator.district,
+                               state:    evaluator.state,
+                               zip_code: evaluator.zip_code)
+      end
     end
   end
 

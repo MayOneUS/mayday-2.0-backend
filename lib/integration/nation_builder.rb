@@ -7,9 +7,31 @@ class Integration::NationBuilder
     people_by_email: '/api/v1/people/match?email=%s',
     rsvps_by_event:  '/api/v1/sites/mayday/pages/events/%s/rsvps'
   }
-  ALLOWED_PARAMS_PERSON = %w[birthdate do_not_call first_name last_name email email_opt_in employer is_volunteer mobile_opt_in
-    mobile occupation phone primary_address recruiter_id sex tags request_ip skills rootstrikers_subscription uuid
-    pledge_page_slug fundraising email subscription maydayin30_entry_url voting_district_id map_lookup_district]
+  ALLOWED_PARAMS_PERSON = [:birthdate, :do_not_call, :first_name, :last_name, :email, :email_opt_in, :employer, :is_volunteer, :mobile_opt_in,
+    :mobile, :occupation, :phone, :recruiter_id, :sex, :tags, :request_ip, :skills, :rootstrikers_subscription, :uuid,
+    :pledge_page_slug, :fundraising, :email_subscription, :maydayin30_entry_url, :voting_district_id, :map_lookup_district,
+    registered_address: [:address1, :address2, :city, :state, :zip]]
+  MAPPINGS_PERSON = {
+    email: nil,
+    phone: nil
+  }
+  MAPPINGS_LOCATION = {
+    address_1:    :address1,
+    address_2:    :address2,
+    city:         :city,
+    state_abbrev: :state,
+    zip_code:     :zip
+  }
+
+  def self.person_params(person)
+    person = rename_keys(person, MAPPINGS_PERSON.stringify_keys)
+    { attributes: person }
+  end
+
+  def self.location_params(email, location)
+    address = rename_keys(location, MAPPINGS_LOCATION.stringify_keys)
+    { attributes: { email: email, registered_address: address } }
+  end
 
   def self.query_people_by_email(email)
     rescue_oauth_errors do
@@ -19,7 +41,7 @@ class Integration::NationBuilder
   end
 
   def self.create_person_and_rsvp(event_id:, person_attributes: {}, person_id: nil)
-    raise ArgumentError, ':mising person_id or :person_attributes' if person_id.blank? && (person_attributes.nil? || person_attributes.empty?)
+    raise ArgumentError, 'missing :person_id or :person_attributes' if person_id.blank? && (person_attributes.nil? || person_attributes.empty?)
     person_id ||= create_or_update_person(attributes: person_attributes)['id']
     create_rsvp(event_id: event_id, person_id: person_id)
   end
@@ -81,6 +103,10 @@ class Integration::NationBuilder
   def self.parse_person_attributes(raw_parameters)
     parameters = ActionController::Parameters.new(raw_parameters)
     parameters.permit(ALLOWED_PARAMS_PERSON)
+  end
+
+  def self.rename_keys(hash, mappings)
+    Hash[hash.map {|k, v| [mappings[k] || k, v] }]
   end
 
 end
