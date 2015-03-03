@@ -41,9 +41,15 @@ class CallsController < ApplicationController
     active_connection = active_call.last_connection
     active_connection.update(remote_id: params['DialCallSid'])
     response = Twilio::TwiML::Response.new do |r|
-      r.Gather action: calls_connection_gather_url(connection_id: active_connection.id) do |gather|
+      r.Gather(
+        action: calls_connection_gather_url(connection_id: active_connection.id),
+        timeout: 15
+      ) do |gather|
+        gather.Say 'How did the senator respond? Press 1 for positively, press 2 for negatively'
+        gather.Pause(length: 5)
         gather.Say 'How did the senator respond? Press 1 for positively, press 2 for negatively'
       end
+      r.Redirect calls_new_connection_url, method: 'get'
     end
 
     render_twiml response
@@ -72,7 +78,7 @@ class CallsController < ApplicationController
 
   def active_call
     remote_id = params['CallSid'] || params[:remote_id]
-    @call = Call.includes(connections: :legislator).where(remote_id: remote_id).first_or_create
+    @call = Ivr::Call.includes(connections: :legislator).where(remote_id: remote_id).first_or_create
   end
 
 end
