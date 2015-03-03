@@ -1,7 +1,7 @@
 class Integration::Twilio
 
   def self.initiate_congress_calling(phone:)
-    @client.calls.create(
+    client.calls.create(
       'from' => ENV['TWILIO_APP_PHONE_NUMBER'],
       'to' => phone,
       'ApplicationSid' => ENV['TWILIO_APP_SID']
