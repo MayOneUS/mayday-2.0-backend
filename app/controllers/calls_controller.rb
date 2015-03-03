@@ -2,12 +2,14 @@ class CallsController < ApplicationController
 
   after_filter :set_header
 
+
+
   # Public: initiates the call process via a request from twillio
   #
   # CallSid - default param from twilio (required)
   def start
     response = Twilio::TwiML::Response.new do |r|
-      r.Say 'We need you to connect with your congressperson and senator. We are going to put you in touch with '
+      r.Play AudioFileFetcher.file_for_key('intro_message')
       r.Redirect calls_new_connection_url, method: 'get'
     end
 
@@ -19,11 +21,15 @@ class CallsController < ApplicationController
   # CallSid - default param from twilio (required)
   def new_connection
     response = Twilio::TwiML::Response.new do |r|
-      if active_call.target_legislators.any?
+      if active_call.next_target.present?
         connection = active_call.create_connection!
-        r.Say 'We will connect you in just a moment. Press star at any time to disconnect from your legislator.'
+        r.Play AudioFileFetcher.file_for_key('connecting_local')
+        r.Play AudioFileFetcher.file_for_key('connecting_to_representative')
+        r.Say 'Press star at any time to disconnect from your legislator.'
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
         r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
+      elsif active_call.connections >= 5
+        r.Play AudioFileFetcher.file_for_key('closing_message')
       else
         r.Say 'We don\'t have any targets for you. Please try again later.'
         r.Hangup
@@ -45,9 +51,9 @@ class CallsController < ApplicationController
         action: calls_connection_gather_url(connection_id: active_connection.id),
         timeout: 15
       ) do |gather|
-        gather.Say 'How did the senator respond? Press 1 for positively, press 2 for negatively'
+        r.Play AudioFileFetcher.file_for_key('user_response')
         gather.Pause(length: 5)
-        gather.Say 'How did the senator respond? Press 1 for positively, press 2 for negatively'
+        r.Play AudioFileFetcher.file_for_key('user_response')
       end
       r.Redirect calls_new_connection_url, method: 'get'
     end
