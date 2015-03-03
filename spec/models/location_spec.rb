@@ -19,10 +19,10 @@ require 'rails_helper'
 
 describe Location do
   it "validates required associations" do
-    connection = Location.new
-    connection.valid?
+    location = Location.new
+    location.valid?
 
-    expect(connection.errors).to have_key(:person)
+    expect(location.errors).to have_key(:person)
   end
 
   describe "#update_location" do

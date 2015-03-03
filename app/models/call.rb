@@ -15,11 +15,9 @@
 class Call < ActiveRecord::Base
   has_many :connections
   has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Connection'
-  belongs_to :person
+  belongs_to :person, required: true
 
   delegate :target_legislators, to: :person
-
-  validates :person, presence: true
 
   CALL_STATUSES = {
     completed: 'completed',
@@ -30,7 +28,7 @@ class Call < ActiveRecord::Base
   }
 
   def create_connection!
-    connections.create(legislator: random_target)
+    connections.create(legislator: next_target)
   end
 
   def called_legislators
@@ -40,6 +38,11 @@ class Call < ActiveRecord::Base
   def random_target
     (target_legislators - called_legislators).sample
   end
+
+  def next_target
+    (target_legislators - called_legislators).first
+  end
+
 
 end
 

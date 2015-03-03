@@ -14,16 +14,13 @@
 #
 
 class Connection < ActiveRecord::Base
-  belongs_to :call
-  belongs_to :legislator
-  belongs_to :campaign
-
-  validates :call, presence: true
-  validates :legislator, presence: true
+  belongs_to :call, required: true
+  belongs_to :legislator, required: true
+  has_many :campaigns, through: :legislator
 
   RESPONSE_CODES = {
     '1' => 'success',
-    '2' => 'hungup',
+    '2' => 'hung up',
     '3' => 'no answer'
   }
 

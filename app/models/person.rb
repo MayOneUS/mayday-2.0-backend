@@ -17,6 +17,7 @@ class Person < ActiveRecord::Base
   has_one :state, through: :location
   has_many :senators, through: :state
   has_many :calls
+  has_many :connections, through: :calls
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, presence: true, uniqueness: { case_sensitive: false },

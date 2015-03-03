@@ -16,11 +16,10 @@
 #
 
 class Location < ActiveRecord::Base
-  belongs_to :person
+  belongs_to :person, required: true
   belongs_to :district
   belongs_to :state
 
-  validates :person, presence: true
   after_save :update_nation_builder
 
   def update_location(address: nil, city: nil, state: nil, zip: nil)
