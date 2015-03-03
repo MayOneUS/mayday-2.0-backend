@@ -18,10 +18,9 @@ class Connection < ActiveRecord::Base
   belongs_to :legislator, required: true
   has_many :campaigns, through: :legislator
 
-  RESPONSE_CODES = {
+  USER_RESPONSE_CODES = {
     '1' => 'success',
-    '2' => 'hung up',
-    '3' => 'no answer'
+    '2' => 'failed',
   }
 
   scope :uncompleted, -> { where(status: nil, remote_id: nil) }
