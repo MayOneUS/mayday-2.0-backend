@@ -57,12 +57,13 @@ You can test if it works by running a command like `heroku logs`.
 
 Once you are connected to heroku, you can use the following to help testing
 
-    heroku run rake db:seed            # seeds the db w/ legislators, states, zips
-    heroku run rake db:seed:dummy_data # creates dummy campaign
-    heroku run rake db:seed:purge      # Purge DB of all data
-    heroku run rake db:seed:purge:api  # Purge DB of API generated data
+    heroku run rake db:seed                   # seeds the db w/ legislators, states, zips
+    heroku run rake db:seed:dummy_data        # creates dummy campaign
+    heroku run rake db:seed:purge             # Purge DB of all data
+    heroku run rake db:seed:purge:api         # Purge DB of API generated data
+    heroku run rake db:seed:purge:dummy_data  # Purge DB of dummy seed data
 
-Note: only run `rake db:seed` and `rake db:seed:dummy_data` after full purge
+Note: only run `rake db:seed` after full purge
 
 ### Deploying to Production
 

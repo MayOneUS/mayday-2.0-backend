@@ -25,6 +25,10 @@ namespace :db do
       task api: :environment do
         DatabaseCleaner.clean_with(:truncation, :only => %w[people locations])
       end
+      desc "Purge DB of dummy seed data"
+      task dummy_data: :environment do
+        DatabaseCleaner.clean_with(:truncation, :only => %w[campaigns targets events])
+      end
     end
   end
 end
