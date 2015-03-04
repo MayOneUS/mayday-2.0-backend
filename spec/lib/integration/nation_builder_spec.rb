@@ -92,6 +92,54 @@ describe Integration::NationBuilder do
     end
   end
 
+  describe "event creation" do
+    let(:start) { 1.day.from_now }
+    let(:event_attributes) do
+      {
+        slug: "test_orientation_" + start.to_formatted_s(:number),
+        name: "Mayday Call Campaign Orientation",
+        start_time: start,
+        end_time: start + 1.hour,
+        status: "unlisted",
+        autoresponse: {
+          broadcaster_id: 1,
+          subject: "Mayday orientation confirmation"
+        }
+      }
+    end
+    describe ".event_params" do
+      it "returns properly formatted args" do
+        args = { start_time: start, end_time: start + 1.hour }
+        expected = { attributes: event_attributes }
+        expect(Integration::NationBuilder.event_params(args)).to eq expected
+      end
+    end
+
+    describe ".create_event" do
+      it "formats json body for target endpoint" do
+        body = { event: event_attributes }
+        allow(Integration::NationBuilder).to receive(:request_handler).and_call_original
+
+        Integration::NationBuilder.create_event(attributes: event_attributes)
+
+        expect(Integration::NationBuilder).to have_received(:request_handler)
+          .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:events],
+                body: body, method: 'post')
+      end
+      it "returns event_id" do
+        response = Integration::NationBuilder.create_event(attributes: event_attributes)
+        expect(response).to eq 13
+      end
+    end
+  end
+
+  describe ".destroy_event" do
+    it "returns true" do
+      response = Integration::NationBuilder.destroy_event(14)
+      expect(response).to eq true
+    end
+  end
+
   describe "#list_counts" do
     it "formats url for target endpoint" do
       allow(RestClient).to receive(:get).and_call_original

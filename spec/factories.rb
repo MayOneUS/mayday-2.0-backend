@@ -17,6 +17,11 @@ FactoryGirl.define do
     end
   end
 
+  factory :event do
+    starts_at 24.hours.from_now
+    ends_at 25.hours.from_now
+  end
+
   factory :legislator do
     sequence(:bioguide_id) { |n| "F#{n}" }
     first_name 'Barbara'

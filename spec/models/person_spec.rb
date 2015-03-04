@@ -61,7 +61,7 @@ describe Person do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
         expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({:attributes=>{"email"=>"user@example.com", "phone"=>"510-555-1234"}})
+          .with({ attributes: { email: 'user@example.com', phone: '510-555-1234' } })
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end
@@ -71,11 +71,11 @@ describe Person do
 
       it "sends call to update Nation if relevant field changed" do
         expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({:attributes=>{"email"=>"user@example.com", "phone"=>"510-555-9999"}})
+          .with({ attributes: { email: 'user@example.com', phone: '510-555-9999' } })
         user.update(phone:'510-555-9999')
       end
 
-      it "doesn't send call to update Nation if no relevant field changed" do
+      it "doesn't send call to update NationBuilder if no relevant field changed" do
         expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
         user.update(phone:'510-555-1234')
       end

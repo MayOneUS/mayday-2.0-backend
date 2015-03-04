@@ -3,10 +3,14 @@ class Integration::NationBuilder
   STANDARD_HEADERS = {'Accept' => 'application/json', 'Content-Type' => 'application/json'}
   ENDPOINTS = {
     list_count_page: '/supporter_counts_for_website',
+    event:           '/api/v1/sites/mayday/pages/events/%s',
+    events:          '/api/v1/sites/mayday/pages/events',
     people:          '/api/v1/people/push',
     people_by_email: '/api/v1/people/match?email=%s',
     rsvps_by_event:  '/api/v1/sites/mayday/pages/events/%s/rsvps'
   }
+  ALLOWED_PARAMS_EVENT = [:slug, :status, :name, :start_time, :end_time,
+    autoresponse: [:broadcaster_id, :subject, :body]]
   ALLOWED_PARAMS_PERSON = [:birthdate, :do_not_call, :first_name, :last_name, :email, :email_opt_in, :employer, :is_volunteer, :mobile_opt_in,
     :mobile, :occupation, :phone, :recruiter_id, :sex, :tags, :request_ip, :skills, :rootstrikers_subscription, :uuid,
     :pledge_page_slug, :fundraising, :email_subscription, :maydayin30_entry_url, :voting_district_id, :map_lookup_district,
@@ -18,18 +22,33 @@ class Integration::NationBuilder
   MAPPINGS_LOCATION = {
     address_1:    :address1,
     address_2:    :address2,
-    city:         :city,
+    city:         nil,
     state_abbrev: :state,
     zip_code:     :zip
   }
 
+  def self.event_params(start_time:, end_time:)
+    event = {
+      slug: "test_orientation_" + start_time.to_formatted_s(:number),
+      name: "Mayday Call Campaign Orientation",
+      start_time: start_time,
+      end_time: end_time,
+      status: "unlisted",
+      autoresponse: {
+        broadcaster_id: 1,
+        subject: "Mayday orientation confirmation"
+      }
+    }
+    { attributes: event }
+  end
+
   def self.person_params(person)
-    person = rename_keys(person, MAPPINGS_PERSON.stringify_keys)
+    person = rename_keys(person.symbolize_keys, MAPPINGS_PERSON)
     { attributes: person }
   end
 
-  def self.location_params(email, location)
-    address = rename_keys(location, MAPPINGS_LOCATION.stringify_keys)
+  def self.location_params(email:, location:)
+    address = rename_keys(location.symbolize_keys, MAPPINGS_LOCATION)
     { attributes: { email: email, registered_address: address } }
   end
 
@@ -62,6 +81,21 @@ class Integration::NationBuilder
     end
   end
 
+  def self.create_event(attributes:)
+    rescue_oauth_errors do
+      body = {'event': parse_event_attributes(attributes)}
+      response = request_handler(endpoint_path: ENDPOINTS[:events], body: body, method: 'post')
+      response['event'].try(:fetch, 'id')
+    end
+  end
+
+  def self.destroy_event(id)
+    rescue_oauth_errors do
+      response = token.send('delete', ENDPOINTS[:event] % id)
+      response.status == 204
+    end
+  end
+
   # Public: fetches list coutns from a fake NB page with json on it.
   # Nationbuilder page template is only this:
   # {"supporter_count": {{ settings.supporters_count }}, "volunteer_count": {{ settings.volunteers_count }} }
@@ -81,9 +115,10 @@ class Integration::NationBuilder
     begin
       yield
     rescue OAuth2::Error => e
-      if e.response.parsed['code'] == 'no_matches'
+      case e.response.parsed['code']
+      when 'no_matches', 'not_found'
         nil
-      elsif e.response.parsed['code'] == 'validation_failed'
+      when 'validation_failed'
         e.response.parsed['validation_errors'][0]
       else
         puts e.inspect
@@ -103,6 +138,11 @@ class Integration::NationBuilder
   def self.parse_person_attributes(raw_parameters)
     parameters = ActionController::Parameters.new(raw_parameters)
     parameters.permit(ALLOWED_PARAMS_PERSON)
+  end
+
+  def self.parse_event_attributes(raw_parameters)
+    parameters = ActionController::Parameters.new(raw_parameters)
+    parameters.permit(ALLOWED_PARAMS_EVENT)
   end
 
   def self.rename_keys(hash, mappings)
