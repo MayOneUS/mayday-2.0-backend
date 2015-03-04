@@ -10,6 +10,10 @@ class Event < ActiveRecord::Base
     create(starts_at: start, ends_at: start + duration.hours)
   end
 
+  def self.upcoming_events(count=10)
+    where(starts_at: Time.now..4.weeks.from_now).order(:starts_at).limit(count)
+  end
+
   private
 
   def post_to_nation_builder

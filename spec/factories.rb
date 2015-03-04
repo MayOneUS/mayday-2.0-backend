@@ -18,8 +18,8 @@ FactoryGirl.define do
   end
 
   factory :event do
-    starts_at 24.hours.from_now
-    ends_at 25.hours.from_now
+    sequence(:starts_at, 1) { |n| n.hours.from_now }
+    sequence(:ends_at, 2)   { |n| n.hours.from_now }
     sequence(:remote_id)
   end
 

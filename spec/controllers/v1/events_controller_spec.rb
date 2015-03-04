@@ -8,8 +8,9 @@ describe V1::EventsController,  type: :controller do
       expect(response).to be_success
     end
     it "sets the events variable" do
+      event = instance_double("Event")
+      expect(Event).to receive(:upcoming_events) { [event] }
       get :index
-      event = FactoryGirl.create(:event)
       expect(assigns(:events)).to eq [event]
     end
   end
