@@ -206,6 +206,24 @@ describe Legislator do
 
   end
 
+  describe "#image_url" do
+    before do
+      @legislator = FactoryGirl.build(:legislator)
+      @bioguide_id = 'b1234'
+      allow(@legislator).to receive(:bioguide_id).and_return(@bioguide_id)
+    end
+    it "calls bioguide_id" do
+      @legislator.image_url
+      expect(@legislator).to have_received(:bioguide_id)
+    end
+    it "calls a proper url" do
+      aws_url = 'http://some-aws-url.com/'
+      ClimateControl.modify TWILIO_AUDIO_AWS_BUCKET_URL: aws_url do
+        expect(@legislator.image_url).to eq("#{aws_url}congress-photos/99x120/#{@bioguide_id}.jpg")
+      end
+    end
+  end
+
   describe "#refetch" do
     let(:state) { FactoryGirl.create(:state, abbrev: 'CA') }
     subject(:senator) { Legislator.fetch_one(state: state, senate_class: 1) }
@@ -221,7 +239,7 @@ describe Legislator do
 
   describe "#serializable_hash" do
     let(:senator) { FactoryGirl.create(:senator) }
-    let(:keys) { keys = ["id", "chamber", "party", "state_rank", "name", "state_abbrev", "district_code"] }
+    let(:keys) { ["id", "chamber", "party", "state_rank", "name", "image_url", "state_abbrev", "district_code"] }
 
     context "no args" do
       it "returns proper fields" do
