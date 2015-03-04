@@ -27,6 +27,7 @@ describe CallsController,  type: :controller do
         @phone = '555-555-5555'
         allow(legislator).to receive(:phone).and_return(@phone)
         setup_active_call_double(target_legislators: [legislator])
+        allow(@active_call).to receive(:next_target).and_return(legislator)
 
         @connection = double('connection')
         allow(@active_call).to receive(:create_connection!).and_return(@connection)
@@ -42,14 +43,35 @@ describe CallsController,  type: :controller do
         expect(@active_call).to have_received(:create_connection!)
       end
     end
-    context "with no target" do
+    context "with completed targets" do
       before do
         setup_active_call_double
+        allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)
+        allow(@active_call).to receive(:next_target).and_return(nil)
       end
       it "says sorry" do
         get :new_connection, 'CallSid': 123
+        target_text = Oga.parse_xml(response.body).css('Play').text
+        expect(target_text).to match(/closing_message/)
+        expect(target_text).to match(/goodbye/)
+      end
+      it "hangs up" do
+        get :new_connection, 'CallSid': 123
         xml_response = Oga.parse_xml(response.body)
-        expect(xml_response.css('Say').text).to match('Please try again later')
+        expect(xml_response.css('Hangup')).to be_present
+      end
+    end
+    context "with no target" do
+      before do
+        setup_active_call_double
+        allow(@active_call).to receive_message_chain(:connections, :size).and_return(0)
+        allow(@active_call).to receive(:next_target).and_return(nil)
+      end
+      it "says sorry" do
+        get :new_connection, 'CallSid': 123
+        target_text = Oga.parse_xml(response.body).css('Play').text
+        expect(target_text).to match(/no_targets/)
+        expect(target_text).to match(/goodbye/)
       end
       it "hangs up" do
         get :new_connection, 'CallSid': 123
@@ -76,7 +98,7 @@ describe CallsController,  type: :controller do
       post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
       xml_response = Oga.parse_xml(response.body)
 
-      expect(xml_response.css('Say').text).to match(/How did the senator/)
+      expect(xml_response.css('Play').text).to match(/user_response/)
     end
     it "renders a twilio gather with the proper action" do
       post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
@@ -93,6 +115,8 @@ describe CallsController,  type: :controller do
       @connection = double('connection')
       allow(Ivr::Connection).to receive(:find).and_return(@connection)
       allow(@connection).to receive(:update)
+      setup_active_call_double
+      allow(@active_call).to receive_message_chain(:connections, :size).and_return(1)
     end
     it "finds the correct connection" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
@@ -102,9 +126,21 @@ describe CallsController,  type: :controller do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
       expect(@connection).to have_received(:update).with(status_from_user: Ivr::Connection::USER_RESPONSE_CODES['1'])
     end
+    it "plays an encouraging message" do
+      allow(@active_call).to receive_message_chain(:connections, :size).and_return(3)
+      allow(AudioFileFetcher).to receive(:file_for_key)
+      post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
+
+      xml_response = Oga.parse_xml(response.body)
+      expect(xml_response.css('Play')).to be_present
+      expect(AudioFileFetcher).to have_received(:file_for_key).with('encouraging_3')
+    end
     it "redirects to new_connection_path" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
-      expect(response).to redirect_to calls_new_connection_path
+      xml_response = Oga.parse_xml(response.body)
+
+      expect(xml_response.css('Redirect').attribute('method')[0].value).to eq('get')
+      expect(xml_response.css('Redirect').text).to eq(calls_new_connection_url)
     end
   end
 
