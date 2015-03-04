@@ -52,6 +52,8 @@ GEM
       columnize (~> 0.8)
       debugger-linecache (~> 1.2)
       slop (~> 3.6)
+    climate_control (0.0.3)
+      activesupport (>= 3.0)
     codeclimate-test-reporter (0.4.6)
       simplecov (>= 0.7.1, < 1.0.0)
     columnize (0.9.0)
@@ -235,6 +237,7 @@ DEPENDENCIES
   annotate (>= 2.6.0)
   bullet
   byebug
+  climate_control
   codeclimate-test-reporter
   database_cleaner
   dotenv-rails
