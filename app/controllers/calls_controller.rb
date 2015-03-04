@@ -23,17 +23,17 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       if active_call.next_target.present?
         connection = active_call.create_connection!
-        r.Play AudioFileFetcher.file_for_key('connecting_local')
+        # r.Play AudioFileFetcher.file_for_key('connecting_local')
         r.Play AudioFileFetcher.file_for_key('connecting_to_representative')
-        r.Say 'Press star at any time to disconnect from your legislator.'
+        r.Play AudioFileFetcher.file_for_key('star_to_disconnect')
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
         r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
-      elsif active_call.connections >= 5
-        r.Play AudioFileFetcher.file_for_key('closing_message')
       else
-        r.Say 'We don\'t have any targets for you. Please try again later.'
+        audio_key = active_call.connections.size >= 5 ? 'closing_message' : 'no_targets'
+        r.Play AudioFileFetcher.file_for_key(audio_key)
+        r.Play AudioFileFetcher.file_for_key('goodbye')
         r.Hangup
-      end
+       end
     end
 
     render_twiml response
@@ -69,7 +69,13 @@ class CallsController < ApplicationController
   def connection_gather
     active_connection = Ivr::Connection.find(params[:connection_id])
     active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
-    redirect_to calls_new_connection_path
+    response = Twilio::TwiML::Response.new do |r|
+      connection_count = active_call.connections.size
+      r.Play AudioFileFetcher.file_for_key("encouraging_#{connection_count}")
+      r.Redirect calls_new_connection_url, method: 'get'
+    end
+
+    render_twiml response
   end
 
   private
