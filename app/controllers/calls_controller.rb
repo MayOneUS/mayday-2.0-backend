@@ -16,7 +16,8 @@ class CallsController < ApplicationController
     render_twiml response
   end
 
-  # Public: initiates a new outgoing call to congress
+  # Public: initiates a new outgoing call to congress. If ENV FAKE_CONGRESS_NUMBER is
+  # set, then the all calls will be routed to that number.
   #
   # CallSid - default param from twilio (required)
   def new_connection
