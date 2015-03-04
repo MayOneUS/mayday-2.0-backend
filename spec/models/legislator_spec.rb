@@ -34,6 +34,31 @@
 require 'rails_helper'
 
 describe Legislator do
+  describe ".create_or_update" do
+    context "new record" do
+      it "creates record with appropriate values" do
+        FactoryGirl.create(:state, abbrev: 'CA')
+        hash = { bioguide_id:  'A001',
+                 chamber:      'senate',
+                 state_abbrev: 'CA',
+                 first_name:   'Joe',
+                 last_name:    'Smith' }
+        rep = Legislator.create_or_update(hash)
+        expect(rep.slice(*hash.keys).values).to eq hash.values
+      end
+    end
+    context "existing record" do
+      it "updates record with appropriate values" do
+        FactoryGirl.create(:senator, bioguide_id: 'A001')
+        hash = { bioguide_id:  'A001',
+                 first_name:   'Joe',
+                 last_name:    'Smith' }
+        rep = Legislator.create_or_update(hash)
+        expect(rep.slice(*hash.keys).values).to eq hash.values
+      end
+    end
+  end
+
   describe ".fetch_one" do
     context "by district" do
       let(:state) { FactoryGirl.create(:state, abbrev: 'CA') }
