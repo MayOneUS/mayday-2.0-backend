@@ -132,7 +132,7 @@ class Legislator < ActiveRecord::Base
     district.district if district
   end
 
-  def image_url(size:'225x275')
+  def image_url
     "#{ENV['TWILIO_AUDIO_AWS_BUCKET_URL']}congress-photos/99x120/#{bioguide_id}.jpg"
   end
 

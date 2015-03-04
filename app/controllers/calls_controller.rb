@@ -2,8 +2,6 @@ class CallsController < ApplicationController
 
   after_filter :set_header
 
-
-
   # Public: initiates the call process via a request from twillio
   #
   # CallSid - default param from twilio (required)
@@ -34,7 +32,7 @@ class CallsController < ApplicationController
         r.Play AudioFileFetcher.file_for_key(audio_key)
         r.Play AudioFileFetcher.file_for_key('goodbye')
         r.Hangup
-       end
+      end
     end
 
     render_twiml response
