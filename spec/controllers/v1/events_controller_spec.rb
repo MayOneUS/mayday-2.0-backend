@@ -2,6 +2,18 @@ require 'rails_helper'
 
 describe V1::EventsController,  type: :controller do
 
+  describe "GET index" do
+    it "returns success" do
+      get :index
+      expect(response).to be_success
+    end
+    it "sets the events variable" do
+      event = instance_double("Event")
+      expect(Event).to receive(:upcoming_events) { [event] }
+      get :index
+      expect(assigns(:events)).to eq [event]
+    end
+  end
 
   describe "POST create_rsvp" do
     context "with a person in parameters" do
