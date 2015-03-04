@@ -23,7 +23,7 @@ RSpec.describe Event, type: :model do
     end
 
     it "doesn't return past event" do
-      event = FactoryGirl.create(:event, starts_at: 1.hour.ago)
+      FactoryGirl.create(:event, starts_at: 1.hour.ago)
       expect(Event.upcoming_events).to be_empty
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Event, type: :model do
     context "creating new event without remote_id" do
       it "sends call to update NationBuilder" do
         expect(Integration::NationBuilder).to receive(:create_event).
-            with({ attributes: event_attributes }) { 1 }
+          with(attributes: event_attributes) { 1 }
         FactoryGirl.create(:event, remote_id: nil, starts_at: start, ends_at: start + 1.hour)
       end
     end
