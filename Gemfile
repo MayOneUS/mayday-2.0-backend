@@ -4,6 +4,7 @@ gem 'rails', '4.2.0'
 gem 'pg'
 gem 'redis'
 gem 'redis-objects'
+gem 'database_cleaner'
 
 # API consuming
 gem 'rest-client'
@@ -31,7 +32,6 @@ group :development, :test do
   gem 'spring-commands-rspec'
   gem 'dotenv-rails'
   gem 'rspec-rails'
-  gem 'database_cleaner'
 end
 
 group :development do
