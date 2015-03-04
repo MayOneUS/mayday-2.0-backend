@@ -7,6 +7,12 @@ namespace :db do
       campaign = Campaign.create(name: 'test campaign')
       campaign.legislators = Legislator.unconvinced.first(20)
       campaign.targets.limit(5).update_all(priority: 1)
+      start = DateTime.parse("2015-03-14 7pm EDT").utc
+      (1..7).each do |n|
+        Event.create(starts_at: start + n.days,
+                     ends_at:   start + 1.hour + n.days,
+                     remote_id: 23 + n)
+      end
     end
 
     desc "Purge DB of all data"

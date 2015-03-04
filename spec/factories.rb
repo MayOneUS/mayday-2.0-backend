@@ -20,6 +20,7 @@ FactoryGirl.define do
   factory :event do
     starts_at 24.hours.from_now
     ends_at 25.hours.from_now
+    sequence(:remote_id)
   end
 
   factory :legislator do

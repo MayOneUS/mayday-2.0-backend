@@ -20,8 +20,8 @@ RSpec.describe Event, type: :model do
     context "creating new event without remote_id" do
       it "sends call to update NationBuilder" do
         expect(Integration::NationBuilder).to receive(:create_event)
-          .with({ attributes: event_attributes })
-        FactoryGirl.create(:event, starts_at: start, ends_at: start + 1.hour)
+          .with({ attributes: event_attributes }) { 1 }
+        FactoryGirl.create(:event, remote_id: nil, starts_at: start, ends_at: start + 1.hour)
       end
     end
 
