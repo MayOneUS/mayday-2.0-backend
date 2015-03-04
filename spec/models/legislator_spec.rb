@@ -214,7 +214,7 @@ describe Legislator do
 
   describe "#serializable_hash" do
     let(:senator) { FactoryGirl.create(:senator) }
-    let(:keys) { keys = ["id", "chamber", "party", "state_rank", "name", "image_url", "state_abbrev", "district_code"] }
+    let(:keys) { ["id", "chamber", "party", "state_rank", "name", "image_url", "state_abbrev", "district_code"] }
 
     context "no args" do
       it "returns proper fields" do
