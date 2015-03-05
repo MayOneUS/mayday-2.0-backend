@@ -5,6 +5,7 @@ describe CallsController,  type: :controller do
   def setup_active_call_double(target_legislators:[])
     @active_call = double('active_call')
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
+    allow(@active_call).to receive(:exceeded_max_connections?).and_return(false)
     allow(Ivr::Call).to receive_message_chain(:includes, :where, :first_or_create).and_return(@active_call)
   end
 
@@ -47,6 +48,7 @@ describe CallsController,  type: :controller do
       before do
         setup_active_call_double
         allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)
+        allow(@active_call).to receive(:exceeded_max_connections?).and_return(true)
         allow(@active_call).to receive(:next_target).and_return(nil)
       end
       it "says sorry" do
