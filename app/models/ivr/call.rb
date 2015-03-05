@@ -38,4 +38,8 @@ class Ivr::Call < ActiveRecord::Base
     (target_legislators - person.called_legislators).sample
   end
 
+  def exceeded_max_connections?
+    connections.size >= Ivr::Call::MAXIMUM_CONNECTIONS
+  end
+
 end

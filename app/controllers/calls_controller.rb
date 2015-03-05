@@ -20,7 +20,7 @@ class CallsController < ApplicationController
   # CallSid - default param from twilio (required)
   def new_connection
     response = Twilio::TwiML::Response.new do |r|
-      if active_call.next_target.present?
+      if active_call.next_target.present? && !active_call.exceeded_max_connections?
         connection = active_call.create_connection!
         # r.Play AudioFileFetcher.audio_url_for_key('connecting_local')
         r.Play AudioFileFetcher.audio_url_for_key('connecting_to_representative')
@@ -28,7 +28,7 @@ class CallsController < ApplicationController
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
         r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
       else
-        audio_key = active_call.connections.size >= 5 ? 'closing_message' : 'no_targets'
+        audio_key = active_call.exceeded_max_connections? ? 'closing_message' : 'no_targets'
         r.Play AudioFileFetcher.audio_url_for_key(audio_key)
         r.Play AudioFileFetcher.audio_url_for_key('goodbye')
         r.Hangup
@@ -78,10 +78,6 @@ class CallsController < ApplicationController
   end
 
   private
-
-  def max_connections
-    active_call.connections.size >= Ivr::Call::MAXIMUM_CONNECTIONS
-  end
 
   def set_header
     response.headers["Content-Type"] = "text/xml"
