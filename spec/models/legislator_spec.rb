@@ -217,12 +217,12 @@ describe Legislator do
   describe "#display_district" do
     it "returns 'District #' for represenatives not at-large" do
       legislator = FactoryGirl.build(:representative)
-      allow(legislator).to receive(:district_code).and_return(1)
+      allow(legislator).to receive(:district_code).and_return('1')
       expect(legislator.display_district).to eq('District 1')
     end
     it "returns 'District #' for represenatives not at-large" do
       legislator = FactoryGirl.build(:representative)
-      allow(legislator).to receive(:district_code).and_return(0)
+      allow(legislator).to receive(:district_code).and_return('0')
       expect(legislator.display_district).to eq('At Large')
     end
     it "returns nil for senators" do

@@ -135,7 +135,7 @@ class Legislator < ActiveRecord::Base
 
   def display_district
     if representative?
-      if district_code == 0
+      if district_code == '0'
         "At Large"
       else
         "District #{district_code}"
