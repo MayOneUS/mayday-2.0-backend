@@ -17,6 +17,7 @@ class Ivr::Connection < ActiveRecord::Base
   belongs_to :call, required: true, class_name: 'Ivr::Call'
   belongs_to :legislator, required: true
   has_many :campaigns, through: :legislator
+  delegate :person, to: :call
 
   USER_RESPONSE_CODES = {
     '1' => 'success',
@@ -25,4 +26,17 @@ class Ivr::Connection < ActiveRecord::Base
 
   scope :uncompleted, -> { where(status: nil, remote_id: nil) }
   scope :completed, -> { where(status: Ivr::Call::CALL_STATUSES[:completed]) }
+
+  def connecting_message_key
+    if legislator.senator?
+      'connecting_to_senator'
+    else
+      if person.constituent_of?(legislator)
+        'connecting_to_rep_local'
+      else
+        'connecting_to_rep'
+      end
+    end
+  end
+
 end
