@@ -34,10 +34,6 @@ class Ivr::Call < ActiveRecord::Base
     connections.create(legislator: next_target)
   end
 
-  def random_target
-    (target_legislators - person.called_legislators).sample
-  end
-
   def exceeded_max_connections?
     connections.size >= Ivr::Call::MAXIMUM_CONNECTIONS
   end
