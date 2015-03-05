@@ -9,8 +9,9 @@ Rails.application.routes.draw do
     resources :events, only: :index do
       post :create_rsvp, on: :collection
     end
+    get '/people/targets',                 to: 'people#targets'
   end
-  post  '/calls/start',                    to: 'calls#start'
+  post '/calls/start',                    to: 'calls#start'
   get  '/calls/new_connection',           to: 'calls#new_connection'
   post '/calls/connection_gather_prompt', to: 'calls#connection_gather_prompt'
   post '/calls/connection_gather',        to: 'calls#connection_gather'
