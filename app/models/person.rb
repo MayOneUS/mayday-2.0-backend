@@ -47,7 +47,7 @@ class Person < ActiveRecord::Base
   end
 
   def constituent_of?(legislator)
-    legislators.include?(legislator) if legislators
+    legislators && legislators.include?(legislator)
   end
 
   def next_target
