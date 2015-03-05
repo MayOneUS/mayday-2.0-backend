@@ -43,8 +43,10 @@ class Location < ActiveRecord::Base
       self.zip_code  = zip
       self.state     = zip_code.try(:state)
       self.district  = zip_code.try(:single_district)
+    else
+      return nil
     end
-    self.save
+    save
   end
 
   def state_abbrev

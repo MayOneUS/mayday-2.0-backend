@@ -24,30 +24,34 @@ describe Person do
   describe "#constituent_of?" do
     let(:senator) { FactoryGirl.create(:senator) }
     let(:rep) { FactoryGirl.create(:representative) }
+
     it "returns nil if person has no state/district" do
       person = FactoryGirl.build(:person)
       expect(person.constituent_of? rep).to be_nil
     end
+
     it "returns true if rep in person's district" do
       person = FactoryGirl.create(:person, district: rep.district)
       expect(person.constituent_of? rep).to be true
     end
+
     it "returns true if senator in person's state" do
       person = FactoryGirl.create(:person, state: senator.state)
       expect(person.constituent_of? senator).to be true
     end
+
     it "returns false if senator in other state" do
       person = FactoryGirl.create(:person, state: FactoryGirl.create(:state))
       expect(person.constituent_of? senator).to be false
     end
+
   end
 
   describe "#target_legislators" do
     let(:district) { FactoryGirl.create(:district) }
     let(:person)   { FactoryGirl.create(:person, district: district,
-                                                 state:    district.state,
-                                                 zip_code: '03431') }
-    let!(:campaign) { FactoryGirl.create(:campaign_with_reps, count: 6, priority: 1) }
+                                                 state:    district.state) }
+    let!(:campaign) { FactoryGirl.create(:campaign_with_reps, count: 5, priority: 1) }
     let!(:rep_with_us) { FactoryGirl.create(:representative, with_us: true, district: district) }
     let!(:unconvinced_senator) {FactoryGirl.create(:senator, with_us: false, state: district.state) }
 
@@ -57,6 +61,11 @@ describe Person do
       it "returns local senator first" do
         expect(legislators.first).to eq unconvinced_senator
       end
+
+      it "doesn't include rep with us" do
+        expect(legislators).not_to include rep_with_us
+      end
+
       it "returns 5 legislators" do
         expect(legislators.count).to eq 5
       end
@@ -65,15 +74,20 @@ describe Person do
     context "json" do
       subject(:legislators) { person.target_legislators(json: true) }
 
-      it "returns local senator first" do
-        expect(legislators.first['id']).to eq unconvinced_senator.id
+      it "sets local attribute for all targets" do
+        locals = legislators.map{|l| l['local']}
+        expect(locals).to eq [true, false, false, false, false]
       end
-      it "sets local to true for local senator" do
-        expect(legislators.first['local']).to be true
+
+    end
+
+    context "with count arg" do
+      subject(:legislators) { person.target_legislators(count: 3) }
+
+      it "returns appropriate count" do
+        expect(legislators.count).to eq 3
       end
-      it "sets local to false for other targets" do
-        expect(legislators.second['local']).to be false
-      end
+
     end
   end
 
