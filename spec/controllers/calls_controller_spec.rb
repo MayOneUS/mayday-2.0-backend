@@ -26,7 +26,7 @@ describe CallsController,  type: :controller do
       allow(@active_call).to receive(:save)
       allow(@active_call).to receive(:person=)
       allow(Person).to receive(:find_or_create_by)
-  end
+    end
     context "with an existing call" do
       it "does not save a new call" do
         setup_active_call_with_new_record
@@ -38,7 +38,7 @@ describe CallsController,  type: :controller do
     end
     context "without an existing call" do
       it "saves a new call record" do
-        setup_active_call_with_new_record(new_record:true)
+        setup_active_call_with_new_record(new_record: true)
         post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
 
         expect(@active_call).to have_received(:save)
