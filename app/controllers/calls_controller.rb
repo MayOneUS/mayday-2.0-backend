@@ -7,6 +7,7 @@ class CallsController < ApplicationController
   # CallSid - default param from twilio (required)
   def start
     response = Twilio::TwiML::Response.new do |r|
+      r.Pause
       r.Play AudioFileFetcher.audio_url_for_key('intro_message')
       r.Redirect calls_new_connection_url, method: 'get'
     end
@@ -22,8 +23,7 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       if active_call.next_target.present? && !active_call.exceeded_max_connections?
         connection = active_call.create_connection!
-        # r.Play AudioFileFetcher.audio_url_for_key('connecting_local')
-        r.Play AudioFileFetcher.audio_url_for_key('connecting_to_representative')
+        r.Play AudioFileFetcher.audio_url_for_key(connection.connecting_message_key)
         r.Play AudioFileFetcher.audio_url_for_key('star_to_disconnect')
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
         r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true

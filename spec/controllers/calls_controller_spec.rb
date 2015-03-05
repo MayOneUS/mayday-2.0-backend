@@ -31,6 +31,7 @@ describe CallsController,  type: :controller do
         allow(@active_call).to receive(:next_target).and_return(legislator)
 
         @connection = double('connection')
+        allow(@connection).to receive(:connecting_message_key).and_return('connecting_to_senator')
         allow(@active_call).to receive(:create_connection!).and_return(@connection)
         allow(@connection).to receive(:legislator).and_return(legislator)
       end
