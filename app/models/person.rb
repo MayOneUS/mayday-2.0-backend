@@ -64,12 +64,12 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def other_targets(count: 5, excluding: nil)
+  def other_targets(count: Ivr::Call::MAXIMUM_CONNECTIONS, excluding: nil)
     num_to_fetch = count - excluding.count
     Legislator.default_targets(excluding: excluding, count: num_to_fetch)
   end
 
-  def target_legislators(json: false, count: 5)
+  def target_legislators(json: false, count: Ivr::Call::MAXIMUM_CONNECTIONS)
     locals = unconvinced_legislators
     others = other_targets(count: count, excluding: locals)
     if json

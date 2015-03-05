@@ -5,6 +5,7 @@ describe CallsController,  type: :controller do
   def setup_active_call_double(target_legislators:[])
     @active_call = double('active_call')
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
+    allow(@active_call).to receive(:exceeded_max_connections?).and_return(false)
     allow(Ivr::Call).to receive_message_chain(:includes, :where, :first_or_create).and_return(@active_call)
   end
 
@@ -47,6 +48,7 @@ describe CallsController,  type: :controller do
       before do
         setup_active_call_double
         allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)
+        allow(@active_call).to receive(:exceeded_max_connections?).and_return(true)
         allow(@active_call).to receive(:next_target).and_return(nil)
       end
       it "says sorry" do
@@ -128,12 +130,12 @@ describe CallsController,  type: :controller do
     end
     it "plays an encouraging message" do
       allow(@active_call).to receive_message_chain(:connections, :size).and_return(3)
-      allow(AudioFileFetcher).to receive(:file_for_key)
+      allow(AudioFileFetcher).to receive(:audio_url_for_key)
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
 
       xml_response = Oga.parse_xml(response.body)
       expect(xml_response.css('Play')).to be_present
-      expect(AudioFileFetcher).to have_received(:file_for_key).with('encouraging_3')
+      expect(AudioFileFetcher).to have_received(:audio_url_for_key).with('encouraging_3')
     end
     it "redirects to new_connection_path" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1

@@ -50,4 +50,19 @@ describe Ivr::Call, type: :model do
       end
     end
   end
+  describe "exceeded_max_connections?" do
+    def setup_call_with_connections(connections_count=1)
+      call = FactoryGirl.build(:call)
+      allow(call).to receive(:connections).and_return(Array.new(connections_count,0))
+      call
+    end
+    it "returns false with 3 connections" do
+      call = setup_call_with_connections(3)
+      expect(call.exceeded_max_connections?).to be false
+    end
+    it "returns true with 5 connections" do
+      call = setup_call_with_connections(5)
+      expect(call.exceeded_max_connections?).to be true
+    end
+  end
 end

@@ -4,9 +4,10 @@ class AudioFileFetcher
 
   VALID_FILE_NAMES = %w[
     closing_message
-    connecting_local
+    connecting_local_rep
     connecting_to_representative
     connecting_to_senator
+    connecting_local_sen
     encouraging_1
     encouraging_2
     encouraging_3
@@ -19,10 +20,13 @@ class AudioFileFetcher
     user_response
   ]
 
-  def self.file_for_key(key)
+  def self.audio_url_for_key(key)
     raise ArgumentError, 'Invalid audio file key' if !VALID_FILE_NAMES.include?(key)
     AWS_BUCKET + key + '.wav'
   end
 
+  def self.encouraging_audio_for_count(connection_count)
+    audio_url_for_key("encouraging_#{connection_count}")
+  end
 
 end
