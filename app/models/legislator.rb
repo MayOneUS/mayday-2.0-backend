@@ -129,8 +129,22 @@ class Legislator < ActiveRecord::Base
     state ? state.abbrev : district.state.abbrev
   end
 
+  def title
+    senator? ? 'Senator' : 'Representative'
+  end
+
+  def display_district
+    if representative?
+      if district_code == 0
+        "At Large"
+      else
+        "District #{district_code}"
+      end
+    end
+  end
+
   def district_code
-    district.district if district
+    district && district.district
   end
 
   def image_url
@@ -140,7 +154,7 @@ class Legislator < ActiveRecord::Base
   private
 
   def serializable_hash(options)
-    super(methods: [:name, :state_abbrev, :district_code, :image_url],
+    super(methods: [:name, :state_abbrev, :district_code, :image_url, :title, :display_district],
             only: [:id, :party, :chamber, :state_rank]).merge(options || {})
   end
 
