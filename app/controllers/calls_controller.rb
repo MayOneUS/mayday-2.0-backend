@@ -48,10 +48,9 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       r.Gather(
         action: calls_connection_gather_url(connection_id: active_connection.id),
-        timeout: 15
       ) do |gather|
         r.Play AudioFileFetcher.audio_url_for_key('user_response')
-        gather.Pause(length: 5)
+        gather.Pause
         r.Play AudioFileFetcher.audio_url_for_key('user_response')
       end
       r.Redirect calls_new_connection_url, method: 'get'

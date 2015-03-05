@@ -32,11 +32,11 @@ describe Ivr::Call, type: :model do
       expect(call.called_legislators).to eq([connection.legislator])
     end
   end
-  describe "#random_target" do
+  describe "#next_target" do
     it "returns a legislator" do
       targeted_senator = FactoryGirl.create(:senator, :targeted)
       call = FactoryGirl.build(:call)
-      expect(call.random_target).to eq(targeted_senator)
+      expect(call.next_target).to eq(targeted_senator)
     end
     context "with a called legislator" do
       it "returns only uncalled legislators" do
@@ -46,7 +46,7 @@ describe Ivr::Call, type: :model do
         call.connections << FactoryGirl.build(:connection, :completed, legislator: legislators[1])
         call.save
 
-        expect(call.random_target).to eq(legislators[2])
+        expect(call.next_target).to eq(legislators[2])
       end
     end
   end

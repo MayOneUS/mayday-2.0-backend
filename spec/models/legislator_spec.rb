@@ -203,7 +203,32 @@ describe Legislator do
         expect(Legislator.default_targets(excluding: [rep, senator]).count).to eq 1
       end
     end
+  end
 
+  describe "#title" do
+    it "returns Senator for senators" do
+      expect(FactoryGirl.build(:senator).title).to eq('Senator')
+    end
+    it "returns Representative for representative" do
+      expect(FactoryGirl.build(:representative).title).to eq('Rep.')
+    end
+  end
+
+  describe "#display_district" do
+    it "returns 'District #' for represenatives not at-large" do
+      legislator = FactoryGirl.build(:representative)
+      allow(legislator).to receive(:district_code).and_return('1')
+      expect(legislator.display_district).to eq('District 1')
+    end
+    it "returns 'District #' for represenatives not at-large" do
+      legislator = FactoryGirl.build(:representative)
+      allow(legislator).to receive(:district_code).and_return('0')
+      expect(legislator.display_district).to eq('At Large')
+    end
+    it "returns nil for senators" do
+      legislator = FactoryGirl.build(:senator)
+      expect(legislator.display_district).to be_nil
+    end
   end
 
   describe "#image_url" do
@@ -239,7 +264,7 @@ describe Legislator do
 
   describe "#serializable_hash" do
     let(:senator) { FactoryGirl.create(:senator) }
-    let(:keys) { ["id", "chamber", "party", "state_rank", "name", "image_url", "state_abbrev", "district_code"] }
+    let(:keys) { ["id", "chamber", "party", "state_rank", "name", "title", "image_url", "display_district", "state_abbrev", "district_code"] }
 
     context "no args" do
       it "returns proper fields" do
