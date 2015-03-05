@@ -96,7 +96,7 @@ class Legislator < ActiveRecord::Base
     find_or_initialize_by(bioguide_id: bioguide_id).tap{|l| l.update(hash)}
   end
 
-  def self.default_targets(excluding: [], count: 5)
+  def self.default_targets(excluding: [], count: Ivr::Call::MAXIMUM_CONNECTIONS)
     where.not(id: excluding.map(&:id)).top_priority.first(count)
   end
 
