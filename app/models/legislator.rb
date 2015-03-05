@@ -151,6 +151,13 @@ class Legislator < ActiveRecord::Base
     "#{ENV['TWILIO_AUDIO_AWS_BUCKET_URL']}congress-photos/99x120/#{bioguide_id}.jpg"
   end
 
+  def image_exists?
+    uri = URI(image_url)
+    request = Net::HTTP.new uri.host
+    response= request.request_head uri.path
+    return response.code.to_i == 200
+  end
+
   private
 
   def serializable_hash(options)
