@@ -130,7 +130,7 @@ class Legislator < ActiveRecord::Base
   end
 
   def title
-    senator? ? 'Senator' : 'Representative'
+    senator? ? 'Senator' : 'Rep.'
   end
 
   def display_district

@@ -210,7 +210,7 @@ describe Legislator do
       expect(FactoryGirl.build(:senator).title).to eq('Senator')
     end
     it "returns Representative for representative" do
-      expect(FactoryGirl.build(:representative).title).to eq('Representative')
+      expect(FactoryGirl.build(:representative).title).to eq('Rep.')
     end
   end
 
