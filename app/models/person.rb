@@ -38,6 +38,18 @@ class Person < ActiveRecord::Base
     district.blank?
   end
 
+  def legislators
+    if district
+      district.legislators
+    elsif state
+      state.senators
+    end
+  end
+
+  def constituent_of?(legislator)
+    legislators.include?(legislator) if legislators
+  end
+
   def next_target
     (target_legislators - called_legislators).first
   end
