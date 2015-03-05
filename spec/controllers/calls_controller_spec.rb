@@ -128,12 +128,12 @@ describe CallsController,  type: :controller do
     end
     it "plays an encouraging message" do
       allow(@active_call).to receive_message_chain(:connections, :size).and_return(3)
-      allow(AudioFileFetcher).to receive(:file_for_key)
+      allow(AudioFileFetcher).to receive(:audio_url_for_key)
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
 
       xml_response = Oga.parse_xml(response.body)
       expect(xml_response.css('Play')).to be_present
-      expect(AudioFileFetcher).to have_received(:file_for_key).with('encouraging_3')
+      expect(AudioFileFetcher).to have_received(:audio_url_for_key).with('encouraging_3')
     end
     it "redirects to new_connection_path" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1

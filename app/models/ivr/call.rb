@@ -28,6 +28,8 @@ class Ivr::Call < ActiveRecord::Base
     failed:    'failed'
   }
 
+  MAXIMUM_CONNECTIONS = 5
+
   def create_connection!
     connections.create(legislator: next_target)
   end
