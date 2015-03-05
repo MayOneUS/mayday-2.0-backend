@@ -88,7 +88,12 @@ class CallsController < ApplicationController
 
   def active_call
     remote_id = params['CallSid'] || params[:remote_id]
-    @call = Ivr::Call.includes(connections: :legislator).where(remote_id: remote_id).first_or_create
+    @call = Ivr::Call.includes(connections: :legislator).first_or_initialize(remote_id: remote_id)
+    if @call.new_record?
+      @call.person ||= Person.find_or_create_by(phone: params[:From])
+      @call.save
+    end
+    @call
   end
 
 end

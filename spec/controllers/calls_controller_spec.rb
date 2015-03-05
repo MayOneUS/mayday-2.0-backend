@@ -2,11 +2,49 @@ require 'rails_helper'
 
 describe CallsController,  type: :controller do
 
-  def setup_active_call_double(target_legislators:[])
+  def setup_active_call_double(target_legislators:[], new_record:false)
     @active_call = double('active_call')
+    person = double('person')
+    allow(@active_call).to receive(:person).and_return(!new_record && person || nil)
+    allow(@active_call).to receive(:new_record?).and_return(new_record)
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
     allow(@active_call).to receive(:exceeded_max_connections?).and_return(false)
-    allow(Ivr::Call).to receive_message_chain(:includes, :where, :first_or_create).and_return(@active_call)
+    allow(Ivr::Call).to receive_message_chain(:includes, :first_or_initialize).and_return(@active_call)
+  end
+
+  def setup_last_connection
+    @last_connection = double('last_connection')
+    allow(@active_call).to receive(:last_connection).and_return(@last_connection)
+    allow(@last_connection).to receive(:update)
+    allow(@last_connection).to receive(:id).and_return(123)
+  end
+
+  describe "setting up active_call" do
+    def setup_active_call_with_new_record(new_record: false)
+      setup_active_call_double(new_record: new_record)
+      setup_last_connection
+      allow(@active_call).to receive(:save)
+      allow(@active_call).to receive(:person=)
+      allow(Person).to receive(:find_or_create_by)
+  end
+    context "with an existing call" do
+      it "does not save a new call" do
+        setup_active_call_with_new_record
+        post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
+
+        expect(@active_call).not_to have_received(:save)
+        expect(Person).not_to have_received(:find_or_create_by)
+      end
+    end
+    context "without an existing call" do
+      it "saves a new call record" do
+        setup_active_call_with_new_record(new_record:true)
+        post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
+
+        expect(@active_call).to have_received(:save)
+        expect(Person).to have_received(:find_or_create_by)
+      end
+    end
   end
 
   describe "GET start" do
@@ -86,10 +124,7 @@ describe CallsController,  type: :controller do
   describe "POST connection_gather_prompt" do
     before do
       setup_active_call_double
-      @last_connection = double('last_connection')
-      allow(@active_call).to receive(:last_connection).and_return(@last_connection)
-      allow(@last_connection).to receive(:update)
-      allow(@last_connection).to receive(:id).and_return(123)
+      setup_last_connection
     end
     it "updates active_connection with remote_id" do
       post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
