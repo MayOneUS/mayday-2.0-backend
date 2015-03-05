@@ -122,7 +122,7 @@ class Legislator < ActiveRecord::Base
   def name
     first = verified_first_name || nickname || first_name
     last  = verified_last_name  || last_name
-    first + ' ' + last
+    first + ' ' + last + (name_suffix ? ', ' + name_suffix : '')
   end
 
   def state_abbrev
