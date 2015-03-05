@@ -21,6 +21,27 @@ describe Person do
     end
   end
 
+  describe "#constituent_of?" do
+    let(:senator) { FactoryGirl.create(:senator) }
+    let(:rep) { FactoryGirl.create(:representative) }
+    it "returns nil if person has no state/district" do
+      person = FactoryGirl.build(:person)
+      expect(person.constituent_of? rep).to be_nil
+    end
+    it "returns true if rep in person's district" do
+      person = FactoryGirl.create(:person, district: rep.district)
+      expect(person.constituent_of? rep).to be true
+    end
+    it "returns true if senator in person's state" do
+      person = FactoryGirl.create(:person, state: senator.state)
+      expect(person.constituent_of? senator).to be true
+    end
+    it "returns false if senator in other state" do
+      person = FactoryGirl.create(:person, state: FactoryGirl.create(:state))
+      expect(person.constituent_of? senator).to be false
+    end
+  end
+
   describe "#target_legislators" do
     let(:district) { FactoryGirl.create(:district) }
     let(:person)   { FactoryGirl.create(:person, district: district,
