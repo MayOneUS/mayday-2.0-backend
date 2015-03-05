@@ -21,7 +21,7 @@ class AudioFileFetcher
   ]
 
   def self.audio_url_for_key(key)
-    raise ArgumentError, 'Invalid audio file key' if !VALID_FILE_NAMES.include?(key)
+    raise ArgumentError, "Invalid audio file key: #{key}" if !VALID_FILE_NAMES.include?(key)
     AWS_BUCKET + key + '.wav'
   end
 
