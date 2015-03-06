@@ -21,10 +21,14 @@ class Person < ActiveRecord::Base
   has_many :called_legislators, through: :calls
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
-  validates :email, presence: true, uniqueness: { case_sensitive: false },
-                    format: { with: VALID_EMAIL_REGEX }
+  validates :email, uniqueness: { case_sensitive: false },
+                    format: { with: VALID_EMAIL_REGEX },
+                    allow_nil: true
 
-  before_save { self.email = email.downcase }
+  validates :email, presence: true, if: "phone.nil?"
+  validates :phone, presence: true, if: "email.nil?"
+
+  before_save :downcase_email
   after_save :update_nation_builder
 
   alias_method :location_association, :location
@@ -86,5 +90,9 @@ class Person < ActiveRecord::Base
     if relevant_fields.any?
       NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields))
     end
+  end
+
+  def downcase_email
+    email && self.email = email.downcase
   end
 end

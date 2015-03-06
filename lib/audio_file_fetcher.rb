@@ -4,8 +4,8 @@ class AudioFileFetcher
 
   VALID_FILE_NAMES = %w[
     closing_message
-    connecting_local_rep
-    connecting_to_representative
+    connecting_to_rep
+    connecting_to_rep_local
     connecting_to_senator
     connecting_local_sen
     encouraging_1
