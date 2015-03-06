@@ -59,8 +59,7 @@ describe V1::PeopleController,  type: :controller do
         context "existing user with address info" do
 
           before do
-            FactoryGirl.create(:person, email: 'user@example.com',
-              district: FactoryGirl.create(:district))
+            FactoryGirl.create(:person, :with_district, email: 'user@example.com')
             get :targets, { email: 'user@example.com' }
           end
 

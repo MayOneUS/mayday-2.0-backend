@@ -10,7 +10,7 @@
 #
 
 class Campaign < ActiveRecord::Base
-  has_many :targets
+  has_many :targets, dependent: :delete_all
   has_many :legislators, through: :targets
   has_many :districts,   through: :representatives
   has_many :zip_codes,   through: :districts
@@ -21,6 +21,6 @@ class Campaign < ActiveRecord::Base
   scope :active, -> { where(ended_at: nil) }
 
   def active?
-    ended_at.blank?
+    ended_at.nil?
   end
 end

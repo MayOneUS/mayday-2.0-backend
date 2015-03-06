@@ -39,72 +39,111 @@ describe Person do
   end
 
   describe "#constituent_of?" do
-    let(:senator) { FactoryGirl.create(:senator) }
-    let(:rep) { FactoryGirl.create(:representative) }
+    let(:voter) { FactoryGirl.create(:person, :with_district) }
 
     it "returns nil if person has no state/district" do
-      person = FactoryGirl.build(:person)
+      person = FactoryGirl.create(:person)
+      rep = FactoryGirl.create(:representative)
       expect(person.constituent_of? rep).to be_nil
     end
 
     it "returns true if rep in person's district" do
-      person = FactoryGirl.create(:person, district: rep.district)
-      expect(person.constituent_of? rep).to be true
+      rep = FactoryGirl.create(:representative, district: voter.district)
+      expect(voter.constituent_of? rep).to be true
     end
 
     it "returns true if senator in person's state" do
-      person = FactoryGirl.create(:person, state: senator.state)
-      expect(person.constituent_of? senator).to be true
+      senator = FactoryGirl.create(:senator, state: voter.state)
+      expect(voter.constituent_of? senator).to be true
     end
 
-    it "returns false if senator in other state" do
-      person = FactoryGirl.create(:person, state: FactoryGirl.create(:state))
-      expect(person.constituent_of? senator).to be false
+    it "returns false if rep in other district" do
+      rep = FactoryGirl.create(:representative)
+      expect(voter.constituent_of? rep).to be false
     end
 
   end
 
-  describe "#target_legislators" do
-    let(:district) { FactoryGirl.create(:district) }
-    let(:person)   { FactoryGirl.create(:person, district: district,
-                                                 state:    district.state) }
-    let!(:campaign) { FactoryGirl.create(:campaign_with_reps, count: 5, priority: 1) }
-    let!(:rep_with_us) { FactoryGirl.create(:representative, with_us: true, district: district) }
-    let!(:unconvinced_senator) {FactoryGirl.create(:senator, with_us: false, state: district.state) }
+  describe "targeting" do
+    let(:voter)   { FactoryGirl.create(:person, :with_district) }
 
-    context "normal" do
-      subject(:legislators) { person.target_legislators }
+    describe "#other_targets" do
 
-      it "returns local senator first" do
-        expect(legislators.first).to eq unconvinced_senator
+      it "only returns priority legislators" do
+        FactoryGirl.create(:representative, :targeted)
+        priority_rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+
+        expect(voter.other_targets(count: 5, excluding: [])).to eq [priority_rep]
       end
 
-      it "doesn't include rep with us" do
-        expect(legislators).not_to include rep_with_us
+      it "excludes legislators" do
+        rep1 = FactoryGirl.create(:representative, :targeted, priority: 1)
+        rep2 = FactoryGirl.create(:representative, :targeted, priority: 1)
+
+        expect(voter.other_targets(count: 5, excluding: [rep1])).to eq [rep2]
       end
 
-      it "returns 5 legislators" do
-        expect(legislators.count).to eq 5
-      end
-    end
-
-    context "json" do
-      subject(:legislators) { person.target_legislators(json: true) }
-
-      it "sets local attribute for all targets" do
-        locals = legislators.map{|l| l['local']}
-        expect(locals).to eq [true, false, false, false, false]
+      it "returns correct number of legislators" do
+        FactoryGirl.create(:campaign_with_reps, count: 3, priority: 1)
+        expect(voter.other_targets(count: 2, excluding: []).count).to eq 2
       end
 
     end
 
-    context "with count arg" do
-      subject(:legislators) { person.target_legislators(count: 3) }
+    describe "#target_legislators" do
 
-      it "returns appropriate count" do
-        expect(legislators.count).to eq 3
+      context "normal" do
+        subject(:legislators) { voter.target_legislators }
+
+        it "returns default targets for person with no district/state" do
+          person = FactoryGirl.create(:person)
+          rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+          expect(person.target_legislators).to eq [rep]
+        end
+
+        it "returns local target followed by other targets" do
+          rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+          unconvinced_senator = FactoryGirl.create(:senator, state: voter.state)
+          expect(legislators).to eq [unconvinced_senator, rep]
+        end
+
+        it "doesn't return local targets twice" do
+          local_rep = FactoryGirl.create(:representative, :targeted, priority: 1,
+                                            district: voter.district)
+          other_rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+          expect(legislators).to eq [local_rep, other_rep]
+        end
+
+        it "doesn't include rep with us" do
+          rep_with_us = FactoryGirl.create(:representative, :with_us, district: voter.district)
+          expect(legislators).not_to include rep_with_us
+        end
       end
 
+      context "json" do
+
+        it "works with empty array" do
+          person = FactoryGirl.create(:person)
+          expect(person.target_legislators(json: true)).to eq []
+        end
+
+        it "sets local attribute for all targets" do
+          FactoryGirl.create(:senator, state: voter.state)
+          FactoryGirl.create(:representative, :targeted, priority: 1)
+          locals = voter.target_legislators(json: true).map{|l| l['local']}
+          expect(locals).to eq [true, false]
+        end
+
+      end
+
+      context "with count arg" do
+
+        it "returns appropriate count" do
+          FactoryGirl.create(:campaign_with_reps, count: 3, priority: 1)
+          expect(voter.target_legislators(count: 2).count).to eq 2
+        end
+
+      end
     end
   end
 
