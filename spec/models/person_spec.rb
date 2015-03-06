@@ -70,10 +70,10 @@ describe Person do
     describe "#other_targets" do
 
       it "only returns priority legislators" do
-        rep1 = FactoryGirl.create(:representative, :targeted)
-        rep2 = FactoryGirl.create(:representative, :targeted, priority: 1)
+        FactoryGirl.create(:representative, :targeted)
+        priority_rep = FactoryGirl.create(:representative, :targeted, priority: 1)
 
-        expect(voter.other_targets(count: 5, excluding: [])).to eq [rep2]
+        expect(voter.other_targets(count: 5, excluding: [])).to eq [priority_rep]
       end
 
       it "excludes legislators" do
@@ -108,7 +108,8 @@ describe Person do
         end
 
         it "doesn't return local targets twice" do
-          local_rep = FactoryGirl.create(:representative, :targeted, priority: 1, district: voter.district)
+          local_rep = FactoryGirl.create(:representative, :targeted, priority: 1,
+                                            district: voter.district)
           other_rep = FactoryGirl.create(:representative, :targeted, priority: 1)
           expect(legislators).to eq [local_rep, other_rep]
         end
