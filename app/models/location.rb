@@ -67,8 +67,7 @@ class Location < ActiveRecord::Base
 
   def update_nation_builder
     if (changed - ["district_id", "created_at", "updated_at"]).any?
-      nb_args = Integration::NationBuilder.location_params(email: person.email, location: self.as_json)
-      Integration::NationBuilder.create_or_update_person(nb_args)
+      NbPersonPushAddressJob.perform_later(person.email, self.as_json)
     end
   end
 
