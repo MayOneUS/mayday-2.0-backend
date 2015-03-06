@@ -172,7 +172,7 @@ describe Legislator do
   end
 
   describe ".default_targets" do
-    it "only returns top priority targets" do
+    it "only returns priority targets" do
       rep = FactoryGirl.create(:representative, :targeted, priority: 1)
       FactoryGirl.create(:representative, :targeted)
       expect(Legislator.default_targets).to eq [rep]

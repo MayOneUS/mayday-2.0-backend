@@ -16,11 +16,6 @@ FactoryGirl.define do
     end
   end
 
-  factory :location do
-    district
-    state { district.state }
-  end
-
   factory :event do
     sequence(:starts_at, 1) { |n| n.hours.from_now }
     sequence(:ends_at, 2)   { |n| n.hours.from_now }
@@ -79,6 +74,9 @@ FactoryGirl.define do
 
     factory :rep_target do
       association :legislator, factory: :representative
+    end
+    factory :senator_target do
+      association :legislator, factory: :senator
     end
   end
 
