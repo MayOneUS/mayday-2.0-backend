@@ -1,20 +1,21 @@
 FactoryGirl.define do
   factory :person do
-    transient do
-      district nil
-      state nil
-      zip_code nil
-    end
     sequence(:email) { |n| "person#{n}@example.com" }
     sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
 
-    after(:create) do |person, evaluator|
-      if evaluator.district || evaluator.state || evaluator.zip_code
-        person.create_location(district: evaluator.district,
-                               state:    evaluator.state,
-                               zip_code: evaluator.zip_code)
+    trait :with_district do
+      after(:create) do |person|
+        district = create(:district)
+        person.create_location(district: district, state: district.state)
       end
     end
+  end
+
+  factory :location do
+    person
+    district
+    state { district.state }
+    sequence(:zip_code) { |n| "2#{n.to_s.rjust(4,'0')}" }
   end
 
   factory :event do
@@ -44,7 +45,14 @@ FactoryGirl.define do
     end
 
     trait :targeted do
-      targets { build_list :target, 1, priority: 1 }
+      transient do
+        priority nil
+      end
+      targets { build_list :target, 1, priority: priority }
+    end
+
+    trait :with_us do
+      with_us true
     end
   end
 
@@ -83,9 +91,7 @@ FactoryGirl.define do
         priority nil
       end
 
-      after(:create) do |campaign, evaluator|
-        campaign.targets = create_list(:rep_target, evaluator.count, priority: evaluator.priority)
-      end
+      targets { build_list(:rep_target, count, priority: priority) }
     end
   end
 
