@@ -34,13 +34,13 @@ describe Ivr::Call, type: :model do
   end
   describe "#next_target" do
     it "returns a legislator" do
-      targeted_senator = FactoryGirl.create(:senator, :targeted)
+      targeted_senator = FactoryGirl.create(:senator, :targeted, priority: 1)
       call = FactoryGirl.build(:call)
       expect(call.next_target).to eq(targeted_senator)
     end
     context "with a called legislator" do
       it "returns only uncalled legislators" do
-        legislators = create_list(:representative, 3, :targeted)
+        legislators = create_list(:representative, 3, :targeted, priority: 1)
         call = FactoryGirl.create(:call)
         call.connections << FactoryGirl.build(:connection, :completed, legislator: legislators[0])
         call.connections << FactoryGirl.build(:connection, :completed, legislator: legislators[1])

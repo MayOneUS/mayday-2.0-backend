@@ -39,14 +39,6 @@ class District < ActiveRecord::Base
     self.representative = Legislator.fetch_one(district: self)
   end
 
-  def unconvinced_rep
-    representative if representative && !representative.with_us?
-  end
-
-  def unconvinced_legislators
-    senators.eligible.unconvinced + [unconvinced_rep].compact
-  end
-
   def legislators
     join_clause = 'INNER JOIN districts '\
                   'ON (districts.id = legislators.district_id '\
@@ -56,10 +48,6 @@ class District < ActiveRecord::Base
 
   def targeted?
     campaigns.active.any?
-  end
-
-  def target_legislators
-    senators.targeted + [target_rep].compact
   end
 
   def targeted_by_campaign?(campaign)

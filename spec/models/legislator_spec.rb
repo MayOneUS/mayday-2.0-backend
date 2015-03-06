@@ -172,36 +172,10 @@ describe Legislator do
   end
 
   describe ".default_targets" do
-    context "no args" do
-      let(:rep) { FactoryGirl.create(:representative) }
-      it "only returns top priority targets" do
-        FactoryGirl.create(:target, legislator: rep, priority: 1)
-        FactoryGirl.create(:rep_target)
-        expect(Legislator.default_targets).to eq [rep]
-      end
-
-      it "returns 5 targets" do
-        FactoryGirl.create(:campaign_with_reps, count: 6, priority: 1)
-        expect(Legislator.default_targets.count).to eq 5
-      end
-    end
-    context "with args" do
-      let(:rep)     { FactoryGirl.create(:representative) }
-      let(:senator) { FactoryGirl.create(:senator) }
-      before do
-        FactoryGirl.create(:target, legislator: rep, priority: 1)
-        FactoryGirl.create(:target, legislator: senator, priority: 1)
-        FactoryGirl.create(:rep_target, priority: 1)
-      end
-      it "returns given number of targets" do
-        expect(Legislator.default_targets(count: 2).count).to eq 2
-      end
-      it "excludes single legislator" do
-        expect(Legislator.default_targets(excluding: [rep])).not_to include(rep)
-      end
-      it "excludes multiple legislators" do
-        expect(Legislator.default_targets(excluding: [rep, senator]).count).to eq 1
-      end
+    it "only returns top priority targets" do
+      rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+      FactoryGirl.create(:representative, :targeted)
+      expect(Legislator.default_targets).to eq [rep]
     end
   end
 

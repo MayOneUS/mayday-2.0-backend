@@ -44,13 +44,13 @@ class Legislator < ActiveRecord::Base
   validates :state,    presence: true, if: :senator?
   validates :district, absence:  true, if: :senator?
 
-  scope :senate,       -> { where(chamber: 'senate') }
-  scope :house,        -> { where(chamber: 'house') }
-  scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
-  scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
-  scope :top_priority, -> { targeted.merge(Target.top_priority) }
-  scope :unconvinced,  -> { where(with_us: false) }
-  scope :with_us,      -> { where(with_us: true) }
+  scope :senate,      -> { where(chamber: 'senate') }
+  scope :house,       -> { where(chamber: 'house') }
+  scope :eligible,    -> { where('term_end < ?', 2.years.from_now) }
+  scope :targeted,    -> { joins(:campaigns).merge(Campaign.active) }
+  scope :priority,    -> { targeted.merge(Target.priority) }
+  scope :unconvinced, -> { where(with_us: false) }
+  scope :with_us,     -> { where(with_us: true) }
 
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
@@ -96,8 +96,8 @@ class Legislator < ActiveRecord::Base
     find_or_initialize_by(bioguide_id: bioguide_id).tap{|l| l.update(hash)}
   end
 
-  def self.default_targets(excluding: [], count: Ivr::Call::MAXIMUM_CONNECTIONS)
-    where.not(id: excluding.map(&:id)).top_priority.first(count)
+  def self.default_targets
+    priority
   end
 
   def refetch
