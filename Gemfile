@@ -32,6 +32,7 @@ group :development, :test do
   gem 'spring-commands-rspec'
   gem 'dotenv-rails'
   gem 'rspec-rails'
+  gem 'hirb'
 end
 
 group :development do
