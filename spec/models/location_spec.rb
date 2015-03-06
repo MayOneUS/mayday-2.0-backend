@@ -76,7 +76,7 @@ describe Location do
         end
         context "zip found" do
           let!(:zip) { FactoryGirl.create(:zip_code, zip_code: '94703') }
-          let!(:district)  { FactoryGirl.create(:district) }
+          let!(:district) { FactoryGirl.create(:district) }
 
           context "with multiple districts" do
             before do
