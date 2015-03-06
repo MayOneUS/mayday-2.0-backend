@@ -1,10 +1,5 @@
 FactoryGirl.define do
   factory :person do
-    transient do
-      district nil
-      state nil
-      zip_code nil
-    end
     sequence(:email) { |n| "person#{n}@example.com" }
     sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
 
@@ -14,6 +9,13 @@ FactoryGirl.define do
         person.create_location(district: district, state: district.state)
       end
     end
+  end
+
+  factory :location do
+    person
+    district
+    state { district.state }
+    sequence(:zip_code) { |n| "2#{n.to_s.rjust(4,'0')}" }
   end
 
   factory :event do

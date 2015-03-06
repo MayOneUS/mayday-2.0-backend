@@ -118,6 +118,11 @@ describe Person do
           rep_with_us = FactoryGirl.create(:representative, :with_us, district: voter.district)
           expect(legislators).not_to include rep_with_us
         end
+
+        it "doesn't include ineligible senators" do
+          senator = FactoryGirl.create(:senator, state: voter.state, term_end: 3.years.from_now)
+          expect(legislators).not_to include senator
+        end
       end
 
       context "json" do

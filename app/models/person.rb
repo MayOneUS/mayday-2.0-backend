@@ -59,7 +59,7 @@ class Person < ActiveRecord::Base
   end
 
   def unconvinced_legislators
-    legislators && legislators.unconvinced
+    legislators && legislators.unconvinced.eligible
   end
 
   def other_targets(count:, excluding:)
