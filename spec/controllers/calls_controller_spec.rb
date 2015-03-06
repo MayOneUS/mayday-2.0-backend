@@ -9,7 +9,7 @@ describe CallsController,  type: :controller do
     allow(@active_call).to receive(:new_record?).and_return(new_record)
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
     allow(@active_call).to receive(:exceeded_max_connections?).and_return(false)
-    allow(Ivr::Call).to receive_message_chain(:includes, :first_or_initialize).and_return(@active_call)
+    allow(Ivr::Call).to receive_message_chain(:includes, :find_or_initialize_by).and_return(@active_call)
   end
 
   def setup_last_connection
@@ -25,7 +25,7 @@ describe CallsController,  type: :controller do
       setup_last_connection
       allow(@active_call).to receive(:save)
       allow(@active_call).to receive(:person=)
-      allow(Person).to receive(:find_or_create_by)
+      allow(Person).to receive(:find_or_initialize_by)
     end
     context "with an existing call" do
       it "does not save a new call" do
@@ -33,7 +33,7 @@ describe CallsController,  type: :controller do
         post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
 
         expect(@active_call).not_to have_received(:save)
-        expect(Person).not_to have_received(:find_or_create_by)
+        expect(Person).not_to have_received(:find_or_initialize_by)
       end
     end
     context "without an existing call" do
@@ -42,7 +42,7 @@ describe CallsController,  type: :controller do
         post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
 
         expect(@active_call).to have_received(:save)
-        expect(Person).to have_received(:find_or_create_by)
+        expect(Person).to have_received(:find_or_initialize_by)
       end
     end
   end
@@ -74,9 +74,11 @@ describe CallsController,  type: :controller do
         allow(@connection).to receive(:legislator).and_return(legislator)
       end
       it "dials the right number" do
-        get :new_connection, 'CallSid': 123
-        xml_response = Oga.parse_xml(response.body)
-        expect(xml_response.css('Dial').text).to eq(@phone)
+        ClimateControl.modify FAKE_CONGRESS_NUMBER: nil do
+          get :new_connection, 'CallSid': 123
+          xml_response = Oga.parse_xml(response.body)
+          expect(xml_response.css('Dial').text).to eq(@phone)
+        end
       end
       it "creates a new connection" do
         get :new_connection, 'CallSid': 123
