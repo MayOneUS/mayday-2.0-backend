@@ -23,7 +23,7 @@ class Person < ActiveRecord::Base
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, uniqueness: { case_sensitive: false },
                     format: { with: VALID_EMAIL_REGEX },
-                    allow_blank: true
+                    allow_nil: true
 
   validates :email, presence: true, if: "phone.nil?"
   validates :phone, presence: true, if: "email.nil?"
@@ -95,6 +95,6 @@ class Person < ActiveRecord::Base
   end
 
   def downcase_email
-    self.email = email.to_s.downcase
+    email && self.email = email.downcase
   end
 end
