@@ -6,6 +6,9 @@ gem 'redis'
 gem 'redis-objects'
 gem 'database_cleaner'
 
+# Active Job
+gem 'sidekiq'
+
 # API consuming
 gem 'rest-client'
 gem 'oauth2'

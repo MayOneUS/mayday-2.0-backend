@@ -95,8 +95,8 @@ describe Person do
     context "creating new user" do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({ attributes: { email: 'user@example.com', phone: '510-555-1234' } })
+        expect(NbPersonPushJob).to receive(:perform_later)
+          .with("email"=>"user@example.com", "phone"=>"510-555-1234")
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end
@@ -104,14 +104,14 @@ describe Person do
       let(:user) { FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234') }
       before { expect(user).to receive(:update_nation_builder).and_call_original }
 
-      it "sends call to update Nation if relevant field changed" do
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({ attributes: { email: 'user@example.com', phone: '510-555-9999' } })
+      it "sends call to update NationBuilder if relevant field changed" do
+        expect(NbPersonPushJob).to receive(:perform_later)
+          .with("email"=>"user@example.com", "phone"=>"510-555-9999")
         user.update(phone:'510-555-9999')
       end
 
       it "doesn't send call to update NationBuilder if no relevant field changed" do
-        expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
+        expect(NbPersonPushJob).not_to receive(:perform_later)
         user.update(phone:'510-555-1234')
       end
     end

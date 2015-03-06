@@ -84,9 +84,7 @@ class Person < ActiveRecord::Base
   def update_nation_builder
     relevant_fields = changed & ["email" , "phone"]
     if relevant_fields.any?
-      attributes = self.slice(:email, *relevant_fields)
-      nb_args = Integration::NationBuilder.person_params(attributes)
-      Integration::NationBuilder.create_or_update_person(nb_args)
+      NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields))
     end
   end
 end
