@@ -28,7 +28,7 @@ class Person < ActiveRecord::Base
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
 
-  attr_accessor :address, :zip
+  attr_accessor :address, :zip, :tags
 
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
@@ -93,8 +93,9 @@ class Person < ActiveRecord::Base
 
   def update_nation_builder
     relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
-    if relevant_fields.any?
+    if relevant_fields.any? || @tags
       attributes = self.slice(:email, *relevant_fields)
+      attributes.merge!(tags: @tags) if @tags
       nb_args = Integration::NationBuilder.person_params(attributes)
       Integration::NationBuilder.create_or_update_person(nb_args)
     end

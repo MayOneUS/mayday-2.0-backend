@@ -202,7 +202,13 @@ describe Person do
       let(:user) { FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234') }
       before { expect(user).to receive(:update_nation_builder).and_call_original }
 
-      it "sends call to update Nation if relevant field changed" do
+      it "sends tags to NationBuilder if present" do
+        expect(Integration::NationBuilder).to receive(:create_or_update_person)
+          .with(attributes: { email: 'user@example.com', tags: ['test'] })
+        user.update(tags:['test'])
+      end
+
+      it "sends call to update NationBuilder if relevant field changed" do
         expect(Integration::NationBuilder).to receive(:create_or_update_person)
           .with(attributes: { email: 'user@example.com', first_name: 'Bob' })
         user.update(first_name:'Bob')

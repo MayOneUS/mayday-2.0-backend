@@ -5,8 +5,8 @@ describe V1::PeopleController,  type: :controller do
     it "returns success" do
       user = instance_double("Person", id: 3)
       expect(Person).to receive(:create_or_update).
-        with({email: 'user@example.com'}) { user }
-      post :create, {person: {email:'user@example.com'}}
+        with(email: 'user@example.com', tags: ['test']) { user }
+      post :create, person: { email:'user@example.com', tags: ['test'] }
       json_response = JSON.parse(response.body)
 
       expect(response).to be_success
