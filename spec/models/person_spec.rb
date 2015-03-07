@@ -38,6 +38,41 @@ describe Person do
     end
   end
 
+  describe ".create_or_update" do
+    context "new record" do
+      it "creates record with appropriate values" do
+        hash = { email: 'user@example.com',
+                 phone: '555-555-1111' }
+        person = Person.create_or_update(hash)
+        expect(person.slice(*hash.keys).values).to eq hash.values
+      end
+    end
+    context "existing record" do
+      it "updates record with appropriate values" do
+        FactoryGirl.create(:person, email: 'user@example.com')
+        hash = { email: 'user@example.com',
+                 phone: '555-555-1111' }
+        person = Person.create_or_update(hash)
+        expect(person.slice(*hash.keys).values).to eq hash.values
+      end
+    end
+  end
+
+  describe "#save_location" do
+
+    it "calls update location if zip present" do
+      expect_any_instance_of(Location).to receive(:update_location).
+        with(address: '2020 Oregon St', zip: '94703') { true }
+      Person.create(email: 'user@example.com', address: '2020 Oregon St', zip: '94703')
+    end
+
+    it "doesn't update location if zip not present" do
+      expect_any_instance_of(Location).not_to receive(:update_location)
+      Person.create(email: 'user@example.com', address: '2020 Oregon St')
+    end
+
+  end
+
   describe "#constituent_of?" do
     let(:voter) { FactoryGirl.create(:person, :with_district) }
 

@@ -1,18 +1,14 @@
 class V1::PeopleController < V1::BaseController
 
   def create
-    person = Integration::NationBuilder.create_or_update_person(attributes: params[:person])
-    render json: {id: person['id']}, status: 200
+    person = Person.create_or_update(person_params)
+    render json: { id: person.id }, status: 200
   end
 
   def targets
     person = Person.find_or_initialize_by(email: params[:email])
     if person.save
-      person.update_location(address: params[:address],
-                             city:    params[:city],
-                             state:   params[:state],
-                             zip:     params[:zip])
-
+      person.update_location(location_params.symbolize_keys)
       @target_legislators = person.target_legislators(json: true)
       @address_required   = person.address_required?
     else
@@ -21,4 +17,13 @@ class V1::PeopleController < V1::BaseController
     render
   end
 
+  private
+
+  def person_params
+    params.require(:person).permit(:email, :phone, :address, :city, :state, :zip)
+  end
+
+  def location_params
+    params.permit(:address, :city, :state, :zip)
+  end
 end
