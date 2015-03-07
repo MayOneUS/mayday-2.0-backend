@@ -92,7 +92,7 @@ class Person < ActiveRecord::Base
   private
 
   def update_nation_builder
-    relevant_fields = changed & ['email', 'phone']
+    relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
     if relevant_fields.any?
       attributes = self.slice(:email, *relevant_fields)
       nb_args = Integration::NationBuilder.person_params(attributes)

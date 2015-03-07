@@ -20,10 +20,11 @@ class V1::PeopleController < V1::BaseController
   private
 
   def person_params
-    params.require(:person).permit(:email, :phone, :address, :city, :state, :zip)
+    params.require(:person).permit(:email, :phone, :first_name, :last_name,
+                                   :address, :zip)
   end
 
   def location_params
-    params.permit(:address, :city, :state, :zip)
+    params.permit(:address, :zip)
   end
 end

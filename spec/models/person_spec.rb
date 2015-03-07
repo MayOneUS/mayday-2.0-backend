@@ -41,8 +41,10 @@ describe Person do
   describe ".create_or_update" do
     context "new record" do
       it "creates record with appropriate values" do
-        hash = { email: 'user@example.com',
-                 phone: '555-555-1111' }
+        hash = { email:      'user@example.com',
+                 phone:      '555-555-1111',
+                 first_name: 'Bob',
+                 last_name:  'Garfield' }
         person = Person.create_or_update(hash)
         expect(person.slice(*hash.keys).values).to eq hash.values
       end
@@ -192,7 +194,7 @@ describe Person do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
         expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({ attributes: { email: 'user@example.com', phone: '510-555-1234' } })
+          .with(attributes: { email: 'user@example.com', phone: '510-555-1234' })
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end
@@ -202,8 +204,8 @@ describe Person do
 
       it "sends call to update Nation if relevant field changed" do
         expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({ attributes: { email: 'user@example.com', phone: '510-555-9999' } })
-        user.update(phone:'510-555-9999')
+          .with(attributes: { email: 'user@example.com', first_name: 'Bob' })
+        user.update(first_name:'Bob')
       end
 
       it "doesn't send call to update NationBuilder if no relevant field changed" do
