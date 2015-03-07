@@ -38,7 +38,7 @@ class Person < ActiveRecord::Base
 
   def self.create_or_update(person_params)
     if email = person_params.delete(:email)
-      find_or_initialize_by(email: email).tap{|p| p.update(person_params)}
+      find_or_initialize_by(email: email).tap{ |p| p.update(person_params) }
     end
   end
 
