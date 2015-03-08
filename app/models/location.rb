@@ -36,7 +36,7 @@ class Location < ActiveRecord::Base
       else
         return nil
       end
-    elsif zip = ZipCode.valid_zip_5(zip) and zip != self.zip_code
+    elsif zip = ZipCode.valid_zip_5(zip) and zip != zip_code
       zip_code = ZipCode.find_by(zip_code: zip)
       self.address_1 = nil
       self.city      = city

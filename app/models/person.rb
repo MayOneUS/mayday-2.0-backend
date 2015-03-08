@@ -93,10 +93,9 @@ class Person < ActiveRecord::Base
 
   def update_nation_builder
     relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
-    if relevant_fields.any? || @tags
-      attributes = self.slice(:email, *relevant_fields)
-      attributes.merge!(tags: @tags) if @tags
-      NbPersonPushJob.perform_later(attributes)
+    relevant_fields << 'tags' if @tags
+    if relevant_fields.any?
+      NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields))
     end
   end
 
