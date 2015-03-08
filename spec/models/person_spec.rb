@@ -193,8 +193,8 @@ describe Person do
     context "creating new user" do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with(attributes: { email: 'user@example.com', phone: '510-555-1234' })
+        expect(NbPersonPushJob).to receive(:perform_later)
+          .with("email" => "user@example.com", "phone"=>"510-555-1234")
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end
@@ -203,19 +203,19 @@ describe Person do
       before { expect(user).to receive(:update_nation_builder).and_call_original }
 
       it "sends tags to NationBuilder if present" do
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with(attributes: { email: 'user@example.com', tags: ['test'] })
+        expect(NbPersonPushJob).to receive(:perform_later).
+          with("email" => "user@example.com", tags: ['test'])
         user.update(tags:['test'])
       end
 
       it "sends call to update NationBuilder if relevant field changed" do
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with(attributes: { email: 'user@example.com', first_name: 'Bob' })
-        user.update(first_name:'Bob')
+        expect(NbPersonPushJob).to receive(:perform_later).
+          with("email" => "user@example.com", "first_name"=>"Bob")
+        user.update(first_name: 'Bob')
       end
 
       it "doesn't send call to update NationBuilder if no relevant field changed" do
-        expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
+        expect(NbPersonPushJob).not_to receive(:perform_later)
         user.update(phone:'510-555-1234')
       end
     end

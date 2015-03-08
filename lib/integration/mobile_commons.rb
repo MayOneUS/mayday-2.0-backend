@@ -28,4 +28,5 @@ class Integration::MobileCommons
   def self.at_large?(district:, state:)
     SINGLE_DISTRICT_STATES.include?(state) && district == '1'
   end
+
 end

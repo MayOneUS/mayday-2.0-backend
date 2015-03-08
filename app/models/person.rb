@@ -96,8 +96,7 @@ class Person < ActiveRecord::Base
     if relevant_fields.any? || @tags
       attributes = self.slice(:email, *relevant_fields)
       attributes.merge!(tags: @tags) if @tags
-      nb_args = Integration::NationBuilder.person_params(attributes)
-      Integration::NationBuilder.create_or_update_person(nb_args)
+      NbPersonPushJob.perform_later(attributes)
     end
   end
 
