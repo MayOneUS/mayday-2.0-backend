@@ -1,7 +1,7 @@
 class V1::EventsController < V1::BaseController
 
   def index
-    @events = Event.upcoming_events
+    @events = Event.upcoming
     render
   end
 

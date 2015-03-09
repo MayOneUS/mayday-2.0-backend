@@ -16,20 +16,20 @@ RSpec.describe Event, type: :model do
     }
   end
 
-  describe ".upcoming_events" do
+  describe ".upcoming" do
     it "returns upcoming event" do
       event = FactoryGirl.create(:event)
-      expect(Event.upcoming_events).to eq [event]
+      expect(Event.upcoming).to eq [event]
     end
 
     it "doesn't return past event" do
       FactoryGirl.create(:event, starts_at: 1.hour.ago)
-      expect(Event.upcoming_events).to be_empty
+      expect(Event.upcoming).to be_empty
     end
 
     it "limits count of returned events" do
       3.times { FactoryGirl.create(:event) }
-      expect(Event.upcoming_events(2).count).to eq 2
+      expect(Event.upcoming(2).count).to eq 2
     end
   end
 

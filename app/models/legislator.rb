@@ -158,11 +158,22 @@ class Legislator < ActiveRecord::Base
     return response.code.to_i == 200
   end
 
+  def eligible
+    term_end < 2.years.from_now
+  end
+
+  def state_name
+    state ? state.name : district.state.name
+  end
+
   private
 
   def serializable_hash(options)
-    super(methods: [:name, :state_abbrev, :district_code, :image_url, :title, :display_district],
-            only: [:id, :party, :chamber, :state_rank]).merge(options || {})
+    options ||= {}
+    extras = options.delete(:extras) || {}
+    options = { methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url],
+                only: [:id, :party, :chamber, :state_rank, :with_us] }.merge(options)
+    super(options).merge(extras || {})
   end
 
   def assign_district

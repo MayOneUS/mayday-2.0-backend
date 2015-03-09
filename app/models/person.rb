@@ -83,7 +83,7 @@ class Person < ActiveRecord::Base
     remaining_count = count - locals.count
     others = other_targets(count: remaining_count, excluding: locals)
     if json
-      locals.as_json('local' => true) + others.as_json('local' => false)
+      locals.as_json(extras: { 'local' => true }) + others.as_json(extras: { 'local' => false })
     else
       locals + others
     end

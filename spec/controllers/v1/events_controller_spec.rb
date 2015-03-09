@@ -9,7 +9,7 @@ describe V1::EventsController,  type: :controller do
     end
     it "sets the events variable" do
       event = instance_double("Event")
-      expect(Event).to receive(:upcoming_events) { [event] }
+      expect(Event).to receive(:upcoming) { [event] }
       get :index
       expect(assigns(:events)).to eq [event]
     end
