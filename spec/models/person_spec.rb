@@ -38,6 +38,43 @@ describe Person do
     end
   end
 
+  describe ".create_or_update" do
+    context "new record" do
+      it "creates record with appropriate values" do
+        hash = { email:      'user@example.com',
+                 phone:      '555-555-1111',
+                 first_name: 'Bob',
+                 last_name:  'Garfield' }
+        person = Person.create_or_update(hash)
+        expect(person.slice(*hash.keys).values).to eq hash.values
+      end
+    end
+    context "existing record" do
+      it "updates record with appropriate values" do
+        FactoryGirl.create(:person, email: 'user@example.com')
+        hash = { email: 'user@example.com',
+                 phone: '555-555-1111' }
+        person = Person.create_or_update(hash)
+        expect(person.slice(*hash.keys).values).to eq hash.values
+      end
+    end
+  end
+
+  describe "#save_location" do
+
+    it "calls update location if zip present" do
+      expect_any_instance_of(Location).to receive(:update_location).
+        with(address: '2020 Oregon St', zip: '94703') { true }
+      Person.create(email: 'user@example.com', address: '2020 Oregon St', zip: '94703')
+    end
+
+    it "doesn't update location if zip not present" do
+      expect_any_instance_of(Location).not_to receive(:update_location)
+      Person.create(email: 'user@example.com', address: '2020 Oregon St')
+    end
+
+  end
+
   describe "#constituent_of?" do
     let(:voter) { FactoryGirl.create(:person, :with_district) }
 
@@ -156,8 +193,8 @@ describe Person do
     context "creating new user" do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({ attributes: { email: 'user@example.com', phone: '510-555-1234' } })
+        expect(NbPersonPushJob).to receive(:perform_later)
+          .with("email" => "user@example.com", "phone"=>"510-555-1234")
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end
@@ -165,14 +202,20 @@ describe Person do
       let(:user) { FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234') }
       before { expect(user).to receive(:update_nation_builder).and_call_original }
 
-      it "sends call to update Nation if relevant field changed" do
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with({ attributes: { email: 'user@example.com', phone: '510-555-9999' } })
-        user.update(phone:'510-555-9999')
+      it "sends tags to NationBuilder if present" do
+        expect(NbPersonPushJob).to receive(:perform_later).
+          with("email" => "user@example.com", tags: ['test'])
+        user.update(tags:['test'])
+      end
+
+      it "sends call to update NationBuilder if relevant field changed" do
+        expect(NbPersonPushJob).to receive(:perform_later).
+          with("email" => "user@example.com", "first_name"=>"Bob")
+        user.update(first_name: 'Bob')
       end
 
       it "doesn't send call to update NationBuilder if no relevant field changed" do
-        expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
+        expect(NbPersonPushJob).not_to receive(:perform_later)
         user.update(phone:'510-555-1234')
       end
     end

@@ -28,11 +28,19 @@ class Person < ActiveRecord::Base
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
 
+  attr_accessor :address, :zip, :tags
+
   before_save :downcase_email
-  after_save :update_nation_builder
+  after_save :update_nation_builder, :save_location
 
   alias_method :location_association, :location
-  delegate :update_location, :zip_code, :city, :address_1, to: :location
+  delegate :update_location, :district, :state, to: :location
+
+  def self.create_or_update(person_params)
+    if email = person_params.delete(:email)
+      find_or_initialize_by(email: email).tap{ |p| p.update(person_params) }
+    end
+  end
 
   def location
     location_association || build_location
@@ -84,15 +92,20 @@ class Person < ActiveRecord::Base
   private
 
   def update_nation_builder
-    relevant_fields = changed & ['email', 'phone']
+    relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
+    relevant_fields << 'tags' if @tags
     if relevant_fields.any?
-      attributes = self.slice(:email, *relevant_fields)
-      nb_args = Integration::NationBuilder.person_params(attributes)
-      Integration::NationBuilder.create_or_update_person(nb_args)
+      NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields))
     end
   end
 
   def downcase_email
     email && self.email = email.downcase
+  end
+
+  def save_location
+    if @zip
+      update_location(address: @address, zip: @zip)
+    end
   end
 end

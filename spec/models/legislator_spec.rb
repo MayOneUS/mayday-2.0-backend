@@ -136,37 +136,26 @@ describe Legislator do
 
   describe "#update_reform_status" do
     context "rep with us" do
-      before do
+      it "sets with_us property to true" do
         FactoryGirl.create(:representative, bioguide_id: "S001168",
                                             with_us: false).update_reform_status
-      end
-
-      it "sets with_us property to true" do
         expect(Legislator.find_by(bioguide_id: "S001168").with_us).to be true
       end
     end
 
     context "unconvinced rep" do
-      before do
+      it "sets with_us property to false" do
         FactoryGirl.create(:representative, bioguide_id: "C001102",
                                             with_us: true).update_reform_status
-      end
-
-      it "sets with_us property to false" do
         expect(Legislator.find_by(bioguide_id: "C001102").with_us).to be false
-
       end
     end
 
     context "rep not found" do
-      before do
+      it "sets with_us property to nil" do
         FactoryGirl.create(:representative, bioguide_id: "bad",
                                             with_us: false).update_reform_status
-      end
-
-      it "sets with_us property to nil" do
         expect(Legislator.find_by(bioguide_id: "bad").with_us).to be_nil
-
       end
     end
   end

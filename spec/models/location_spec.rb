@@ -136,26 +136,23 @@ describe Location do
       end
     end
   end
+
   describe "#update_nation_builder" do
     let(:person) { FactoryGirl.create(:person, email: 'user@example.com') }
-    let(:args) do
+    let(:location_attributes) do
       {
-        attributes: {
-          email: "user@example.com",
-          registered_address: {
-            address1: nil,
-            address2: nil,
-            city:    "Keene",
-            zip:      nil,
-            state:    nil
-          }
-        }
-      }
+        address_1:    nil,
+        address_2:    nil,
+        city:         'Keene',
+        zip_code:     nil,
+        state_abbrev: nil
+      }.stringify_keys
     end
     context "creating new location" do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Location).to receive(:update_nation_builder).and_call_original
-        expect(Integration::NationBuilder).to receive(:create_or_update_person).with(args)
+        expect(NbPersonPushAddressJob).to receive(:perform_later).
+          with('user@example.com', location_attributes)
         person.create_location(city: 'Keene')
       end
     end
@@ -164,13 +161,13 @@ describe Location do
       before { expect(location).to receive(:update_nation_builder).and_call_original }
 
       it "sends call to update Nation if relevant field changed" do
-        expect(Integration::NationBuilder).to receive(:create_or_update_person)
-          .with(args)
+        expect(NbPersonPushAddressJob).to receive(:perform_later).
+          with('user@example.com', location_attributes)
         location.update(city: 'Keene')
       end
 
       it "doesn't send call to update Nation if no relevant field changed" do
-        expect(Integration::NationBuilder).not_to receive(:create_or_update_person)
+        expect(NbPersonPushAddressJob).not_to receive(:perform_later)
         location.update(city: 'Berkeley')
       end
     end

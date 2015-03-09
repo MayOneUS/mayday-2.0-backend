@@ -1,15 +1,17 @@
 require 'rails_helper'
 
 describe V1::PeopleController,  type: :controller do
-
   describe "POST create" do
     it "returns success" do
-      post :create, {email: 'dude@gmail.com'}
+      user = instance_double("Person", id: 3)
+      expect(Person).to receive(:create_or_update).
+        with(email: 'user@example.com', tags: ['test']) { user }
+      post :create, person: { email: 'user@example.com', tags: ['test'] }
       json_response = JSON.parse(response.body)
 
       expect(response).to be_success
       expect(json_response).to have_key('id')
-      expect(json_response['id']).to eq(57126)
+      expect(json_response['id']).to eq(3)
     end
   end
 
@@ -41,7 +43,7 @@ describe V1::PeopleController,  type: :controller do
 
           it "doesn't update location" do
             expect_any_instance_of(Location).to receive(:update_location).
-              with(address: nil, city: nil, state: nil, zip: nil) { nil }
+              with({}) { nil }
 
             get :targets, { email: 'user@example.com' }
           end
@@ -74,9 +76,9 @@ describe V1::PeopleController,  type: :controller do
 
         it "updates location" do
           expect_any_instance_of(Location).to receive(:update_location).
-            with(address: '2020 Oregon St', city: nil, state: nil, zip: '94703') { true }
+            with(address: '2020 Oregon St', zip: '94703') { true }
 
-          get :targets, { email: 'user@example.com', address: '2020 Oregon St', zip: '94703' }
+          get :targets, email: 'user@example.com', address: '2020 Oregon St', zip: '94703'
         end
 
       end
