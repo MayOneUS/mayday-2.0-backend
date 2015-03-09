@@ -227,7 +227,11 @@ describe Legislator do
 
   describe "#serializable_hash" do
     let(:senator) { FactoryGirl.create(:senator) }
-    let(:keys) { ["id", "chamber", "party", "state_rank", "name", "title", "image_url", "display_district", "state_abbrev", "district_code"] }
+    let(:keys) { [
+        "id", "chamber", "party", "state_rank", "name", "title", "image_url",
+        "display_district", "state_abbrev", "district_code", "eligible",
+        "state_name", "with_us"
+      ] }
 
     context "no args" do
       it "returns proper fields" do
@@ -236,7 +240,7 @@ describe Legislator do
     end
 
     context "with args" do
-      subject(:response) { senator.as_json(extra_key: 'foo') }
+      subject(:response) { senator.as_json(extras: { extra_key: 'foo' }) }
 
       it "returns proper fields" do
         expect(response.keys).to match_array(keys + [:extra_key])
