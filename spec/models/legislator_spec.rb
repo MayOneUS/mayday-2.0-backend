@@ -232,7 +232,7 @@ describe Legislator do
         "id", "chamber", "party", "state_rank", "name", "title", "image_url",
         "display_district", "state_abbrev", "district_code", "eligible",
         "state_name", "with_us"
-      ] 
+      ]
     end
 
     context "no args" do
