@@ -39,9 +39,9 @@ class V1::NominationsController < V1::BaseController
 
   def form_data
     legislator = Legislator.includes({ district: :state }, :state).
-      find(nomination_params[:legislator_id])
+                            find(nomination_params[:legislator_id])
     data = legislator.slice(:title, :name, :state_abbrev, :district_code).
-      merge(nomination_params).symbolize_keys
+                      merge(nomination_params).symbolize_keys
     Hash[data.map { |k, v| [MAPPINGS[k] || k, v] }]
   end
 end
