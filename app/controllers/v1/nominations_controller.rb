@@ -29,9 +29,8 @@ class V1::NominationsController < V1::BaseController
   end
 
   def nomination_params
-    hash = params.permit(:legislator_id, :selection_comment, :other_comment,
-                         :email, :zip, :first_name, :last_name ).symbolize_keys
-    Hash[hash.map {|k, v| [MAPPINGS[k] || k, v] }]
+    survey_params = params.permit(:legislator_id, :selection_comment, :other_comment,
+                                  :email, :zip, :first_name, :last_name).symbolize_keys
+    Hash[survey_params.map { |k, v| [MAPPINGS[k] || k, v] }]
   end
-
 end
