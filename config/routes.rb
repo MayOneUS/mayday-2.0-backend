@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'nominations/create'
+
   api_version(module: "V1", path: {value: "v1"}, default: true, defaults: {format: :json}) do
     resources :legislators, only: :index do
       get :targeted, on: :collection
@@ -9,7 +11,8 @@ Rails.application.routes.draw do
     resources :events, only: :index do
       post :create_rsvp, on: :collection
     end
-    get '/people/targets',                 to: 'people#targets'
+    resources :nominations, only: :create
+    get '/people/targets', to: 'people#targets'
   end
   post '/calls/start',                    to: 'calls#start'
   get  '/calls/new_connection',           to: 'calls#new_connection'
