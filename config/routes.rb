@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  get 'nominations/create'
-
   api_version(module: "V1", path: {value: "v1"}, default: true, defaults: {format: :json}) do
     resources :legislators, only: :index do
       get :targeted, on: :collection
