@@ -29,6 +29,8 @@ If you want to use [Docker](https://www.docker.com/) for local development, this
 
 If you already have Docker and Docker Compose installed, starting this app is as easy as `docker-compose up`.
 
+After you've created the Docker containers, you can apply the migrations to the database with `docker-compose run web rake db:migrate`.
+
 ### RVM
 
 *If you don't want to use Docker* for some reason, you can also just install ruby and all dependencies on your own:
@@ -37,6 +39,19 @@ If you already have Docker and Docker Compose installed, starting this app is as
 1. Install Redis
 1. Install Posgres and set up a user account.
 1. Install gems w/ `bundle install`
+
+You will also need to start a local PostgreSQL database and a Redis instance.
+
+Finally, apply the database migrations with `rake db:migrate`.
+
+### Sidekiq worker
+
+This app uses [sidekiq](https://github.com/mperham/sidekiq) to do background processing for a few tasks.
+
+By default, the app expects a sidekiq worker process to be available. You can start this process locally by running `bundle exec sidekiq -c 10`.
+
+If you don't want to send jobs to sidekiq, you can set the `SIDEKIQ_TESTING` environment variable to `'inline'` or `'fake'`.
+
 
 Deployment & Hosting Environments
 ---------------------------------
