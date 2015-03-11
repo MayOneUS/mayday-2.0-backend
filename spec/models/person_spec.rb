@@ -193,8 +193,8 @@ describe Person do
     context "creating new user" do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
-        expect(NbPersonPushJob).to receive(:perform_later)
-          .with(email: 'user@example.com', phone: '510-555-1234')
+        expect(NbPersonPushJob).to receive(:perform_later).
+          with(email: 'user@example.com', phone: '510-555-1234')
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end

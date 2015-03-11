@@ -28,7 +28,7 @@ class Person < ActiveRecord::Base
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
 
-  attr_accessor :address, :zip, :remote_fields
+  attr_writer :address, :zip, :remote_fields
 
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
