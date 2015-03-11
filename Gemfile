@@ -24,6 +24,7 @@ gem 'rack-cors', :require => 'rack/cors'
 gem 'rails_12factor', group: :production # Heroku-required
 gem 'newrelic_rpm'
 gem 'unicorn'
+gem 'sinatra' # Used for the sidekiq UI
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -50,7 +51,6 @@ group :test do
   gem 'oga' #xml parsing
   gem 'factory_girl_rails'
   gem 'ffaker'
-  gem 'sinatra'
   gem 'webmock'
   gem "fakeredis", :require => "fakeredis/rspec"
   gem 'timecop'
