@@ -17,7 +17,7 @@ class V1::NominationsController < V1::BaseController
 
   def create
     Person.create_or_update(person_params)
-    if nomination_params.present?
+    if nomination_params.values.any?(&:present?)
       GoogleFormsSubmitJob.perform_later(FORM_ID, form_data)
       submitted = true
     else
