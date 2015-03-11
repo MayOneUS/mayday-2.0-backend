@@ -23,6 +23,10 @@ Getting started
 
 The app is a standard Rails app right now, so getting started should be straightforward for those with Rails experience.
 
+### Environment variables
+
+After you clone the repository, copy the `.env.example` file to `.env`, and supply real values for any environment variables you will need for your development work. Another MAYDAY Tech Team member can help you with this.
+
 ### Docker
 
 If you want to use [Docker](https://www.docker.com/) for local development, this repo comes with a `Dockerfile` and a [Docker Compose](https://docs.docker.com/compose/) configuration file (`docker-compose.yml`).
@@ -48,7 +52,7 @@ Finally, apply the database migrations with `rake db:migrate`.
 
 This app uses [sidekiq](https://github.com/mperham/sidekiq) to do background processing for a few tasks.
 
-By default, the app expects a sidekiq worker process to be available. You can start this process locally by running `bundle exec sidekiq -c 10`.
+By default, the app expects a sidekiq worker process to be available. You can start this process locally by running `bundle exec sidekiq -c 5`.
 
 If you don't want to send jobs to sidekiq, you can set the `SIDEKIQ_TESTING` environment variable to `'inline'` or `'fake'`.
 
@@ -82,7 +86,6 @@ Note: only run `rake db:seed` after full purge
 
 ### Deploying to Production
 
-
 Deployments to production are still manual for now. If you have already configured Heroku as specified in the development section above, you're halfway there:
 
 1. Get someone to add you as a collaborator on the production Heroku app
@@ -102,6 +105,8 @@ Watch the builds here: https://travis-ci.org/MayOneUS/mayday-2.0-backend
 
 ## Application monitoring
 
+### New Relic
+
 This app is configured to use [New Relic](http://newrelic.com/)'s application monitoring.
 
 The easiest way to access the monitoring data is through the Heroku dashboard:
@@ -111,6 +116,17 @@ The easiest way to access the monitoring data is through the Heroku dashboard:
 1. Click on **New Relic APM**.
 
 You will be automatically signed in to the New Relic dashboard.
+
+### Sidekiq
+
+We use a different approach to monitor sidekiq (taken from the [sidekiq wiki](https://github.com/mperham/sidekiq/wiki/Monitoring)). First, we expose two URLs which give basic information about the queue status:
+
+- `/queue-status` will return `OK` if the queue size is less than 100, or `UHOH` if it's above 100
+- `/queue-latency` will return `OK` if the queue latency is less then 30 seconds, or `UHOH` if it's above 30 seconds
+
+We monitor these URLs using [Pingdom](https://www.pingdom.com/) and alert our Slack #engineering channel when there's an issue.
+
+We also run the sidekiq dashboard UI on our Heroku servers. You can access it by going to `/sidekiq`. Ask another MAYDAY Tech Team member for the password to this dashboard on our staging and production servers.
 
 ## Contributing / Code Review Process
 
