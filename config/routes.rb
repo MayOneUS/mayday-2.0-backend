@@ -16,4 +16,8 @@ Rails.application.routes.draw do
   get  '/calls/new_connection',           to: 'calls#new_connection'
   post '/calls/connection_gather_prompt', to: 'calls#connection_gather_prompt'
   post '/calls/connection_gather',        to: 'calls#connection_gather'
+
+  require 'sidekiq/api'
+  get "/queue-status" => proc { [200, {"Content-Type" => "text/plain"}, [Sidekiq::Queue.new.size < 100 ? "OK" : "UHOH" ]] }
+  get "/queue-latency" => proc { [200, {"Content-Type" => "text/plain"}, [Sidekiq::Queue.new.latency < 30 ? "OK" : "UHOH" ]] }
 end

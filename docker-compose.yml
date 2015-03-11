@@ -16,6 +16,19 @@ web:
     - DATABASE_URL=postgres://postgres@db:5432/postgres
     - REDIS_URL=redis://redis@redis:6379/
 
+worker:
+  image: mayday20backend_web:latest
+  command: bundle exec sidekiq -c 10
+  volumes:
+    - .:/usr/src/app
+  links:
+    - redis
+  env_file:
+    - .env
+  environment:
+    - REDIS_PROVIDER=REDIS_URL
+    - REDIS_URL=redis://redis@redis:6379/
+
 db:
   image: postgres:9.4
 
