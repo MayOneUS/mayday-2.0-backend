@@ -193,8 +193,8 @@ describe Person do
     context "creating new user" do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
-        expect(NbPersonPushJob).to receive(:perform_later)
-          .with("email" => "user@example.com", "phone"=>"510-555-1234")
+        expect(NbPersonPushJob).to receive(:perform_later).
+          with(email: 'user@example.com', phone: '510-555-1234')
         FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
       end
     end
@@ -202,15 +202,15 @@ describe Person do
       let(:user) { FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234') }
       before { expect(user).to receive(:update_nation_builder).and_call_original }
 
-      it "sends tags to NationBuilder if present" do
+      it "sends remote_fields to NationBuilder if present" do
         expect(NbPersonPushJob).to receive(:perform_later).
-          with("email" => "user@example.com", tags: ['test'])
-        user.update(tags:['test'])
+          with(email: 'user@example.com', tags: ['test'], foo: 'bar')
+        user.update(remote_fields: { tags: ['test'], foo: 'bar' })
       end
 
       it "sends call to update NationBuilder if relevant field changed" do
         expect(NbPersonPushJob).to receive(:perform_later).
-          with("email" => "user@example.com", "first_name"=>"Bob")
+          with(email: 'user@example.com', first_name: 'Bob')
         user.update(first_name: 'Bob')
       end
 

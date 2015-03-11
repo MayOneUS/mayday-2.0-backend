@@ -28,7 +28,7 @@ class Person < ActiveRecord::Base
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
 
-  attr_accessor :address, :zip, :tags
+  attr_writer :address, :zip, :remote_fields
 
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
@@ -93,9 +93,9 @@ class Person < ActiveRecord::Base
 
   def update_nation_builder
     relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
-    relevant_fields << 'tags' if @tags
-    if relevant_fields.any?
-      NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields))
+    if relevant_fields.any? || @remote_fields.present?
+      NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields).
+                                      merge(@remote_fields || {}))
     end
   end
 
