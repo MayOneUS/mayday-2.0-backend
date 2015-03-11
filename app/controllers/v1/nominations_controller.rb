@@ -29,7 +29,8 @@ class V1::NominationsController < V1::BaseController
   private
 
   def person_params
-    params.permit(:email, :phone, :first_name, :last_name, :zip, tags: [])
+    params.permit(:email, :phone, :first_name, :last_name, :zip,
+                  remote_fields: [tags: []])
   end
 
   def nomination_params
