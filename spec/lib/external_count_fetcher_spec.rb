@@ -19,7 +19,7 @@ describe ExternalCountFetcher do
   end
 
   context "with redis instance_variables" do
-    it "should set redis experation times" do
+    it "should set redis expiration times" do
       redis = Redis.new
       Timecop.freeze(Time.now - 2.hours) do
         count_fetcher.fetch_empty_counts!
@@ -27,11 +27,11 @@ describe ExternalCountFetcher do
       end
       Timecop.freeze do
         new_time = (ExternalCountFetcher::REDIS_EXPIRE_SECONDS-2.hours.to_i)
-        expect(count_fetcher.house_supporters.ttl).to eq(new_time)
+        expect(count_fetcher.house_supporters.ttl).to be_within(1).of(new_time)
       end
     end
 
-    it "should extend redis experation times" do
+    it "should extend redis expiration times" do
       redis = Redis.new
       Timecop.freeze do
         Timecop.freeze(Time.now - 2.hours) do
