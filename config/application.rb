@@ -44,6 +44,5 @@ module Mayday
     end
 
     config.middleware.use Rack::Deflater
-
   end
 end
