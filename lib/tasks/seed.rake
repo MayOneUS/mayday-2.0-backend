@@ -8,11 +8,11 @@ namespace :db do
       ids = %w[M001196 B001296 A000373 T000474 A000371 L000581 E000215 P000604 F000043 J000032 S001156 C001066 C001049 D000482 C001097 G000571 C001061 J000294 G000575 N000188 V000081 V000132]
       campaign.legislators = Legislator.where(bioguide_id: ids)
       campaign.targets.limit(5).update_all(priority: 1)
-      start = DateTime.parse("2015-03-14 7pm EDT").utc
-      (1..7).each do |n|
+      start = DateTime.parse("2017-03-14 7pm EDT").utc
+      (1..5).each do |n|
         Event.create(starts_at: start + n.days,
                      ends_at:   start + 1.hour + n.days,
-                     remote_id: 23 + n)
+                     remote_id: 25 + n)
       end
     end
 
