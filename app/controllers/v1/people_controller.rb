@@ -21,7 +21,7 @@ class V1::PeopleController < V1::BaseController
 
   def person_params
     params.require(:person).permit(:email, :phone, :first_name, :last_name,
-                                   :address, :zip, remote_fields: [tags: []])
+                                   :address, :zip, remote_fields: [:event_id, tags: []])
   end
 
   def location_params
