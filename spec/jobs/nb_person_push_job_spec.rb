@@ -8,7 +8,7 @@ RSpec.describe NbPersonPushJob, type: :job do
       NbPersonPushJob.new.perform(email: "user@example.com", phone: "510-555-9999")
     end
 
-    it "calls creates RSVP when event_id is present" do
+    it "creates RSVP when event_id is present" do
       args = { attributes: { email: "user@example.com" } }
       expect(Integration::NationBuilder).to receive(:create_or_update_person).
         with(args) { { 'id' => 6 } }
