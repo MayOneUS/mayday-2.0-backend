@@ -14,7 +14,7 @@ RSpec.describe NbPersonPushJob, type: :job do
         with(args) { { 'id' => 6 } }
       expect(Integration::NationBuilder).to receive(:create_rsvp).
         with(event_id: 4, person_id: 6)
-      NbPersonPushJob.new.perform(email:"user@example.com", event_id: 4)
+      NbPersonPushJob.new.perform(email: "user@example.com", event_id: 4)
     end
   end
 end
