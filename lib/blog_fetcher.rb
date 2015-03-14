@@ -8,14 +8,19 @@ class BlogFetcher
   KEY_BASE = "blog_feeds"
   EXPIRE_SECONDS = 3.hours.to_i
 
-  def self.feed(param)
-    redis.get(key(param)) || fetch_feed!(param)
+  def self.feed(param:, reset:false)
+    !reset && redis.get(key(param)) || fetch_feed!(param)
   end
 
   private
 
   def self.fetch_feed!(param)
     feed = RestClient.get(BASE_URL + ENDPOINTS[param])
+    if feed.present?
+      # TODO: small bug here.  If nothign is returned, we set an empty key
+      feed.slice!('var tumblr_api_read = ')
+      feed.slice!(";\n")
+    end
     redis.set(key(param), feed)
     redis.expire(key(param), EXPIRE_SECONDS)
     feed
