@@ -13,14 +13,14 @@ class District < ActiveRecord::Base
   belongs_to :state, required: true
   has_many :senators, through: :state
   has_and_belongs_to_many :zip_codes
-  has_one :representative, class_name: "Legislator"
+  has_one :representative, class_name: "Legislator", dependent: :destroy
   has_one :target_rep, -> { targeted }, class_name: "Legislator"
   has_many :campaigns, through: :representative
 
   validates :district, presence: true, uniqueness: { scope: :state }
 
   def self.find_by_state_and_district(state:, district:)
-    joins(:state).where('states.abbrev': state).find_by(district: district)
+    joins(:state).where(states: { abbrev: state }).find_by(district: district)
   end
 
   def self.find_by_address(address:, zip:, city: nil, state: nil, includes: nil)

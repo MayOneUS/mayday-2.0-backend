@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe BlogFetcher do
- describe ".feed" do
+  describe ".feed" do
     context "nothing cached" do
       it "fetches requested feed" do
         redis = Redis.new

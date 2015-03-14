@@ -30,6 +30,10 @@ namespace :db do
       task dummy_data: :environment do
         DatabaseCleaner.clean_with(:truncation, :only => %w[campaigns targets events])
       end
+      desc "Purge DB of extra states (e.g., Puerto Rico)"
+      task extra_states: :environment do
+        State.where("id > ?", 51).each { |state| state.destroy }
+      end
     end
   end
 end
