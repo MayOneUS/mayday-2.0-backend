@@ -6,16 +6,17 @@ describe BlogFetcher do
       it "fetches requested feed" do
         redis = Redis.new
         expect(RestClient).to receive(:get)
-          .with('http://blog.mayday.us/api/read/json?num=5')
+          .with(BlogFetcher::BASE_URL + BlogFetcher::ENDPOINTS[:recent])
         BlogFetcher.feed(:recent)
-        expect(redis.ttl('blog_feeds:recent')).to be_within(1).of(BlogFetcher::EXPIRE_SECONDS)
+        expect(redis.ttl("#{BlogFetcher::KEY_BASE}:recent"))
+          .to be_within(1).of(BlogFetcher::EXPIRE_SECONDS)
       end
     end
 
     context "feed already cached" do
       it "returns feed from cache" do
         redis = Redis.new
-        redis.set('blog_feeds:recent', 'foo')
+        redis.set("#{BlogFetcher::KEY_BASE}:recent", 'foo')
         expect(RestClient).not_to receive(:get)
         BlogFetcher.feed(:recent)
       end
