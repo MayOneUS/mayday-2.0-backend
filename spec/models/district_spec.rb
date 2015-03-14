@@ -15,7 +15,7 @@ describe District do
   describe ".find_by_address" do
     let(:state) { FactoryGirl.create(:state, abbrev: 'CA') }
     let!(:district) { FactoryGirl.create(:district, district: '13', state: state) }
-    
+
     subject(:result) do
       District.find_by_address(address: '123 Main St', zip: '94703')
     end

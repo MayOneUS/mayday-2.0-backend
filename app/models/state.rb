@@ -11,8 +11,8 @@
 #
 
 class State < ActiveRecord::Base
-  has_many :districts
-  has_many :zip_codes
+  has_many :districts, dependent: :destroy
+  has_many :zip_codes, dependent: :delete_all
   has_many :senators, class_name: "Legislator"
   has_many :target_senators, -> { targeted }, class_name: "Legislator"
   has_many :campaigns, through: :senators
