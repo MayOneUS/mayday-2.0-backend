@@ -10,6 +10,9 @@ Rails.application.routes.draw do
       post :create_rsvp, on: :collection
     end
     resources :nominations, only: :create
+    resources :blog_posts, only: :index do
+      get :press_releases, on: :collection
+    end
     get '/people/targets', to: 'people#targets'
   end
   post '/calls/start',                    to: 'calls#start'
