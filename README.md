@@ -13,8 +13,9 @@ This is a [Rails 4.2](http://rubyonrails.org/) app. It uses a [PostgreSQL](http:
 
 This is currently deployed on [Heroku](https://www.heroku.com/) in two environments:
 
-- **Staging** https://mayone-staging.herokuapp.com/
-- **Production** https://mayone-prod.herokuapp.com/
+- **Staging** https://services-staging.mayday.us/
+- **Step Two Staging:** https://services-step-two.mayday.us/
+- **Production** https://services.mayday.us
 
 The `application.html.erb` template includes a `<meta>` tag instructing search engines to not index anything on the site.
 
@@ -72,7 +73,13 @@ To hook up this app with Heroku's command line tool in your development environm
 
 You can test if it works by running a command like `heroku logs`.
 
-#### Common Staging Commands
+### Step Two Staging
+
+To access the step two staging Heroku app, follow the instructions for the staging app and then run `git remote add step-two https://git.heroku.com/mayday-step-two.git`.
+
+You can now run commands against the step two staging app like this: `heroku logs -a step-two`.
+
+### Common Staging Commands
 
 Once you are connected to heroku, you can use the following to help testing
 
@@ -101,7 +108,7 @@ The site currently uses [Travis CI](https://travis-ci.org/) for Continuous Integ
 
 Watch the builds here: https://travis-ci.org/MayOneUS/mayday-2.0-backend
 
-**All successful builds of the master branch will be automatically deployed to the mayone-staging Herkou app.**
+**All successful builds of the `master` branch will be automatically deployed to the staging Herkou app.** All successful builds of the `m2` branch will be automatically deployed to the step two staging app.
 
 ## Application monitoring
 
