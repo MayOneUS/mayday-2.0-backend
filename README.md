@@ -77,7 +77,7 @@ You can test if it works by running a command like `heroku logs`.
 
 To access the step two staging Heroku app, follow the instructions for the staging app and then run `git remote add step-two https://git.heroku.com/mayday-step-two.git`.
 
-You can now run commands against the step two staging app like this: `heroku logs -a step-two`.
+You can now run commands against the step two staging app like this: `heroku logs -a mayday-step-two`.
 
 ### Common Staging Commands
 
