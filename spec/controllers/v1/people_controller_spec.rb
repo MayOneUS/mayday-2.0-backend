@@ -3,39 +3,51 @@ require 'rails_helper'
 describe V1::PeopleController,  type: :controller do
   describe "POST create" do
     it "returns success" do
-      user = instance_double("Person", id: 3)
-      expect(Person).to receive(:create_or_update).
-        with(email: 'user@example.com', remote_fields: { tags: ['test'] }) { user }
+      user = instance_double("Person", id: 3, valid?: true)
+      allow(Person).to receive_message_chain(:create_with, :find_or_create_by).and_return(user)
+
       post :create, person: { email: 'user@example.com', remote_fields: { tags: ['test'] } }
       json_response = JSON.parse(response.body)
 
+      expect(Person).to have_received(:create_with)
+        .with(email: 'user@example.com', remote_fields: { tags: ['test'] })
       expect(response).to be_success
       expect(json_response).to have_key('id')
       expect(json_response['id']).to eq(3)
     end
+
+    it "returns error without params" do
+      post :create
+      json_response = JSON.parse(response.body)
+
+      expect(json_response).to have_key('error')
+      expect(json_response['error']).to eq("Email can't be blank. Phone can't be blank.")
+    end
   end
 
   describe "GET targets" do
-    context "no params" do
-      before { get :targets }
 
+    context "with no params" do
+      render_views
       it "returns error" do
+        get :targets
+        @json_response = JSON.parse(response.body)
+        expect(@json_response).to have_key('error')
+        expect(@json_response['error']).to eq("Email can't be blank. Phone can't be blank.")
+      end
+    end
+
+    context "invalid email" do
+      render_views
+      it "returns error" do
+        get :targets, { email: 'bad' }
         expect(assigns(:error)).to_not be_blank
       end
     end
 
-    context "bad email" do
-      before { get :targets, { email: 'bad' } }
-
-      it "returns error" do
-        expect(assigns(:error)).to_not be_blank
-      end
-    end
-
-    context "good email" do
-      context "no address" do
-        context "new user" do
-
+    context "with good email" do
+      context "with no address" do
+        context "with new user" do
           it "returns address required" do
             get :targets, { email: 'user@example.com' }
             expect(assigns(:address_required)).to be true
@@ -49,27 +61,26 @@ describe V1::PeopleController,  type: :controller do
           end
 
           it "sets target legislators" do
+            # TODO In testing, if rendering views, there is a preformance loop when using as_json w/ jbuilder.
             rep = instance_double("Legislator")
             expect_any_instance_of(Person).to receive(:target_legislators).
-              with(json: true) { [rep] }
+              with(json: true).and_return([rep])
             get :targets, { email: 'user@example.com' }
             expect(assigns(:target_legislators)).to eq [rep]
           end
-
         end
 
-        context "existing user with address info" do
-
-          before do
+        context "with existing user with address info" do
+          render_views
+          it "returns address not required" do
             FactoryGirl.create(:person, :with_district, email: 'user@example.com')
             get :targets, { email: 'user@example.com' }
-          end
 
-          it "returns address not required" do
-            expect(assigns(:address_required)).to be false
+            json_response = JSON.parse(response.body)
+            expect(json_response['address_required']).to be false
           end
-
         end
+
       end
 
       context "good address" do

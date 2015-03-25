@@ -89,6 +89,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def error_message_output
+    !valid? && errors.full_messages.join('. ') + '.'
+  end
+
   private
 
   def update_nation_builder
