@@ -23,41 +23,39 @@ class Location < ActiveRecord::Base
   after_save :update_nation_builder
 
   def update_location(address: nil, city: nil, state: nil, zip: nil)
+    zip = nil unless ZipCode.valid_zip?(zip)
+
     if address
-      if district = District.find_by_address(address: address,
-                                             city:    city,
-                                             state:   state,
-                                             zip:     zip)
-        self.address_1 = address
-        self.city      = city
-        self.district  = district
-        self.state     = district.state
-        self.zip_code  = zip if zip = ZipCode.valid_zip_5(zip)
-      else
-        return nil
-      end
-    elsif (zip = ZipCode.valid_zip_5(zip)) && (zip != zip_code)
+      district = District.find_by_address(address: address,
+        city:  city,
+        state: state,
+        zip:   zip)
+    elsif zip && updated_zip?(zip)
       zip_code = ZipCode.find_by(zip_code: zip)
-      self.address_1 = nil
-      self.city      = city
-      self.zip_code  = zip
-      self.state     = zip_code.try(:state)
-      self.district  = zip_code.try(:single_district)
-    else
-      return nil
     end
-    save
+
+    if district || zip_code
+      new_attributes = {
+        address_1:  address || nil,
+        city:       city,
+        state:      (district || zip_code).try(:state),
+        zip_code:   zip_code || zip
+      }.compact!
+      new_attributes[:district] = district || zip_code.try(:single_district)
+
+      update_attributes(new_attributes)
+    end
   end
 
   def state_abbrev
-    if state
-      state.abbrev
-    elsif district
-      district.state.abbrev
-    end
+    (state || district).try(:abbrev)
   end
 
   private
+
+  def updated_zip?(zip)
+    zip != zip_code
+  end
 
   def serializable_hash(options)
     options ||= { methods: [:state_abbrev],
