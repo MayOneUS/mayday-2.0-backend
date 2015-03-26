@@ -27,15 +27,15 @@ describe Location do
 
   describe "#update_location" do
     let(:location) { FactoryGirl.create(:location, zip_code: '03431') }
-    context "bad address" do
+    context "with a bad address" do
       it "doesn't change location" do
-        original_attributes = location.attributes
-        location.update_location(address: '2020 Oregon St', zip: 'bad')
-        expect(location.attributes).to eq original_attributes
+        expect{
+          location.update_location(address: '2020 Oregon St', zip: 'bad')
+          }.not_to change{location.attributes}
       end
     end
 
-    context "good address" do
+    context "with a good address" do
       let (:state)    { FactoryGirl.create(:state, abbrev: 'CA') }
       let!(:district) { FactoryGirl.create(:district, state: state, district: '13') }
 
@@ -57,8 +57,8 @@ describe Location do
       end
     end
 
-    context "zip only" do
-      context "same as zip already stored" do
+    context "with zip only" do
+      context "with same zip already stored" do
         it "doesn't change location" do
           original_attributes = location.attributes
           location.update_location(zip: '03431')
@@ -66,15 +66,15 @@ describe Location do
         end
       end
 
-      context "different from zip already stored" do
-        context "bad zip" do
+      context "with different zip already stored" do
+        context "for invalid zip" do
           it "doesn't change location" do
             original_attributes = location.attributes
             location.update_location(zip: '999999')
             expect(location.attributes).to eq original_attributes
           end
         end
-        context "zip found" do
+        context "for zip found" do
           let!(:zip) { FactoryGirl.create(:zip_code, zip_code: '94703') }
           let!(:district) { FactoryGirl.create(:district) }
 
@@ -97,7 +97,7 @@ describe Location do
               expect(location.zip_code).to eq '94703'
             end
           end
-          context "single district" do
+          context "with single district" do
             before do
               zip.districts = [district]
               location.update_location(zip: '94703')
@@ -118,19 +118,25 @@ describe Location do
           end
         end
 
-        context "zip not found" do
+        context "for zip not found" do
           before do
-            location.update_location(zip: '94703')
+            allow(ZipCode).to receive(:find_by).and_return(nil)
           end
 
           it "clears district" do
-            expect(location.district).to be_nil
+            expect{
+              location.update_location(zip: '94703')
+            }.not_to change{location.district}
           end
           it "clears state" do
-            expect(location.state).to be_nil
+            expect{
+              location.update_location(zip: '94703')
+            }.not_to change{location.state}
           end
           it "sets zip" do
-            expect(location.zip_code).to eq '94703'
+            expect{
+              location.update_location(zip: '94703')
+            }.not_to change{location.zip_code}
           end
         end
       end

@@ -19,6 +19,8 @@ class District < ActiveRecord::Base
 
   validates :district, presence: true, uniqueness: { scope: :state }
 
+  delegate :abbrev, to: :state
+
   def self.find_by_state_and_district(state:, district:)
     joins(:state).where(states: { abbrev: state }).find_by(district: district)
   end
