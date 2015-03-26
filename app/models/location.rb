@@ -22,28 +22,27 @@ class Location < ActiveRecord::Base
 
   after_save :update_nation_builder
 
-  def update_location(address: nil, city: nil, state: nil, zip: nil)
-    zip = nil unless ZipCode.valid_zip?(zip)
+  def update_location(address_params)
+    address_params[:zip] = nil unless ZipCode.valid_zip?(address_params[:zip])
 
-    if address
-      district = District.find_by_address(address: address,
-        city:  city,
-        state: state,
-        zip:   zip)
-    elsif zip && updated_zip?(zip)
-      zip_code = ZipCode.find_by(zip_code: zip)
-    end
-
-    if district || zip_code
+    if source = address_source(address_params)
       new_attributes = {
-        address_1:  address || nil,
-        city:       city,
-        state:      (district || zip_code).try(:state),
-        zip_code:   zip_code || zip
+        address_1:  address_params[:address] || nil,
+        city:       address_params[:city],
+        state:      source.try(:state),
+        zip_code:   source.try(:zip_code) || address_params[:zip]
       }.compact!
-      new_attributes[:district] = district || zip_code.try(:single_district)
+      new_attributes[:district] = source.is_a?(District) ? source : source.try(:single_district)
 
       update_attributes(new_attributes)
+    end
+  end
+
+  def address_source(address_params)
+    if address_params[:address]
+      District.find_by_address(address_params)
+    elsif address_params[:zip] && updated_zip?(address_params[:zip])
+      ZipCode.find_by(zip_code: address_params[:zip])
     end
   end
 
