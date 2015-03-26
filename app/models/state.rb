@@ -20,6 +20,8 @@ class State < ActiveRecord::Base
   validates :name,   presence: true, uniqueness: { case_sensitive: false }
   validates :abbrev, presence: true, uniqueness: { case_sensitive: false }
 
+  alias_method :legislators, :senators
+
   def eligible_senator
     senators.eligible.first
   end

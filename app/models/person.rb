@@ -51,11 +51,7 @@ class Person < ActiveRecord::Base
   end
 
   def legislators
-    if district
-      district.legislators
-    elsif state
-      state.senators
-    end
+    (district || state).try(:legislators)
   end
 
   def constituent_of?(legislator)
@@ -71,16 +67,12 @@ class Person < ActiveRecord::Base
   end
 
   def other_targets(count:, excluding:)
-    if count > 0
-      Legislator.default_targets.where.not(id: excluding.map(&:id)).limit(count)
-    else
-      []
-    end
+    Legislator.includes(:state, {:district => :state}).default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
   end
 
   def target_legislators(json: false, count: Ivr::Call::MAXIMUM_CONNECTIONS)
     locals = unconvinced_legislators || []
-    remaining_count = count - locals.count
+    remaining_count = count - locals.size
     others = other_targets(count: remaining_count, excluding: locals)
     if json
       locals.as_json(extras: { 'local' => true }) + others.as_json(extras: { 'local' => false })
