@@ -11,4 +11,15 @@ describe V1::LegislatorsController do
       expect(json_response[0]['name']).to eq(legislator.name)
     end
   end
+
+  describe "GET show" do
+    it "returns basic info" do
+      legislator = FactoryGirl.create(:representative, :targeted)
+
+      get :show, id: legislator.bioguide_id
+      json_response = JSON.parse(response.body)
+
+      expect(json_response['name']).to eq(legislator.name)
+    end
+  end
 end
