@@ -11,10 +11,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150414190858) do
+ActiveRecord::Schema.define(version: 20150415195410) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "actions", force: :cascade do |t|
+    t.integer  "person_id",   null: false
+    t.integer  "activity_id", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "actions", ["activity_id"], name: "index_actions_on_activity_id", using: :btree
+  add_index "actions", ["person_id", "activity_id"], name: "index_actions_on_person_id_and_activity_id", using: :btree
+  add_index "actions", ["person_id"], name: "index_actions_on_person_id", using: :btree
+
+  create_table "activities", force: :cascade do |t|
+    t.string   "name"
+    t.string   "template_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "activities", ["template_id"], name: "index_activities_on_template_id", unique: true, using: :btree
 
   create_table "calls", force: :cascade do |t|
     t.string   "remote_id"
@@ -175,6 +195,8 @@ ActiveRecord::Schema.define(version: 20150414190858) do
   add_index "zip_codes", ["state_id"], name: "index_zip_codes_on_state_id", using: :btree
   add_index "zip_codes", ["zip_code"], name: "index_zip_codes_on_zip_code", unique: true, using: :btree
 
+  add_foreign_key "actions", "activities"
+  add_foreign_key "actions", "people"
   add_foreign_key "calls", "people"
   add_foreign_key "connections", "calls"
   add_foreign_key "connections", "legislators"

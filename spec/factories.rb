@@ -107,4 +107,9 @@ FactoryGirl.define do
       status Ivr::Call::CALL_STATUSES[:completed]
     end
   end
+
+  factory :activity do
+    sequence(:name) { |n| "Activity #{n}" }
+    sequence(:template_id) { |n| "template_#{n}" }
+  end
 end
