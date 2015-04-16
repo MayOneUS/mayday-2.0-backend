@@ -19,6 +19,7 @@ class Person < ActiveRecord::Base
   has_many :calls, class_name: 'Ivr::Call'
   has_many :connections, through: :calls
   has_many :called_legislators, through: :calls
+  has_many :actions
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, uniqueness: { case_sensitive: false },
