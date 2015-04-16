@@ -16,12 +16,10 @@ describe Person do
   describe "validations" do
     it "validates with an email and no phone" do
       person = Person.new(email: 'user@example.com')
-      person.valid?
       expect(person.valid?).to be true
     end
     it "validates with a phone and no email" do
       person = Person.new(phone: '555-555-5555')
-      person.save!
       expect(person.valid?).to be true
     end
     it "is invalid with no email or phone" do
@@ -29,6 +27,15 @@ describe Person do
       expect(person.valid?).to be false
     end
   end
+
+  describe "create" do
+    it "generates uuid" do
+      person = Person.create(email: 'user@example.com')
+      expect(person.uuid).to_not be_nil
+      expect(person.uuid.length).to eq 36
+    end
+  end
+
   describe "#called_legislators" do
     it "returns those legislators who are called" do
       connection = FactoryGirl.create(:connection, :completed)

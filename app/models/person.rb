@@ -31,15 +31,25 @@ class Person < ActiveRecord::Base
 
   attr_writer :address, :zip, :remote_fields
 
+  before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
 
   alias_method :location_association, :location
   delegate :update_location, :district, :state, to: :location
 
+  FIELDS_ALSO_ON_NB = %w[email first_name is_volunteer last_name phone]
+
   def self.create_or_update(person_params)
     if email = person_params.delete(:email)
       find_or_initialize_by(email: email).tap{ |p| p.update(person_params) }
+    end
+  end
+
+  def self.new_uuid
+    loop do
+      token = SecureRandom.uuid
+      break token unless Person.where(uuid: token).any?
     end
   end
 
@@ -89,7 +99,7 @@ class Person < ActiveRecord::Base
   private
 
   def update_nation_builder
-    relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
+    relevant_fields = changed & FIELDS_ALSO_ON_NB
     if relevant_fields.any? || @remote_fields.present?
       NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields).
                                       merge(@remote_fields || {}))
@@ -98,6 +108,10 @@ class Person < ActiveRecord::Base
 
   def downcase_email
     email && self.email = email.downcase
+  end
+
+  def generate_uuid
+    self.uuid = self.class.new_uuid
   end
 
   def save_location
