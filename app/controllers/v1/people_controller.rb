@@ -1,13 +1,13 @@
 class V1::PeopleController < V1::BaseController
 
   def create
-    person = Person.create_with(person_params).find_or_create_by(email: person_params[:email])
+    person = Person.create_or_update(person_params)
     if person.valid?
       output = { id: person.id }
     else
       output = { error: person.error_message_output }
     end
-    render json: output , status: 200
+    render json: output
   end
 
   def targets
@@ -25,8 +25,8 @@ class V1::PeopleController < V1::BaseController
   private
 
   def person_params
-    params.fetch(:person, {}).permit(:email, :phone, :first_name, :last_name,
-      :address, :zip, remote_fields: [:event_id, :is_volunteer, tags: []])
+    params.require(:person).permit(:email, :phone, :first_name, :last_name,
+      :address, :zip, :is_volunteer, remote_fields: [:event_id, tags: []])
   end
 
   def location_params

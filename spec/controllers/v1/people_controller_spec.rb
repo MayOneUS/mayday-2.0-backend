@@ -4,12 +4,12 @@ describe V1::PeopleController,  type: :controller do
   describe "POST create" do
     it "returns success" do
       user = instance_double("Person", id: 3, valid?: true)
-      allow(Person).to receive_message_chain(:create_with, :find_or_create_by).and_return(user)
+      allow(Person).to receive(:create_or_update).and_return(user)
 
       post :create, person: { email: 'user@example.com', remote_fields: { tags: ['test'] } }
       json_response = JSON.parse(response.body)
 
-      expect(Person).to have_received(:create_with)
+      expect(Person).to have_received(:create_or_update)
         .with(email: 'user@example.com', remote_fields: { tags: ['test'] })
       expect(response).to be_success
       expect(json_response).to have_key('id')
@@ -21,7 +21,7 @@ describe V1::PeopleController,  type: :controller do
       json_response = JSON.parse(response.body)
 
       expect(json_response).to have_key('error')
-      expect(json_response['error']).to eq("Email can't be blank. Phone can't be blank.")
+      expect(json_response['error']).to eq("person is required")
     end
   end
 

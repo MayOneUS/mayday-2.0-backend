@@ -58,11 +58,18 @@ describe Person do
     end
     context "existing record" do
       it "updates record with appropriate values" do
-        FactoryGirl.create(:person, email: 'user@example.com')
+        person = FactoryGirl.create(:person, email: 'user@example.com')
         hash = { email: 'user@example.com',
                  phone: '555-555-1111' }
-        person = Person.create_or_update(hash)
-        expect(person.slice(*hash.keys).values).to eq hash.values
+        Person.create_or_update(hash)
+        expect(person.reload.slice(*hash.keys).values).to eq hash.values
+      end
+      it "finds user based on uuid, if present" do
+        person = FactoryGirl.create(:person, uuid: 'good-uuid', email: 'user@example.com',)
+        hash = { email: 'new_email_address@example.com',
+                 uuid:  'good-uuid' }
+        Person.create_or_update(hash)
+        expect(person.reload.slice(*hash.keys).values).to eq hash.values
       end
     end
   end
