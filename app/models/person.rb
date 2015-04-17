@@ -41,16 +41,22 @@ class Person < ActiveRecord::Base
   FIELDS_ALSO_ON_NB = %w[email first_name is_volunteer last_name phone]
 
   def self.create_or_update(person_params)
-    if email = person_params.delete(:email)
-      find_or_initialize_by(email: email).tap{ |p| p.update(person_params) }
+    key = nil
+    [:uuid, :email, :phone].each do |field|
+      if value = person_params.delete(field).presence
+        key = { field => value }
+        break
+      end
+    end
+    if key
+      find_or_initialize_by(key).tap{ |p| p.update(person_params) }
+    else
+      Person.create(person_params)
     end
   end
 
   def self.new_uuid
-    loop do
-      token = SecureRandom.uuid
-      break token unless Person.where(uuid: token).any?
-    end
+    SecureRandom.uuid
   end
 
   def location

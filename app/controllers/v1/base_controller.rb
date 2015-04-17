@@ -11,4 +11,8 @@ class V1::BaseController < ApplicationController
     end
   end
 
+  rescue_from ActionController::ParameterMissing do |exception|
+    render json: { error: "#{exception.param} is required" }, status: 422
+  end
+
 end
