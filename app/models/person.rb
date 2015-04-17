@@ -19,6 +19,7 @@ class Person < ActiveRecord::Base
   has_many :calls, class_name: 'Ivr::Call'
   has_many :connections, through: :calls
   has_many :called_legislators, through: :calls
+  has_many :actions
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, uniqueness: { case_sensitive: false },
@@ -30,16 +31,32 @@ class Person < ActiveRecord::Base
 
   attr_writer :address, :zip, :remote_fields
 
+  before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
 
   alias_method :location_association, :location
   delegate :update_location, :district, :state, to: :location
 
+  FIELDS_ALSO_ON_NB = %w[email first_name is_volunteer last_name phone]
+
   def self.create_or_update(person_params)
-    if email = person_params.delete(:email)
-      find_or_initialize_by(email: email).tap{ |p| p.update(person_params) }
+    key = nil
+    [:uuid, :email, :phone].each do |field|
+      if value = person_params.delete(field).presence
+        key = { field => value }
+        break
+      end
     end
+    if key
+      find_or_initialize_by(key).tap{ |p| p.update(person_params) }
+    else
+      Person.create(person_params)
+    end
+  end
+
+  def self.new_uuid
+    SecureRandom.uuid
   end
 
   def location
@@ -88,7 +105,7 @@ class Person < ActiveRecord::Base
   private
 
   def update_nation_builder
-    relevant_fields = changed & ['email', 'phone', 'first_name', 'last_name']
+    relevant_fields = changed & FIELDS_ALSO_ON_NB
     if relevant_fields.any? || @remote_fields.present?
       NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields).
                                       merge(@remote_fields || {}))
@@ -97,6 +114,10 @@ class Person < ActiveRecord::Base
 
   def downcase_email
     email && self.email = email.downcase
+  end
+
+  def generate_uuid
+    self.uuid = self.class.new_uuid
   end
 
   def save_location

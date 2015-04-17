@@ -3,13 +3,15 @@ Rails.application.routes.draw do
     resources :legislators, only: [:index, :show] do
       get :targeted, on: :collection
     end
-    resources :stats, only: :index
-    resources :people, only: :create
-    resources :calls, only: :create
-    resources :events, only: :index do
+    resources :stats,       only: :index
+    resources :people,      only: :create
+    resources :calls,       only: :create
+    resources :actions,     only: :create
+    resources :nominations, only: :create
+
+    resources :events,  only: :index do
       post :create_rsvp, on: :collection
     end
-    resources :nominations, only: :create
     resources :blog_posts, only: :index do
       get :press_releases, on: :collection
     end

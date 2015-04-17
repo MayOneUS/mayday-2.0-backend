@@ -16,12 +16,10 @@ describe Person do
   describe "validations" do
     it "validates with an email and no phone" do
       person = Person.new(email: 'user@example.com')
-      person.valid?
       expect(person.valid?).to be true
     end
     it "validates with a phone and no email" do
       person = Person.new(phone: '555-555-5555')
-      person.save!
       expect(person.valid?).to be true
     end
     it "is invalid with no email or phone" do
@@ -29,6 +27,15 @@ describe Person do
       expect(person.valid?).to be false
     end
   end
+
+  describe "create" do
+    it "generates uuid" do
+      person = Person.create(email: 'user@example.com')
+      expect(person.uuid).to_not be_nil
+      expect(person.uuid.length).to eq 36
+    end
+  end
+
   describe "#called_legislators" do
     it "returns those legislators who are called" do
       connection = FactoryGirl.create(:connection, :completed)
@@ -51,11 +58,18 @@ describe Person do
     end
     context "existing record" do
       it "updates record with appropriate values" do
-        FactoryGirl.create(:person, email: 'user@example.com')
+        person = FactoryGirl.create(:person, email: 'user@example.com')
         hash = { email: 'user@example.com',
                  phone: '555-555-1111' }
-        person = Person.create_or_update(hash)
-        expect(person.slice(*hash.keys).values).to eq hash.values
+        Person.create_or_update(hash)
+        expect(person.reload.slice(*hash.keys).values).to eq hash.values
+      end
+      it "finds user based on uuid, if present" do
+        person = FactoryGirl.create(:person, uuid: 'good-uuid', email: 'user@example.com',)
+        hash = { email: 'new_email_address@example.com',
+                 uuid:  'good-uuid' }
+        Person.create_or_update(hash)
+        expect(person.reload.slice(*hash.keys).values).to eq hash.values
       end
     end
   end
