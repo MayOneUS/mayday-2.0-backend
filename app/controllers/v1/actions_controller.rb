@@ -1,14 +1,14 @@
 class V1::ActionsController < V1::BaseController
+  before_action :set_person
+
   def create
     activity = Activity.find_by(template_id: params[:template_id])
 
-    action = Action.create(person: person_from_params, activity: activity)
-    if action.valid?
-      output = { success: true }
-    else
-      output = { error: action.errors.full_messages.first }
+    action = Action.create(person: @person, activity: activity)
+    if action.invalid?
+      @error = action.errors.full_messages.join('. ') + '.'
     end
-    render json: output
+    render
   end
 
   private
@@ -17,9 +17,8 @@ class V1::ActionsController < V1::BaseController
     params.require(:person).permit(:uuid, :email, :phone)
   end
 
-  def person_from_params
-    person = Person.create_or_update(person_params)
-    person if person.valid?
+  def set_person
+    @person = Person.create_or_update(person_params) if person_params.present?
   end
 
 end
