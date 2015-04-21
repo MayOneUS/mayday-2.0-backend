@@ -63,6 +63,10 @@ class Person < ActiveRecord::Base
     location_association || build_location
   end
 
+  def completed_activities
+    actions.joins(:activity).pluck("activities.template_id")
+  end
+
   def address_required?
     district.blank?
   end
