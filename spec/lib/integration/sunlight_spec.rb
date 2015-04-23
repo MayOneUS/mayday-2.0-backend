@@ -15,13 +15,13 @@ describe Integration::Sunlight do
       end
 
       it "renames fields" do
-        keys   = %w[congressional_session opencongress_url]
-        values = [114, 'https://www.opencongress.org/bill/s1016-114']
+        keys   = %w[congressional_session introduced_at opencongress_url]
+        values = [114, '2015-04-20', 'https://www.opencongress.org/bill/s1016-114']
         expect(response.slice(*keys).values).to eq values
       end
 
       it "parses associations" do
-        keys = %w[pledged_support_at sponsor_id]
+        keys = %w[cosponsored_at sponsor_id]
         expect(response['cosponsors'].count).to eq 30
         expect(response['cosponsors'].first.keys).to eq keys
       end

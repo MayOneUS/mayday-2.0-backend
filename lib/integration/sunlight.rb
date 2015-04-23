@@ -21,7 +21,7 @@ class Integration::Sunlight
       # 'cosponsors_count',
       'cosponsors.sponsored_on',
       'cosponsors.legislator.bioguide_id',
-      # 'introduced_on',
+      'introduced_on',
       # 'last_action_at',
       # 'last_version_on',
       # 'last_vote_at',
@@ -73,18 +73,19 @@ class Integration::Sunlight
   }
   MAPPINGS = {
     bill: {
-      'congress' => 'congressional_session',
+      'congress'          => 'congressional_session',
+      'introduced_on'     => 'introduced_at',
       'urls.opencongress' => 'opencongress_url'
     },
     legislator: {
       'district' => 'district_code',
-      'state' => 'state_abbrev'
+      'state'    => 'state_abbrev'
     }
   }
   ASSOCIATIONS = {
     bill: {
       'cosponsors' => {
-        'sponsored_on' => 'pledged_support_at',
+        'sponsored_on' => 'cosponsored_at',
         'legislator.bioguide_id' => 'sponsor_id'
       }
     }
