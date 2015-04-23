@@ -35,12 +35,12 @@ class Ivr::Call < ActiveRecord::Base
     connections.create(legislator: next_target)
   end
 
-  def call_targets
+  def legislators_targeted
     target_legislators - all_called_legislators - attempted_legislators
   end
 
   def next_target
-    call_targets.first
+    legislators_targeted.first
   end
 
   def exceeded_max_connections?

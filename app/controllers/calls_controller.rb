@@ -105,7 +105,7 @@ class CallsController < ApplicationController
   end
 
   def set_caller_id
-    if params['Caller'] && !params['Caller'].includes?('client')
+    if params['Caller'] && params['Caller'] !~ /client/
       params['Caller']
     else
       ENV['TWILIO_APP_PHONE_NUMBER']

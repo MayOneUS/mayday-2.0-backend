@@ -14,16 +14,24 @@ describe V1::CallsController,  type: :controller do
 
       twilio_call = double('twilio_call')
       allow(twilio_call).to receive(:sid).and_return(@fake_sid)
-      allow(Integration::Twilio).to receive(:initiate_congress_calling).and_return(twilio_call)
+      allow(Integration::Twilio).to receive(:initiate_call).and_return(twilio_call)
     end
     it "initates a twilio call" do
-      post :create, phone: @target_phone
-      expect(Integration::Twilio).to have_received(:initiate_congress_calling).with(phone: @target_phone)
+      post :create, person: { phone: @target_phone }
+      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone)
     end
     it "returns the twilio call sid" do
-      post :create, phone: @target_phone
+      post :create, person: { phone: @target_phone }
       json_response = JSON.parse(response.body)
-      expect(json_response['call_sid']).to eq(@fake_sid)
+      expect(json_response['call_sid']).to include(@fake_sid)
+    end
+
+    context "with bad params" do
+      it "returns the twilio call sid" do
+        post :create, phone: @target_phone
+        json_response = JSON.parse(response.body)
+        expect(json_response).to have_key('error')
+      end
     end
   end
 end

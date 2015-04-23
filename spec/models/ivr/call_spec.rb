@@ -40,8 +40,8 @@ describe Ivr::Call, type: :model do
       expect(call.attempted_legislators).to eq([connection.legislator])
     end
   end
-  describe "#call_targets" do
-    def call_targets_setup(targeted_legislators_count:3)
+  describe "#legislators_targeted" do
+    def legislators_targeted_setup(targeted_legislators_count:3)
       @legislators = create_list(:representative, targeted_legislators_count, :targeted, priority: 1)
       @call = FactoryGirl.create(:call)
       @call.connections << FactoryGirl.build(:connection, :completed, legislator: @legislators[0])
@@ -51,25 +51,25 @@ describe Ivr::Call, type: :model do
     it "returns a legislator" do
       targeted_senator = FactoryGirl.create(:senator, :targeted, priority: 1)
       call = FactoryGirl.build(:call)
-      expect(call.call_targets).to include(targeted_senator)
+      expect(call.legislators_targeted).to include(targeted_senator)
     end
     context "with current connections" do
       it "doesn't return legislators from recent connections" do
-        call_targets_setup
-        expect(@call.call_targets).to eq([@legislators.last])
+        legislators_targeted_setup
+        expect(@call.legislators_targeted).to eq([@legislators.last])
       end
     end
     context "with previously completed calls to legislators" do
       it "returns only uncalled legislators" do
-        call_targets_setup
+        legislators_targeted_setup
 
         target_person = @call.person
         second_call = FactoryGirl.create(:call, person: target_person)
-        call_targets = second_call.call_targets
+        legislators_targeted = second_call.legislators_targeted
 
-        expect(call_targets).to include(@legislators[1])
-        expect(call_targets).to include(@legislators[2])
-        expect(call_targets).not_to include(@legislators[0])
+        expect(legislators_targeted).to include(@legislators[1])
+        expect(legislators_targeted).to include(@legislators[2])
+        expect(legislators_targeted).not_to include(@legislators[0])
       end
 
     end
