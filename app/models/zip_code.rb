@@ -45,8 +45,4 @@ class ZipCode < ActiveRecord::Base
     campaigns.include?(campaign)
   end
 
-  def to_s
-    zip_code
-  end
-
 end
