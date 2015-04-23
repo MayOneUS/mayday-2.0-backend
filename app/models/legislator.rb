@@ -44,13 +44,14 @@ class Legislator < ActiveRecord::Base
   validates :state,    presence: true, if: :senator?
   validates :district, absence:  true, if: :senator?
 
-  scope :senate,      -> { where(chamber: 'senate') }
-  scope :house,       -> { where(chamber: 'house') }
-  scope :eligible,    -> { where('term_end < ?', 2.years.from_now) }
-  scope :targeted,    -> { joins(:campaigns).merge(Campaign.active) }
-  scope :priority,    -> { targeted.merge(Target.priority) }
-  scope :unconvinced, -> { where(with_us: false) }
-  scope :with_us,     -> { where(with_us: true) }
+  scope :senate,       -> { where(chamber: 'senate') }
+  scope :with_includes,-> { includes({ district: :state }, :state) }
+  scope :house,        -> { where(chamber: 'house') }
+  scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
+  scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
+  scope :priority,     -> { targeted.merge(Target.priority) }
+  scope :unconvinced,  -> { where(with_us: false) }
+  scope :with_us,      -> { where(with_us: true) }
 
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
@@ -127,6 +128,15 @@ class Legislator < ActiveRecord::Base
 
   def state_abbrev
     state ? state.abbrev : district.state.abbrev
+  end
+
+  def map_key
+    district_string = if representative?
+      district_code.rjust(2, "0")
+    else
+      state_rank.upcase
+    end
+    "#{state_abbrev}-#{district_string}"
   end
 
   def title

@@ -36,12 +36,16 @@ describe Person do
     end
   end
 
-  describe "#called_legislators" do
+  describe "#all_called_legislators" do
     it "returns those legislators who are called" do
-      connection = FactoryGirl.create(:connection, :completed)
-      person = connection.call.person
+      call = FactoryGirl.create(:call)
+      connections = create_list(:connection, 2, :completed, call: call)
+      connection_three = FactoryGirl.create(:connection, :failed, call: call)
+      person = call.person
 
-      expect(person.called_legislators).to eq([connection.legislator])
+      expected_ids = person.all_called_legislators.map(&:id)
+      expect(expected_ids).to eq(connections.map{|c| c.legislator.id})
+      expect(expected_ids).not_to include(connection_three.legislator.id)
     end
   end
 

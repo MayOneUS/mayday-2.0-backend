@@ -85,7 +85,7 @@ describe CallsController,  type: :controller do
         expect(@active_call).to have_received(:create_connection!)
       end
     end
-    context "with completed targets" do
+    context "with max connections" do
       before do
         setup_active_call_double
         allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)

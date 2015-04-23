@@ -18,7 +18,7 @@ class Person < ActiveRecord::Base
   has_many :senators, through: :state
   has_many :calls, class_name: 'Ivr::Call'
   has_many :connections, through: :calls
-  has_many :called_legislators, through: :calls
+  has_many :all_called_legislators, through: :calls, source: :called_legislators
   has_many :actions
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
@@ -77,10 +77,6 @@ class Person < ActiveRecord::Base
 
   def constituent_of?(legislator)
     legislators && legislators.include?(legislator)
-  end
-
-  def next_target
-    (target_legislators - called_legislators).first
   end
 
   def unconvinced_legislators

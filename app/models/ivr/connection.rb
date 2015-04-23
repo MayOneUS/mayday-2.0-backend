@@ -25,7 +25,9 @@ class Ivr::Connection < ActiveRecord::Base
   }
 
   scope :uncompleted, -> { where(status: nil, remote_id: nil) }
-  scope :completed, -> { where(status: Ivr::Call::CALL_STATUSES[:completed]) }
+  scope :completed, -> { 
+    where(status: Ivr::Call::CALL_STATUSES[:completed], status_from_user: USER_RESPONSE_CODES['1']) 
+  }
 
   def connecting_message_key
     if legislator.senator?

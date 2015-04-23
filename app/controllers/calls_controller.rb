@@ -26,7 +26,7 @@ class CallsController < ApplicationController
         r.Play AudioFileFetcher.audio_url_for_key(connection.connecting_message_key)
         r.Play AudioFileFetcher.audio_url_for_key('star_to_disconnect')
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
-        r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true
+        r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true, 'callerId' => caller_id
       else
         audio_key = active_call.exceeded_max_connections? ? 'closing_message' : 'no_targets'
         r.Play AudioFileFetcher.audio_url_for_key(audio_key)
@@ -98,6 +98,18 @@ class CallsController < ApplicationController
       call.save
     end
     call
+  end
+
+  def caller_id
+    @caller_id ||= set_caller_id
+  end
+
+  def set_caller_id
+    if params['Caller'] && !params['Caller'].includes?('client')
+      params['Caller']
+    else
+      ENV['TWILIO_APP_PHONE_NUMBER']
+    end
   end
 
 end

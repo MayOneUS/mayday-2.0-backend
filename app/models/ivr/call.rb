@@ -15,10 +15,11 @@
 class Ivr::Call < ActiveRecord::Base
   has_many :connections, class_name: 'Ivr::Connection'
   has_many :called_legislators, -> { merge(Ivr::Connection.completed) }, through: :connections, source: :legislator
+  has_many :attempted_legislators, through: :connections, source: :legislator
   has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Ivr::Connection'
   belongs_to :person, required: true
 
-  delegate :target_legislators, :next_target, to: :person
+  delegate :target_legislators, :all_called_legislators, to: :person
 
   CALL_STATUSES = {
     completed: 'completed',
@@ -32,6 +33,14 @@ class Ivr::Call < ActiveRecord::Base
 
   def create_connection!
     connections.create(legislator: next_target)
+  end
+
+  def call_targets
+    target_legislators - all_called_legislators - attempted_legislators
+  end
+
+  def next_target
+    call_targets.first
   end
 
   def exceeded_max_connections?

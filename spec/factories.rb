@@ -26,10 +26,10 @@ FactoryGirl.define do
 
   factory :legislator do
     sequence(:bioguide_id) { |n| "F#{n}" }
-    first_name 'Barbara'
-    last_name 'Boxer'
+    first_name { Faker::Name.first_name }
+    last_name { Faker::Name.last_name }
     phone '202-224-3553'
-    party 'D'
+    party { %w[D R].sample }
     term_end 1.year.from_now
 
     factory :senator do
@@ -105,6 +105,11 @@ FactoryGirl.define do
 
     trait :completed do
       status Ivr::Call::CALL_STATUSES[:completed]
+      status_from_user Ivr::Connection::USER_RESPONSE_CODES['1']
+    end
+
+    trait :failed do
+      status Ivr::Call::CALL_STATUSES[:failed]
     end
   end
 

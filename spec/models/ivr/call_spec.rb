@@ -25,29 +25,63 @@ describe Ivr::Call, type: :model do
     end
   end
   describe "#called_legislators" do
-    it "returns those legislators who are called" do
-      connection = FactoryGirl.create(:connection, :completed)
+    it "returns those legislators who are succesfully called" do
+      connection = FactoryGirl.create(:connection, :completed, status_from_user: Ivr::Connection::USER_RESPONSE_CODES['1'])
       call = connection.call
 
       expect(call.called_legislators).to eq([connection.legislator])
     end
   end
-  describe "#next_target" do
+  describe "#attempted_legislators" do
+    it "returns those legislators who are called" do
+      connection = FactoryGirl.create(:connection)
+      call = connection.call
+
+      expect(call.attempted_legislators).to eq([connection.legislator])
+    end
+  end
+  describe "#call_targets" do
+    def call_targets_setup(targeted_legislators_count:3)
+      @legislators = create_list(:representative, targeted_legislators_count, :targeted, priority: 1)
+      @call = FactoryGirl.create(:call)
+      @call.connections << FactoryGirl.build(:connection, :completed, legislator: @legislators[0])
+      @call.connections << FactoryGirl.build(:connection, :failed, legislator: @legislators[1])
+      @call.save
+    end
     it "returns a legislator" do
       targeted_senator = FactoryGirl.create(:senator, :targeted, priority: 1)
       call = FactoryGirl.build(:call)
-      expect(call.next_target).to eq(targeted_senator)
+      expect(call.call_targets).to include(targeted_senator)
     end
-    context "with a called legislator" do
-      it "returns only uncalled legislators" do
-        legislators = create_list(:representative, 3, :targeted, priority: 1)
-        call = FactoryGirl.create(:call)
-        call.connections << FactoryGirl.build(:connection, :completed, legislator: legislators[0])
-        call.connections << FactoryGirl.build(:connection, :completed, legislator: legislators[1])
-        call.save
-
-        expect(call.next_target).to eq(legislators[2])
+    context "with current connections" do
+      it "doesn't return legislators from recent connections" do
+        call_targets_setup
+        expect(@call.call_targets).to eq([@legislators.last])
       end
+    end
+    context "with previously completed calls to legislators" do
+      it "returns only uncalled legislators" do
+        call_targets_setup
+
+        target_person = @call.person
+        second_call = FactoryGirl.create(:call, person: target_person)
+        call_targets = second_call.call_targets
+
+        expect(call_targets).to include(@legislators[1])
+        expect(call_targets).to include(@legislators[2])
+        expect(call_targets).not_to include(@legislators[0])
+      end
+
+    end
+
+  end
+  describe "#next_target" do
+    it "is the next targeted legislator" do
+      legislators = create_list(:representative, 4, :targeted, priority: 1)
+      call = FactoryGirl.create(:call)
+      call.connections << FactoryGirl.build(:connection, :completed, legislator: legislators[0])
+      call.connections << FactoryGirl.build(:connection, :failed, legislator: legislators[1])
+      call.save
     end
   end
   describe "exceeded_max_connections?" do
