@@ -27,6 +27,13 @@ namespace :db do
       Legislator.where.not(bioguide_id: ids).update_all(with_us: false)
       Legislator.where(bioguide_id: ids).update_all(with_us: true)
     end
+
+    desc "seed actions"
+    task activities: :environment do
+      %w[sign-up-form call-congress volunteer-form sign-letter join-discussion spread-the-word].each do |tempalte_id|
+        Activity.create(template_id: tempalte_id)
+      end
+    end
   end
 
   desc "Purge DB of all data"
@@ -37,7 +44,7 @@ namespace :db do
   namespace :purge do
     desc "Purge DB of API generated data"
     task api: :environment do
-      DatabaseCleaner.clean_with(:truncation, :only => %w[people locations calls connections])
+      DatabaseCleaner.clean_with(:truncation, :only => %w[people locations calls connections actions])
     end
     desc "Purge DB of dummy seed data"
     task dummy_data: :environment do
