@@ -7,11 +7,15 @@ namespace :db do
       ids = ["T000193", "B000490", "L000563", "G000559", "K000380", "L000263", "D000623", "V000108", "H001038", "C001063", "R000599"] #fake targets from 04/17
       campaign.legislators = Legislator.where(bioguide_id: ids)
       campaign.targets.limit(5).update_all(priority: 1)
-      start = DateTime.parse("2017-03-14 7pm EDT").utc
+      start = DateTime.parse("2017-05-14 7pm EDT").utc
       (1..5).each do |n|
         Event.create(starts_at: start + n.days,
                      ends_at:   start + 1.hour + n.days,
                      remote_id: 25 + n)
+      end
+
+      %w[hr20-114 hr424-114].each do |bill_id|
+        Bill.fetch(bill_id: bill_id)
       end
 
       puts "You now have #{Legislator.targeted.length} targeted legislators"

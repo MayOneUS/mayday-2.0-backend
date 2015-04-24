@@ -53,4 +53,20 @@ class Bill < ActiveRecord::Base
       end
     end
   end
+
+  def supporter_count
+    sponsorships.size
+  end
+
+  def cosponsor_count
+    cosponsors.size
+  end
+
+  def needed_cosponsor_count
+    (chamber_size / 2.0).ceil - cosponsor_count
+  end
+
+  def chamber_size
+    Legislator.where(chamber: chamber).in_office.count # need to remove extra states or this will return 439
+  end
 end
