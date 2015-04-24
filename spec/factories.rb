@@ -117,4 +117,8 @@ FactoryGirl.define do
     sequence(:name) { |n| "Activity #{n}" }
     sequence(:template_id) { |n| "template_#{n}" }
   end
+
+  factory :bill do
+    sequence(:bill_id) { |n| "bill-#{n}" }
+  end
 end

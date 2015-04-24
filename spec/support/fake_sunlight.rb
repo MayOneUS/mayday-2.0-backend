@@ -2,7 +2,16 @@ require 'sinatra/base'
 
 class FakeSunlight < Sinatra::Base
 
-  get Integration::Sunlight::LEGISLATORS_ENDPOINT do
+  get Integration::Sunlight::ENDPOINTS[:bills] do
+    file = if params[:bill_id] == 'not_found'
+             'not_found'
+           else
+             'found_bill'
+           end
+    json_response 200, file
+  end
+
+  get Integration::Sunlight::ENDPOINTS[:legislators] do
     file = if params[:page] == '2'
              'multiple_results_page_2'
            elsif params[:senate_class].presence || params[:bioguide_id] == 'F000062'

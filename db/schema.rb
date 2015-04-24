@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150416002805) do
+ActiveRecord::Schema.define(version: 20150423193544) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,19 @@ ActiveRecord::Schema.define(version: 20150416002805) do
   end
 
   add_index "activities", ["template_id"], name: "index_activities_on_template_id", unique: true, using: :btree
+
+  create_table "bills", force: :cascade do |t|
+    t.string   "bill_id"
+    t.string   "chamber"
+    t.string   "short_title"
+    t.string   "summary_short"
+    t.integer  "congressional_session"
+    t.string   "opencongress_url"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "bills", ["bill_id"], name: "index_bills_on_bill_id", unique: true, using: :btree
 
   create_table "calls", force: :cascade do |t|
     t.string   "remote_id"
@@ -161,6 +174,19 @@ ActiveRecord::Schema.define(version: 20150416002805) do
   add_index "people", ["email"], name: "index_people_on_email", unique: true, using: :btree
   add_index "people", ["uuid"], name: "index_people_on_uuid", unique: true, using: :btree
 
+  create_table "sponsorships", force: :cascade do |t|
+    t.integer  "bill_id",            null: false
+    t.integer  "legislator_id",      null: false
+    t.datetime "pledged_support_at"
+    t.datetime "cosponsored_at"
+    t.datetime "introduced_at"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "sponsorships", ["bill_id"], name: "index_sponsorships_on_bill_id", using: :btree
+  add_index "sponsorships", ["legislator_id"], name: "index_sponsorships_on_legislator_id", using: :btree
+
   create_table "states", force: :cascade do |t|
     t.string   "name"
     t.string   "abbrev"
@@ -209,6 +235,8 @@ ActiveRecord::Schema.define(version: 20150416002805) do
   add_foreign_key "locations", "districts"
   add_foreign_key "locations", "people"
   add_foreign_key "locations", "states"
+  add_foreign_key "sponsorships", "bills"
+  add_foreign_key "sponsorships", "legislators"
   add_foreign_key "targets", "campaigns"
   add_foreign_key "targets", "legislators"
   add_foreign_key "zip_codes", "states"
