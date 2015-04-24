@@ -13,7 +13,10 @@ task map_parse: :environment do
       key += 'NIOR' if key =~ /SE|JU/
       coordinates_output[key]=[x,y]
 
-      labels_output[key[0,2]] = label_offset.split(',').map(&:to_f) if label_offset
+      if label_offset
+        offsets = label_offset.split(',').map{|x_offset,y_offset| [x_offset.to_f+x, y_offset.to_f+y]}
+        labels_output[key[0,2]] = offsets
+      end
     end
   end;0
 
