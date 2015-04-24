@@ -14,7 +14,8 @@ task map_parse: :environment do
       coordinates_output[key]=[x,y]
 
       if label_offset
-        offsets = label_offset.split(',').map{|x_offset,y_offset| [x_offset.to_f+x, y_offset.to_f+y]}
+        offsets = label_offset.split(',')
+        offsets = [offsets[0].to_f+x, offsets[1].to_f+y]
         labels_output[key[0,2]] = offsets
       end
     end
