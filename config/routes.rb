@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   api_version(module: "V1", path: {value: "v1"}, default: true, defaults: {format: :json}) do
     resources :legislators, only: [:index, :show] do
       get :targeted, on: :collection
-      get :supporters_map, on: :collection
+      get :supporters_map, on: :collection, defaults: {format: :js}
     end
     resources :stats,       only: :index
     resources :people,      only: :create

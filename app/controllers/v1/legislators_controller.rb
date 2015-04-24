@@ -42,7 +42,7 @@ class V1::LegislatorsController < V1::BaseController
       }
     end
     json = {tile_coordinates: coordinates_output, label_coordinates: Legislator::MAP_LABELS}.to_json
-    render text: "onLegislatorResponse(#{json})"
+    render js: "onLegislatorResponse(#{json})"
   end
 
 end
