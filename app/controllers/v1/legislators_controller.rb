@@ -36,7 +36,7 @@ class V1::LegislatorsController < V1::BaseController
           support_max: support_max,
           targeted: targeted,
           image_url: l.image_url,
-          biogudie_id: l.bioguide_id,
+          bioguide_id: l.bioguide_id,
           sponsorships: sponsorships,
           chamber: l.chamber
         }
