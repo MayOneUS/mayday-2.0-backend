@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       get :press_releases, on: :collection
     end
     get '/people/targets', to: 'people#targets'
+    get '/bills/supporter_counts', to: 'bills#supporter_counts'
   end
   post '/calls/start',                    to: 'calls#start'
   get  '/calls/new_connection',           to: 'calls#new_connection'
