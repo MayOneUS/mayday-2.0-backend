@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: bills
+#
+#  id                    :integer          not null, primary key
+#  bill_id               :string
+#  chamber               :string
+#  short_title           :string
+#  summary_short         :string
+#  congressional_session :integer
+#  opencongress_url      :string
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#
+
 require 'rails_helper'
 
 describe Bill do

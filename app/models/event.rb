@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: events
+#
+#  id         :integer          not null, primary key
+#  starts_at  :datetime
+#  ends_at    :datetime
+#  remote_id  :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class Event < ActiveRecord::Base
   validates :remote_id, presence: true, uniqueness: true
   validates :starts_at, presence: true

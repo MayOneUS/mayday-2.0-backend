@@ -29,6 +29,7 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  with_us             :boolean          default("false")
+#  twitter_id          :string
 #
 
 class Legislator < ActiveRecord::Base
