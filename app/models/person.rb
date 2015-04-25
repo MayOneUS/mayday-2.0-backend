@@ -24,6 +24,7 @@ class Person < ActiveRecord::Base
   has_many :connections, through: :calls
   has_many :all_called_legislators, through: :calls, source: :called_legislators
   has_many :actions
+  has_many :activities, through: :actions
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, uniqueness: { case_sensitive: false },
@@ -99,6 +100,21 @@ class Person < ActiveRecord::Base
       locals.as_json(extras: { 'local' => true }) + others.as_json(extras: { 'local' => false })
     else
       locals + others
+    end
+  end
+
+  def completed_activity?(activity)
+    activities.include?(activity)
+  end
+
+  def activities_hash
+    Activity.order(:id).map do |activity|
+      {
+        name: activity.name,
+        order: activity.id,
+        completed: completed_activity?(activity),
+        template_id: activity.template_id
+      }
     end
   end
 

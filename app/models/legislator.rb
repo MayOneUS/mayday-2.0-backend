@@ -184,7 +184,7 @@ class Legislator < ActiveRecord::Base
   end
 
   def sponsorship_hash
-    bills.each_with_object({}) { |b,h| h[b.bill_id] = 'cosponsored' }
+    bills.each_with_object({}) { |b, h| h[b.bill_id] = 'cosponsored' }
   end
 
   def support_max
