@@ -6,6 +6,7 @@ RSpec.describe V1::ActionsController, type: :controller do
     context "with good params" do
       before do
         FactoryGirl.create(:activity, template_id: 'real_id')
+        FactoryGirl.create(:activity)
         FactoryGirl.create(:person, uuid: 'the-uuid', email: 'joe@example.com')
       end
       it "returns person object" do
@@ -14,7 +15,11 @@ RSpec.describe V1::ActionsController, type: :controller do
         post :create, person: { email: 'joe@example.com' }, template_id: 'real_id'
         parsed_response = JSON.parse(response.body)
         expect(parsed_response.slice('uuid', 'completed_activities').values)
-          .to eq ["the-uuid", ["real_id"]]
+          .to eq ['the-uuid', ['real_id']]
+        activities = parsed_response['activities']
+        expect(activities.count).to eq 2
+        expect(activities.first.keys).to eq ['name', 'order', 'completed', 'template_id']
+        expect(activities.map{|a| a['completed']}).to eq [true, false]
       end
     end
     context "with bad params" do

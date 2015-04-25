@@ -30,8 +30,8 @@ namespace :db do
 
     desc "seed actions"
     task activities: :environment do
-      %w[sign-up-form call-congress volunteer-form sign-letter join-discussion spread-the-word].each do |tempalte_id|
-        Activity.create(template_id: tempalte_id)
+      %w[sign-up-form call-congress volunteer-form sign-letter join-discussion spread-the-word].each do |template_id|
+        Activity.create(template_id: template_id)
       end
     end
   end
