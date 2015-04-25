@@ -17,6 +17,10 @@ class V1::LegislatorsController < V1::BaseController
     render json: Legislator.with_includes.targeted
   end
 
+  def newest_supporters
+    render json: Legislator.with_includes.joins(:sponsorships).order('sponsorships.cosponsored_at desc').all
+  end
+
   def supporters_map
     coordinates_output = []
     Legislator.with_includes.includes(:bills,:active_campaigns).all.each_with_index do |l,i|
