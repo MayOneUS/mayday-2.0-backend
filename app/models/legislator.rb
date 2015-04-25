@@ -151,6 +151,10 @@ class Legislator < ActiveRecord::Base
     senator? ? 'Senator' : 'Rep.'
   end
 
+  def long_title
+    senator? ? 'Senator' : 'Representative'
+  end
+
   def display_district
     if representative?
       if district_code == '0'
@@ -180,8 +184,16 @@ class Legislator < ActiveRecord::Base
     term_end < 2.years.from_now
   end
 
+  def state_ref
+    state ? state : district.state
+  end
+
   def state_name
-    state ? state.name : district.state.name
+    state_ref.name
+  end
+
+  def state_abbrev
+    state_ref.abbrev
   end
 
   def sponsorship_hash
@@ -190,6 +202,15 @@ class Legislator < ActiveRecord::Base
 
   def support_max
     'cosponsored' if bills.any?
+  end
+
+  def support_description
+    start = "#{long_title} #{name} (#{party}-#{state_abbrev}) "
+    if bills.any?
+      start << "is a proud supporter of campaign finance reform. Thank #{title} #{last_name} for their support!"
+    else
+      start << "is not a sponsor of Campaign Finance Reform.  Demand #{title} #{last_name}'s support now!"
+    end
   end
 
   def targeted?

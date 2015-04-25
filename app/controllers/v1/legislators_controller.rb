@@ -33,7 +33,8 @@ class V1::LegislatorsController < V1::BaseController
           image_url: l.image_url,
           bioguide_id: l.bioguide_id,
           sponsorships: l.sponsorship_hash,
-          chamber: l.chamber
+          chamber: l.chamber,
+          description: l.support_description
         }
       }
     end
