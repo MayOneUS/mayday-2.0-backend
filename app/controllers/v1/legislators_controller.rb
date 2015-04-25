@@ -18,7 +18,7 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def newest_supporters
-    render json: Legislator.with_includes.joins(:sponsorships).order('sponsorships.cosponsored_at desc').all
+    render json: Legislator.with_includes.joins(:sponsorships).order('sponsorships.cosponsored_at desc').first(5)
   end
 
   def supporters_map
