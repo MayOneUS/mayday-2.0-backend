@@ -14,7 +14,8 @@
 #
 
 class Bill < ActiveRecord::Base
-  has_many :sponsorships
+  has_many :sponsorships, dependent: :delete_all
+  has_many :supporters, through: :sponsorships, source: :legislator
   has_many :cosponsors, -> { merge(Sponsorship.cosponsored) }, through: :sponsorships, source: :legislator
   has_one :authorship, -> { merge(Sponsorship.sponsored) }, class_name: 'Sponsorship'
   has_one :sponsor, through: :authorship, source: :legislator
