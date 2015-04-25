@@ -13,12 +13,12 @@ namespace :db do
                      ends_at:   start + 1.hour + n.days,
                      remote_id: 25 + n)
       end
+      puts "You now have #{Legislator.targeted.length} targeted legislators"
 
-      %w[hr20-114 hr424-114].each do |bill_id|
+      Bill::TRACKED_BILL_IDS.each do |bill_id|
         Bill.fetch(bill_id: bill_id)
       end
 
-      puts "You now have #{Legislator.targeted.length} targeted legislators"
     end
 
     desc "Reset reps with us"

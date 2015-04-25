@@ -22,6 +22,8 @@ class Bill < ActiveRecord::Base
 
   validates :bill_id, uniqueness: true
 
+  TRACKED_BILL_IDS = %w[hr20-114 hr424-114]
+
   def self.fetch(bill_id:)
     if results = Integration::Sunlight.get_bill(bill_id:  bill_id)
       create_or_update(results.deep_symbolize_keys)

@@ -18,11 +18,9 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def supporters_map
-    blank_sponsorships = { 'hr20-114' => '', 'hr424-114' => '' }
     coordinates_output = []
     Legislator.with_includes.includes(:bills,:active_campaigns).all.each_with_index do |l,i|
       next unless Legislator::MAP_COORDINATES.include?(l.map_key)
-      sponsorships = blank_sponsorships.merge(l.sponsorship_hash)
       coordinates_output << {
         map_key: l.map_key,
         coordinates: Legislator::MAP_COORDINATES[l.map_key],
@@ -34,7 +32,7 @@ class V1::LegislatorsController < V1::BaseController
           targeted: l.targeted?,
           image_url: l.image_url,
           bioguide_id: l.bioguide_id,
-          sponsorships: sponsorships,
+          sponsorships: l.sponsorship_hash,
           chamber: l.chamber
         }
       }
