@@ -37,6 +37,8 @@ class Legislator < ActiveRecord::Base
   belongs_to :state
   has_many :targets
   has_many :campaigns, through: :targets
+  has_many :sponsorships
+  has_many :bills, through: :sponsorships
 
   validates :bioguide_id, presence: true, uniqueness: true
   validates :chamber, inclusion: { in: %w(house senate) }
@@ -179,6 +181,18 @@ class Legislator < ActiveRecord::Base
 
   def state_name
     state ? state.name : district.state.name
+  end
+
+  def sponsorship_hash
+    bills.each_with_object({}) { |b,h| h[b.bill_id] = 'cosponsored' }
+  end
+
+  def support_max
+    'cosponsored' if bills.any?
+  end
+
+  def targeted?
+    campaigns.active.any?
   end
 
   private

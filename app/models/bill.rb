@@ -1,20 +1,6 @@
-# == Schema Information
-#
-# Table name: bills
-#
-#  id                    :integer          not null, primary key
-#  bill_id               :string
-#  chamber               :string
-#  short_title           :string
-#  summary_short         :string
-#  congressional_session :integer
-#  opencongress_url      :string
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#
-
 class Bill < ActiveRecord::Base
-  has_many :sponsorships
+  has_many :sponsorships, dependent: :delete_all
+  has_many :supporters, through: :sponsorships, source: :legislator
   has_many :cosponsors, -> { merge(Sponsorship.cosponsored) }, through: :sponsorships, source: :legislator
   has_one :authorship, -> { merge(Sponsorship.sponsored) }, class_name: 'Sponsorship'
   has_one :sponsor, through: :authorship, source: :legislator
