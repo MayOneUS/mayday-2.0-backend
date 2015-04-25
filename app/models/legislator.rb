@@ -37,6 +37,7 @@ class Legislator < ActiveRecord::Base
   belongs_to :state
   has_many :targets
   has_many :campaigns, through: :targets
+  has_many :active_campaigns, -> { merge(Campaign.active) }, through: :targets, source: :campaign
   has_many :sponsorships
   has_many :bills, through: :sponsorships
 
@@ -192,7 +193,7 @@ class Legislator < ActiveRecord::Base
   end
 
   def targeted?
-    campaigns.active.any?
+    active_campaigns.any?
   end
 
   private

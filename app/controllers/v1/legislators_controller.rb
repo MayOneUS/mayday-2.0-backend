@@ -20,7 +20,7 @@ class V1::LegislatorsController < V1::BaseController
   def supporters_map
     blank_sponsorships = { 'hr20-114' => '', 'hr424-114' => '' }
     coordinates_output = []
-    Legislator.with_includes.all.each_with_index do |l,i|
+    Legislator.with_includes.includes(:bills,:active_campaigns).all.each_with_index do |l,i|
       next unless Legislator::MAP_COORDINATES.include?(l.map_key)
       sponsorships = blank_sponsorships.merge(l.sponsorship_hash)
       coordinates_output << {

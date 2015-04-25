@@ -14,7 +14,7 @@ class V1::ActionsController < V1::BaseController
   private
 
   def person_params
-    params.require(:person).permit(:uuid, :email, :phone)
+    params.require(:person).permit(:uuid, :email, :phone, :zip)
   end
 
   def set_person
@@ -22,3 +22,4 @@ class V1::ActionsController < V1::BaseController
   end
 
 end
+2
