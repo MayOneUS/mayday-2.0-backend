@@ -116,6 +116,7 @@ GEM
     oga (0.2.0)
       ast
       racc (~> 1.4, >= 1.4.12)
+    oj (2.12.4)
     pg (0.18.1)
     racc (1.4.12)
     rack (1.6.0)
@@ -264,6 +265,7 @@ DEPENDENCIES
   newrelic_rpm
   oauth2
   oga
+  oj
   pg
   rack-cors
   rack-mini-profiler

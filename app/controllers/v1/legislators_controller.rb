@@ -22,6 +22,13 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def supporters_map
+    json = prep_supports_map_json  #add caching later
+    render js: "onLegislatorResponse(#{json})"
+  end
+
+  private 
+
+  def prep_supports_map_json
     coordinates_output = []
     Legislator.with_includes.includes(:bills,:active_campaigns).all.each_with_index do |l,i|
       next unless Legislator::MAP_COORDINATES.include?(l.map_key)
@@ -42,8 +49,7 @@ class V1::LegislatorsController < V1::BaseController
         }
       }
     end
-    json = {tile_coordinates: coordinates_output, label_coordinates: Legislator::MAP_LABELS}.to_json
-    render js: "onLegislatorResponse(#{json})"
+    Oj.dump({tile_coordinates: coordinates_output, label_coordinates: Legislator::MAP_LABELS},  mode: :compat)
   end
 
 end

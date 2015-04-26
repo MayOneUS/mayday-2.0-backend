@@ -223,7 +223,7 @@ class Legislator < ActiveRecord::Base
     options ||= {}
     extras = options.delete(:extras) || {}
     options = { methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url],
-                only: [:id, :party, :chamber, :state_rank, :with_us, :last_name] }.merge(options)
+                only: [:id, :party, :chamber, :state_rank, :with_us, :last_name, :bioguide_id] }.merge(options)
     super(options).merge(extras || {})
   end
 
