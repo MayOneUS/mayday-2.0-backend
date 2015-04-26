@@ -29,7 +29,7 @@ task output_legislators: :environment do
   require 'csv'
 
   legislators = Legislator.with_includes.includes({sponsorships: :bill})
-  bill_order = Bill.all.map{|b| b.attributes.select{|att| %w[id bill_id].include?(att) }
+  bill_order = Bill.all.map{|b| b.attributes.select{|att| %w[id bill_id].include?(att) }}
 
   sponsorship_attr_order = Sponsorship.first.attributes.keys
   sponsorship_headers = bill_order.map{|bi| sponsorship_attr_order.map{|attribute| "#{bi['bill_id']}-#{attribute}"}}.flatten
