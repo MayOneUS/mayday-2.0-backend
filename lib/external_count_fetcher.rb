@@ -52,7 +52,7 @@
         when :donations_count     then Integration::PledgeService.donations_count
         when :donations_total     then Integration::PledgeService.donations_total
         when :called_voters_count then 0
-        when :reps_calls_count    then 0
+        when :reps_calls_count    then Ivr::Connection.completed
         when :house_supporters    then Legislator.house.with_us.count
         when :senate_supporters   then Legislator.senate.with_us.count
         else raise ArgumentError, "Unknown Key: #{key}"
