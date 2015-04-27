@@ -31,7 +31,12 @@ RSpec.describe V1::ActionsController, type: :controller do
       it "returns error if person is incomplete or template_id is bad" do
         post :create, person: { foo: 'bar' }, template_id: 'fake_id'
         expect(JSON.parse(response.body)['success']).to be_nil
-        expect(JSON.parse(response.body)['error']).to eq "Person can't be blank. Activity can't be blank."
+        expect(JSON.parse(response.body)['error']).to eq "Person can't be blank. Activity can't be blank. Activity not found."
+      end
+      it "returns error if template_id is not provided" do
+        post :create, person: { foo: 'bar' }
+        expect(JSON.parse(response.body)['success']).to be_nil
+        expect(JSON.parse(response.body)['error']).to eq "template_id is required"
       end
     end
   end
