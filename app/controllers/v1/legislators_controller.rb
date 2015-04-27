@@ -20,7 +20,8 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def newest_supporters
-    render json: Legislator.with_includes.joins(:sponsorships).order('sponsorships.cosponsored_at desc').first(5)
+    limit = params[:limit] || 5
+    render json: Legislator.with_includes.joins(:sponsorships).order('sponsorships.cosponsored_at desc').first(limit)
   end
 
   def supporters_map
