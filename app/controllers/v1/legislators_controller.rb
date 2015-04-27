@@ -1,5 +1,7 @@
 class V1::LegislatorsController < V1::BaseController
 
+  SUPPORTER_MAP_REDIS_KEY = 'supports_map_json'
+
   def index
     render json: Legislator.with_includes
       .order(:first_name, :last_name)
@@ -22,8 +24,8 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def supporters_map
-    json = prep_supports_map_json  #add caching later
-    render js: "onLegislatorResponse(#{json})"
+    output = redis.get(SUPPORTER_MAP_REDIS_KEY) || prep_supports_map_json
+    render js: output
   end
 
   private
@@ -49,7 +51,20 @@ class V1::LegislatorsController < V1::BaseController
         }
       }
     end
-    Oj.dump({tile_coordinates: coordinates_output, label_coordinates: Legislator::MAP_LABELS},  mode: :compat)
+    json = Oj.dump({tile_coordinates: coordinates_output, label_coordinates: Legislator::MAP_LABELS},  mode: :compat)
+    output = "onLegislatorResponse(#{json})"
+
+    redis.set(SUPPORTER_MAP_REDIS_KEY, output)
+    redis.expire(SUPPORTER_MAP_REDIS_KEY, 12.hours)
+
+    output
   end
+
+
+
+  def redis
+    @redis ||= Redis.current
+  end
+
 
 end
