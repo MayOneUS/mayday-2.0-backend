@@ -51,6 +51,6 @@ class Sponsorship < ActiveRecord::Base
   def serializable_hash(options)
     super({ methods: [:name, :congressional_session, :current_sponsorship_level,
                       :current_sponsorship_at],
-            only:[] }.merge(options || {}))
+            only: [] }.merge(options || {}))
   end
 end

@@ -60,6 +60,15 @@ class Bill < ActiveRecord::Base
     end
   end
 
+  def timeline
+    running_count = 1 # sponsor
+    sponsorships.where.not(cosponsored_at: nil).order("DATE(cosponsored_at)")
+                .group("DATE(cosponsored_at)").count.map do |date, count|
+      running_count += count
+      [date, running_count]
+    end
+  end
+
   def supporter_count
     sponsorships.size
   end

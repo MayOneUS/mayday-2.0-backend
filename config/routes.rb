@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     end
     get '/people/targets', to: 'people#targets'
     get '/bills/supporter_counts', to: 'bills#supporter_counts'
+    get '/bills/timeline', to: 'bills#timeline'
   end
   post '/calls/start',                    to: 'calls#start'
   get  '/calls/new_connection',           to: 'calls#new_connection'
