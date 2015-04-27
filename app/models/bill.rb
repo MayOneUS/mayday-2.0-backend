@@ -22,7 +22,10 @@ class Bill < ActiveRecord::Base
 
   validates :bill_id, uniqueness: true
 
+  CURRENT_SESSION = 114 # better way to handle this?
   TRACKED_BILL_IDS = %w[hr20-114 hr424-114]
+
+  scope :current, -> { where(congressional_session: CURRENT_SESSION) }
 
   def self.fetch(bill_id:)
     if results = Integration::Sunlight.get_bill(bill_id:  bill_id)
@@ -49,7 +52,7 @@ class Bill < ActiveRecord::Base
   end
 
   def update_cosponsors(cosponsors)
-    sponsorships.where.not(cosponsored_at: nil).delete_all
+    sponsorships.where.not(cosponsored_at: nil).delete_all # To do: update rather than delete?
     cosponsors.each do |sponsorship|
       if cosponsor = Legislator.find_by(bioguide_id: sponsorship[:sponsor_id])
         sponsorships.create(legislator: cosponsor, cosponsored_at: sponsorship[:cosponsored_at])
@@ -71,5 +74,9 @@ class Bill < ActiveRecord::Base
 
   def chamber_size
     Legislator.where(chamber: chamber).in_office.count # need to remove extra states or this will return 439
+  end
+
+  def name
+    short_title || official_title
   end
 end

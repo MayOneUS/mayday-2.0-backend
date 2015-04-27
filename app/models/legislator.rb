@@ -39,7 +39,9 @@ class Legislator < ActiveRecord::Base
   has_many :campaigns, through: :targets
   has_many :active_campaigns, -> { merge(Campaign.active) }, through: :targets, source: :campaign
   has_many :sponsorships
+  has_many :current_sponsorships, -> { current }, class_name: "Sponsorship"
   has_many :bills, through: :sponsorships
+  has_many :current_bills, through: :current_sponsorships, source: :bill
 
   validates :bioguide_id, presence: true, uniqueness: true
   validates :chamber, inclusion: { in: %w(house senate) }
@@ -224,7 +226,7 @@ class Legislator < ActiveRecord::Base
     extras = options.delete(:extras) || {}
     options = { methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url],
                 only: [:id, :party, :chamber, :state_rank, :with_us, :last_name, :bioguide_id] }.merge(options)
-    super(options).merge(extras || {})
+    super(options).merge(extras)
   end
 
   def assign_district
