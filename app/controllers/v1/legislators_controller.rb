@@ -26,7 +26,7 @@ class V1::LegislatorsController < V1::BaseController
     render js: "onLegislatorResponse(#{json})"
   end
 
-  private 
+  private
 
   def prep_supports_map_json
     coordinates_output = []

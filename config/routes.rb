@@ -5,8 +5,11 @@ Rails.application.routes.draw do
       get :newest_supporters, on: :collection
       get :supporters_map, on: :collection, defaults: {format: :js}
     end
+    resources :people,      only: :create do
+      get :delete_all, on: :collection
+      get '/:identifier', on: :collection, action: :show, constraints: { identifier: /[^\/]+/} #allow email as identifier
+    end
     resources :stats,       only: :index
-    resources :people,      only: :create
     resources :calls,       only: :create
     resources :actions,     only: :create
     resources :nominations, only: :create

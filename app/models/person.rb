@@ -14,16 +14,16 @@
 #
 
 class Person < ActiveRecord::Base
-  has_one :location
+  has_one :location, dependent: :destroy
   has_one :district, through: :location
   has_one :representative, through: :district
   has_one :target_rep, -> { targeted }, through: :district
   has_one :state, through: :location
   has_many :senators, through: :state
-  has_many :calls, class_name: 'Ivr::Call'
+  has_many :calls, class_name: 'Ivr::Call', dependent: :destroy
   has_many :connections, through: :calls
   has_many :all_called_legislators, through: :calls, source: :called_legislators
-  has_many :actions
+  has_many :actions, dependent: :destroy
   has_many :activities, through: :actions
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i

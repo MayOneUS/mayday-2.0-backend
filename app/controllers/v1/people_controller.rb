@@ -10,6 +10,21 @@ class V1::PeopleController < V1::BaseController
     render json: output
   end
 
+  def show
+    logger.warn params[:identifier]
+    @person = Person.includes(:actions)
+      .where('email = :identifier OR uuid = :identifier OR phone = :identifier', identifier: params[:identifier])
+      .first
+    @error = "No person found for #{params[:identifier]}" if @person.nil?
+    render :template => 'v1/actions/create'
+  end
+
+  def delete_all
+    # TODO remove in prod
+    Person.destroy_all
+    render text: "deleted all records"
+  end
+
   def targets
     person = Person.find_or_initialize_by(email: params[:email])
     if person.save # valid? TODO: optimize location saving
