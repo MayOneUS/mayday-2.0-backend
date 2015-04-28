@@ -23,7 +23,8 @@ class V1::LegislatorsController < V1::BaseController
 
   def newest_supporters
     limit = params[:limit] || 5
-    render json: Legislator.with_includes.includes(:sponsorships).order('sponsorships.cosponsored_at desc').first(limit)
+    legislators = Legislator.with_includes.includes({sponsorships: :bill}, :bills).where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current).order('sponsorships.cosponsored_at desc').first(limit)
+    render json: legislators
   end
 
   def supporters_map

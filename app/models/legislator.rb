@@ -58,7 +58,7 @@ class Legislator < ActiveRecord::Base
   scope :unconvinced,  -> { includes(:sponsorships).where(:sponsorships => { :id => nil }) }
   scope :with_us,      -> { joins(sponsorships: :bill) }
   scope :in_office,    -> { where(in_office: true) }
-  scope :current_supporters,-> { joins(sponsorships: :bill).distinct.merge(Bill.current) }
+  scope :current_supporters,-> { joins(sponsorships: :bill).where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current) }
 
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
