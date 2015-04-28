@@ -23,27 +23,16 @@ class Sponsorship < ActiveRecord::Base
 
   delegate :name, :congressional_session, to: :bill
 
-  SPONSORSHIP_LEVELS = [
-    [:introduced_at, 'sponsored'],
-    [:cosponsored_at, 'cosponsored'],
-    [:pledged_support_at, 'pledged_support']
-  ]
-
-  def current_sponsorship
-    SPONSORSHIP_LEVELS.each do |field_name, level|
-      if date = send(field_name)
-        return [date, level]
-      end
-    end
-    [nil, nil]
-  end
-
   def current_sponsorship_level
-    current_sponsorship[1]
+    case
+      when introduced_at then :sponsored
+      when cosponsored_at then :cosponsored
+      when pledged_support then :pledged_support
+    end
   end
 
   def current_sponsorship_at
-    current_sponsorship[0]
+    introduced_at || cosponsored_at || pledged_support_at
   end
 
   private
