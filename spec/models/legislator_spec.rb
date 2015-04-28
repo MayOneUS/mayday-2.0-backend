@@ -161,12 +161,40 @@ describe Legislator do
     end
   end
 
-  describe ".default_targets" do
-    it "only returns priority targets" do
-      rep = FactoryGirl.create(:representative, :targeted, priority: 1)
-      FactoryGirl.create(:representative, :targeted)
-      expect(Legislator.default_targets).to eq [rep]
+
+  describe "scopes" do
+    describe ".priority" do
+      it "only returns priority targets" do
+        rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+        FactoryGirl.create(:representative, :targeted)
+        expect(Legislator.priority).to eq [rep]
+      end
     end
+
+    describe ".current_supporters" do
+      context "with active cosponsors" do
+        it "returns active supporters" do
+          bill = FactoryGirl.create(:bill)
+          FactoryGirl.create_list(:sponsorship, 3, bill: bill)
+          expect(Legislator.current_supporters.count).to eq(3)
+        end
+      end
+      context "with no active cosponsors" do
+        it "doesn't find any supporters" do
+          expect(Legislator.current_supporters.count).to eq(0)
+        end
+      end
+      context "with cosponsors from old sessions" do
+        it "returns only active supporters" do
+          bill = FactoryGirl.create(:bill)
+          old_bill = FactoryGirl.create(:bill, congressional_session: 113)
+          FactoryGirl.create_list(:sponsorship, 1, bill: bill)
+          FactoryGirl.create_list(:sponsorship, 2, bill: old_bill)
+          expect(Legislator.current_supporters.count).to eq(1)
+        end
+      end
+    end
+
   end
 
   describe "#title" do

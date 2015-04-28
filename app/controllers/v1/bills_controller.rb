@@ -11,11 +11,6 @@ class V1::BillsController < V1::BaseController
   private
 
   def set_bill
-    bill_id = params[:bill_id].presence
-    if bill_id
-      @bill = Bill.find_by(bill_id: bill_id)
-    else
-      @bill = Bill.first # TO DO
-    end
+    @bill = Bill.find_by(bill_id: params[:bill_id]) || Bill::AllSupporters.new
   end
 end

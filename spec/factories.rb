@@ -1,4 +1,8 @@
 FactoryGirl.define do
+  sequence :sponsorship_date do
+    Faker::Date.between(100.days.ago, Date.today)
+  end
+
   factory :person do
     sequence(:email) { |n| "person#{n}@example.com" }
     sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
@@ -53,6 +57,10 @@ FactoryGirl.define do
 
     trait :with_us do
       with_us true
+    end
+
+    trait :cosponsor do
+      association :sponsorship, :cosponsored
     end
   end
 
@@ -119,6 +127,25 @@ FactoryGirl.define do
   end
 
   factory :bill do
-    sequence(:bill_id) { |n| "bill-#{n}" }
+    sequence(:bill_id) { |n| "bill-#{Faker::Lorem.words(4).join(' ')}" }
+    congressional_session Bill::CURRENT_SESSION
+    # sequence(:chamber){ [] }
+  end
+
+  factory :sponsorship do
+    association :bill
+    association :legislator, factory: :senator
+
+    trait :cosponsored do
+      cosponsored_at{ generate(:sponsorship_date) }
+    end
+
+    trait :pledged_support do
+      pledged_support_at{ generate(:sponsorship_date) }
+    end
+
+    trait :introduced do
+      introduced_at{ generate(:sponsorship_date) }
+    end
   end
 end
