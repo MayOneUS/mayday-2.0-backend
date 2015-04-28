@@ -2,16 +2,22 @@ class V1::ActionsController < V1::BaseController
   before_action :set_person
 
   def create
-    activity = Activity.find_by(template_id: params[:template_id])
+    activity = Activity.find_by(template_id: activity_param)
 
     action = Action.create(person: @person, activity: activity)
     if action.invalid?
-      @error = action.errors.full_messages.join('. ') + '.'
+      error_messages = action.errors.full_messages.join('. ') + '.'
+      error_messages += ' Activity not found.' if activity.nil?
+      @error = error_messages
     end
     render
   end
 
   private
+
+  def activity_param
+    params.require(:template_id)
+  end
 
   def person_params
     params.require(:person).permit(:uuid, :email, :phone, :zip)
@@ -22,4 +28,3 @@ class V1::ActionsController < V1::BaseController
   end
 
 end
-2
