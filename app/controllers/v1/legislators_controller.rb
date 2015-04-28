@@ -3,10 +3,11 @@ class V1::LegislatorsController < V1::BaseController
   SUPPORTER_MAP_REDIS_KEY = 'supports_map_json'
 
   def index
-    render json: Legislator.with_includes
+    render json: Legislator.with_includes.includes(:sponsorships, :bills).includes(:current_bills)
       .order(:first_name, :last_name)
-      .to_json( methods: [:name, :title, :state_name, :eligible],
-                only: [:id, :with_us])
+      .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
+        :with_us, :display_district],
+        only: [:id, :with_us, :party, :bioguide_id])
   end
 
   def show
