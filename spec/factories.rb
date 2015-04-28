@@ -56,11 +56,13 @@ FactoryGirl.define do
     end
 
     trait :with_us do
-      with_us true
+      # association :sponsorship, :cosponsored, legislator: self
+      sponsorships {[FactoryGirl.create(:sponsorship)]}
     end
 
     trait :cosponsor do
-      association :sponsorship, :cosponsored
+      # association :sponsorship, :cosponsored, legislator: self
+      sponsorships {[FactoryGirl.create(:sponsorship)]}
     end
   end
 

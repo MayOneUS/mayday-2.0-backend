@@ -1,4 +1,4 @@
-class Bill::AllSupporters
+class AllSupporters
   attr_accessor :supporter_count, :cosponsor_count, :needed_cosponsor_count, :short_title, :chamber_size, :congressional_session
   TOTAL_NEEDED = 219
 

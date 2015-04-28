@@ -51,7 +51,7 @@ group :test do
   gem 'climate_control'
   gem 'oga' #xml parsing
   gem 'factory_girl_rails'
-  gem 'ffaker'
+  gem 'faker'
   gem 'webmock'
   gem "fakeredis", :require => "fakeredis/rspec"
   gem 'timecop'

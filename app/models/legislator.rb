@@ -28,7 +28,6 @@
 #  verified_last_name  :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  with_us             :boolean          default("false")
 #  twitter_id          :string
 #
 
@@ -56,8 +55,8 @@ class Legislator < ActiveRecord::Base
   scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
   scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
   scope :priority,     -> { targeted.merge(Target.priority) }
-  scope :unconvinced,  -> { where(with_us: false) }
-  scope :with_us,      -> { where(with_us: true) }
+  scope :unconvinced,  -> { includes(:sponsorships).where(:sponsorships => { :id => nil }) }
+  scope :with_us,      -> { joins(sponsorships: :bill) }
   scope :in_office,    -> { where(in_office: true) }
   scope :current_supporters,-> { joins(sponsorships: :bill).distinct.merge(Bill.current) }
 
@@ -95,13 +94,6 @@ class Legislator < ActiveRecord::Base
     end
   end
 
-  def self.recheck_reps_with_us
-    if ids = Integration::RepsWithUs.all_reps_with_us.presence
-      where.not(bioguide_id: ids).update_all(with_us: false)
-      where(bioguide_id: ids).update_all(with_us: true)
-    end
-  end
-
   def self.create_or_update(legislator_hash)
     hash = legislator_hash.symbolize_keys
     bioguide_id = hash.delete(:bioguide_id)
@@ -117,10 +109,6 @@ class Legislator < ActiveRecord::Base
     if stats = results['legislators'].try(:first)
       update(stats)
     end
-  end
-
-  def update_reform_status
-    update(with_us: Integration::RepsWithUs.rep_with_us?(bioguide_id))
   end
 
   def senator?
@@ -207,6 +195,10 @@ class Legislator < ActiveRecord::Base
     'cosponsored' if bills.any?
   end
 
+  def with_us
+    bills.any?
+  end
+
   def support_description
     start = "#{long_title} #{name} (#{party}-#{state_abbrev}) "
     if bills.any?
@@ -225,8 +217,8 @@ class Legislator < ActiveRecord::Base
   def serializable_hash(options)
     options ||= {}
     extras = options.delete(:extras) || {}
-    options = { methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url],
-                only: [:id, :party, :chamber, :state_rank, :with_us, :last_name, :bioguide_id] }.merge(options)
+    options = { methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url, :with_us],
+                only: [:id, :party, :chamber, :state_rank, :last_name, :bioguide_id] }.merge(options)
     super(options).merge(extras)
   end
 

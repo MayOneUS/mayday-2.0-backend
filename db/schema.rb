@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150427224921) do
+ActiveRecord::Schema.define(version: 20150428185212) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -111,7 +111,7 @@ ActiveRecord::Schema.define(version: 20150427224921) do
   add_index "events", ["remote_id"], name: "index_events_on_remote_id", unique: true, using: :btree
 
   create_table "legislators", force: :cascade do |t|
-    t.string   "bioguide_id",                         null: false
+    t.string   "bioguide_id",         null: false
     t.date     "birthday"
     t.string   "chamber"
     t.integer  "district_id"
@@ -134,9 +134,8 @@ ActiveRecord::Schema.define(version: 20150427224921) do
     t.string   "title"
     t.string   "verified_first_name"
     t.string   "verified_last_name"
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.boolean  "with_us",             default: false
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
     t.string   "twitter_id"
   end
 

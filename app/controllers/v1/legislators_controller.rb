@@ -13,8 +13,8 @@ class V1::LegislatorsController < V1::BaseController
     legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:id])
     render json: legislator
       .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
-                         :map_key, :current_sponsorships],
-               only: [:with_us, :party, :state_rank, :in_office])
+                         :map_key, :current_sponsorships, :with_us],
+               only: [:party, :state_rank, :in_office])
   end
 
   def targeted
@@ -23,7 +23,7 @@ class V1::LegislatorsController < V1::BaseController
 
   def newest_supporters
     limit = params[:limit] || 5
-    render json: Legislator.with_includes.joins(:sponsorships).order('sponsorships.cosponsored_at desc').first(limit)
+    render json: Legislator.with_includes.includes(:sponsorships).order('sponsorships.cosponsored_at desc').first(limit)
   end
 
   def supporters_map
