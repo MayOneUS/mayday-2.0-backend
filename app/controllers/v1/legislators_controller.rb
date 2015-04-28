@@ -10,9 +10,11 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def show
-    legislator = Legislator.with_includes.find_by_bioguide_id(params[:id])
+    legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:id])
     render json: legislator
-      .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev], only: [:with_us, :party])
+      .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
+                         :map_key, :current_sponsorships],
+               only: [:with_us, :party, :state_rank, :in_office])
   end
 
   def targeted

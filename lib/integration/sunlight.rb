@@ -26,7 +26,7 @@ class Integration::Sunlight
       # 'last_version_on',
       # 'last_vote_at',
       # 'number',
-      # 'official_title',
+      'official_title',
       'short_title',
       'sponsor_id',
       # 'summary',
