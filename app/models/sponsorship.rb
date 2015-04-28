@@ -27,7 +27,7 @@ class Sponsorship < ActiveRecord::Base
     case
       when introduced_at then :sponsored
       when cosponsored_at then :cosponsored
-      when pledged_support then :pledged_support
+      when pledged_support_at then :pledged_support
     end
   end
 
