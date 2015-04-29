@@ -20,6 +20,8 @@ class Sponsorship < ActiveRecord::Base
   scope :cosponsored,     -> { where.not(cosponsored_at: nil) }
   scope :pledged_support, -> { where.not(pledged_support_at: nil) }
   scope :current,         -> { joins(:bill).merge(Bill.current) }
+  scope :session, -> session { joins(:bill).merge(Bill.session(session)) }
+  scope :chamber, -> chamber { joins(:legislator).merge(Legislator.chamber(chamber)) }
 
   delegate :name, :congressional_session, to: :bill
 
