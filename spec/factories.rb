@@ -29,8 +29,8 @@ FactoryGirl.define do
   end
 
   factory :legislator do
-    sequence(:bioguide_id) { |n| "F#{n}" }
-    first_name { Faker::Name.first_name }
+    sequence(:bioguide_id) { |n| "F#{n} + Faker::Number.number(8)" }
+    first_name { puts 'leg';Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     phone '202-224-3553'
     party { %w[D R].sample }
@@ -56,12 +56,10 @@ FactoryGirl.define do
     end
 
     trait :with_us do
-      # association :sponsorship, :cosponsored, legislator: self
       sponsorships {[FactoryGirl.create(:sponsorship)]}
     end
 
     trait :cosponsor do
-      # association :sponsorship, :cosponsored, legislator: self
       sponsorships {[FactoryGirl.create(:sponsorship)]}
     end
   end
@@ -72,8 +70,8 @@ FactoryGirl.define do
   end
 
   factory :state do
-    sequence(:name) { |n| "State#{n}" }
     sequence(:abbrev) { |n| (n % 529).divmod(23).map{ |i| ('D'..'Z').to_a[i] }.join }
+    name { "State #{abbrev}" }
   end
 
   factory :zip_code do

@@ -2,18 +2,18 @@ class V1::LegislatorsController < V1::BaseController
 
   def index
     json = Rails.cache.fetch("legislators#index", expires_in: 12.hours) do
-    Legislator.with_includes.includes(:sponsorships, :bills).includes(:current_bills)
-      .allowed_states.order(:first_name, :last_name)
-      .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
-        :with_us, :display_district],
-        only: [:id, :with_us, :party, :bioguide_id])
+      Legislator.with_includes.includes(:sponsorships, :bills).includes(:current_bills)
+        .order(:first_name, :last_name)
+        .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
+          :with_us, :display_district],
+          only: [:id, :with_us, :party, :bioguide_id])
     end
-    render json: json
+    render js: json
   end
 
   def show
-    json = Rails.cache.fetch("legislators#show?id=#{params[:id]}", expires_in: 12.hours) do
-      legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:id])
+    json = Rails.cache.fetch("legislators#show?bioguide_id=#{params[:bioguide_id]}", expires_in: 12.hours) do
+      legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:bioguide_id])
       legislator
         .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
                            :map_key, :current_sponsorships, :with_us],
