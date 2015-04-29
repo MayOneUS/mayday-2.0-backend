@@ -51,6 +51,7 @@ class Legislator < ActiveRecord::Base
 
   scope :senate,       -> { where(chamber: 'senate') }
   scope :with_includes,-> { includes({ district: :state }, :state) }
+  scope :allowed_states,-> { where('state_id < 53') }
   scope :house,        -> { where(chamber: 'house') }
   scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
   scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }

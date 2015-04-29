@@ -4,7 +4,7 @@ class V1::LegislatorsController < V1::BaseController
 
   def index
     render json: Legislator.with_includes.includes(:sponsorships, :bills).includes(:current_bills)
-      .order(:first_name, :last_name)
+      .allowed_states.order(:first_name, :last_name)
       .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
         :with_us, :display_district],
         only: [:id, :with_us, :party, :bioguide_id])
@@ -24,7 +24,9 @@ class V1::LegislatorsController < V1::BaseController
 
   def newest_supporters
     limit = params[:limit] || 5
-    legislators = Legislator.with_includes.includes({sponsorships: :bill}, :bills).where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current).order('sponsorships.cosponsored_at desc').first(limit)
+    legislators = Legislator.with_includes.includes({sponsorships: :bill}, :bills)
+      .where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current)
+      .order('sponsorships.cosponsored_at desc').first(limit)
     render json: legislators
   end
 
