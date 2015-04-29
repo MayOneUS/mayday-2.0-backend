@@ -8,6 +8,7 @@ class V1::LegislatorsController < V1::BaseController
           :with_us, :display_district],
           only: [:id, :with_us, :party, :bioguide_id])
     end
+    expires_in 6.hours, :public => true
     render js: json
   end
 
