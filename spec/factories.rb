@@ -29,8 +29,8 @@ FactoryGirl.define do
   end
 
   factory :legislator do
-    sequence(:bioguide_id) { |n| "F#{n} + Faker::Number.number(8)" }
-    first_name { puts 'leg';Faker::Name.first_name }
+    sequence(:bioguide_id) { |n| "F#{n}#{Faker::Number.number(8)}" }
+    first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     phone '202-224-3553'
     party { %w[D R].sample }
