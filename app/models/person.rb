@@ -111,7 +111,7 @@ class Person < ActiveRecord::Base
     Activity.order(:id).map do |activity|
       {
         name: activity.name,
-        order: activity.id,
+        order: activity.sort_order,
         completed: completed_activity?(activity),
         template_id: activity.template_id
       }

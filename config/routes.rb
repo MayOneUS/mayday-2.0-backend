@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     resources :stats,       only: :index
     resources :calls,       only: :create
     resources :actions,     only: :create
+    resources :activities,  only: :index
     resources :nominations, only: :create
 
     resources :events,  only: :index do

@@ -30,8 +30,8 @@ namespace :db do
 
     desc "seed actions"
     task activities: :environment do
-      %w[sign-up-form call-congress volunteer-form sign-letter join-discussion spread-the-word].each do |template_id|
-        Activity.create(template_id: template_id)
+      %w[sign-up-form call-congress volunteer-form sign-letter join-discussion spread-the-word].each_with_index do |template_id, index|
+        Activity.create(template_id: template_id, sort_order: index, name: template_id.gsub('-',' '))
       end
     end
   end
