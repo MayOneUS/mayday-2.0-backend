@@ -14,12 +14,13 @@ class V1::LegislatorsController < V1::BaseController
 
   def show
     json = Rails.cache.fetch("legislators#show?bioguide_id=#{params[:bioguide_id]}", expires_in: 12.hours) do
-      legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:bioguide_id])
+      Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:bioguide_id])
       legislator
         .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
                            :map_key, :current_sponsorships, :with_us],
                  only: [:party, :state_rank, :in_office])
     end
+    expires_in 6.hours, :public => true
     render json: json
   end
 
@@ -30,11 +31,11 @@ class V1::LegislatorsController < V1::BaseController
   def newest_supporters
     limit = params[:limit] || 5
     json = Rails.cache.fetch("legislators#index?limit=#{limit}", expires_in: 12.hours) do
-      legislators = Legislator.with_includes.includes({sponsorships: :bill}, :bills)
+      Legislator.with_includes.includes({sponsorships: :bill}, :bills)
         .where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current)
         .order('sponsorships.cosponsored_at desc').first(limit)
       end
-    render json: legislators
+    render json: json
   end
 
   def supporters_map
