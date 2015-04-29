@@ -122,6 +122,7 @@ FactoryGirl.define do
   end
 
   factory :activity do
+    sequence(:sort_order)
     sequence(:name) { |n| "Activity #{n}" }
     sequence(:template_id) { |n| "template_#{n}" }
   end
