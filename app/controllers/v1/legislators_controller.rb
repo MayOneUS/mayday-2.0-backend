@@ -1,21 +1,25 @@
 class V1::LegislatorsController < V1::BaseController
 
-  SUPPORTER_MAP_REDIS_KEY = 'supports_map_json'
-
   def index
-    render json: Legislator.with_includes.includes(:sponsorships, :bills).includes(:current_bills)
+    json = Rails.cache.fetch("legislators#index", expires_in: 12.hours) do
+    Legislator.with_includes.includes(:sponsorships, :bills).includes(:current_bills)
       .allowed_states.order(:first_name, :last_name)
       .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
         :with_us, :display_district],
         only: [:id, :with_us, :party, :bioguide_id])
+    end
+    render json: json
   end
 
   def show
-    legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:id])
-    render json: legislator
-      .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
-                         :map_key, :current_sponsorships, :with_us],
-               only: [:party, :state_rank, :in_office])
+    json = Rails.cache.fetch("legislators#show?id=#{params[:id]}", expires_in: 12.hours) do
+      legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:id])
+      json = legislator
+        .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
+                           :map_key, :current_sponsorships, :with_us],
+                 only: [:party, :state_rank, :in_office])
+    end
+    render json: json
   end
 
   def targeted
@@ -24,14 +28,18 @@ class V1::LegislatorsController < V1::BaseController
 
   def newest_supporters
     limit = params[:limit] || 5
-    legislators = Legislator.with_includes.includes({sponsorships: :bill}, :bills)
-      .where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current)
-      .order('sponsorships.cosponsored_at desc').first(limit)
+    json = Rails.cache.fetch("legislators#index?limit=#{limit}", expires_in: 12.hours) do
+      legislators = Legislator.with_includes.includes({sponsorships: :bill}, :bills)
+        .where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current)
+        .order('sponsorships.cosponsored_at desc').first(limit)
+      end
     render json: legislators
   end
 
   def supporters_map
-    output = redis.get(SUPPORTER_MAP_REDIS_KEY) || prep_supports_map_json
+    json = Rails.cache.fetch("legislators#supporters_map", expires_in: 12.hours) do
+      output = prep_supports_map_json
+    end
     render js: output
   end
 
@@ -60,9 +68,6 @@ class V1::LegislatorsController < V1::BaseController
     end
     json = Oj.dump({tile_coordinates: coordinates_output, label_coordinates: Legislator::MAP_LABELS},  mode: :compat)
     output = "onLegislatorResponse(#{json})"
-
-    redis.set(SUPPORTER_MAP_REDIS_KEY, output)
-    redis.expire(SUPPORTER_MAP_REDIS_KEY, 12.hours)
 
     output
   end

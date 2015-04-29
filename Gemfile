@@ -4,6 +4,7 @@ gem 'rails', '4.2.0'
 gem 'pg'
 gem 'redis'
 gem 'redis-objects'
+gem 'redis-rails'
 gem 'database_cleaner'
 
 # Active Job

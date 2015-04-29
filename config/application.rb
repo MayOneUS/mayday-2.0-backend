@@ -43,6 +43,11 @@ module Mayday
       end
     end
 
+    redis_host = ENV['REDIS_URL'] || ENV['REDISTOGO_URL']
+    if redis_host
+      config.cache_store = :redis_store, redis_host, { expires_in: 6.hours }
+    end
+
     config.middleware.use Rack::Deflater
   end
 end
