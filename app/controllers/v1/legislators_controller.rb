@@ -14,7 +14,7 @@ class V1::LegislatorsController < V1::BaseController
   def show
     json = Rails.cache.fetch("legislators#show?id=#{params[:id]}", expires_in: 12.hours) do
       legislator = Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:id])
-      json = legislator
+      legislator
         .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
                            :map_key, :current_sponsorships, :with_us],
                  only: [:party, :state_rank, :in_office])
@@ -38,9 +38,9 @@ class V1::LegislatorsController < V1::BaseController
 
   def supporters_map
     json = Rails.cache.fetch("legislators#supporters_map", expires_in: 12.hours) do
-      output = prep_supports_map_json
+      prep_supports_map_json
     end
-    render js: output
+    render js: json
   end
 
   private
