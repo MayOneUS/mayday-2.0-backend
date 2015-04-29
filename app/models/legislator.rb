@@ -37,7 +37,7 @@ class Legislator < ActiveRecord::Base
   has_many :targets
   has_many :campaigns, through: :targets
   has_many :active_campaigns, -> { merge(Campaign.active) }, through: :targets, source: :campaign
-  has_many :sponsorships
+  has_many :sponsorships, dependent: :destroy
   has_many :current_sponsorships, -> { current }, class_name: "Sponsorship"
   has_many :bills, through: :sponsorships
   has_many :current_bills, through: :current_sponsorships, source: :bill
