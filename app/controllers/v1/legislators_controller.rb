@@ -17,7 +17,7 @@ class V1::LegislatorsController < V1::BaseController
       Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:bioguide_id])
         .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
                            :map_key, :current_sponsorships, :with_us, :display_district],
-                 only: [:party, :state_rank, :in_office, :bioguide_id, :id])
+                 only: [:party, :state_rank, :in_office, :bioguide_id, :id, :twitter_id, :facebook_id])
     end
     expires_in 6.hours, :public => true
     render json: json
