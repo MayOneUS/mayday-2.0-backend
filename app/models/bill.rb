@@ -11,6 +11,7 @@
 #  opencongress_url      :string
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  official_title        :string
 #
 
 class Bill < ActiveRecord::Base

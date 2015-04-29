@@ -7,6 +7,7 @@
 #  template_id :string
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  sort_order  :integer
 #
 
 class Activity < ActiveRecord::Base
