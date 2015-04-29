@@ -1,13 +1,15 @@
 class V1::PeopleController < V1::BaseController
 
   def create
-    person = Person.create_or_update(person_params)
-    if person.valid?
-      output = { id: person.id }
+    @person = Person.create_or_update(person_params)
+    if @person.valid?
+      if template_ids = params[:actions].presence
+        @person.mark_activities_completed(template_ids)
+      end
     else
-      output = { error: person.error_message_output }
+      @error = person.error_message_output
     end
-    render json: output
+    render :show
   end
 
   def show
@@ -16,7 +18,7 @@ class V1::PeopleController < V1::BaseController
       .where('email = :identifier OR uuid = :identifier OR phone = :identifier', identifier: params[:identifier])
       .first
     @error = "No person found for #{params[:identifier]}" if @person.nil?
-    render :template => 'v1/actions/create'
+    render
   end
 
   def delete_all

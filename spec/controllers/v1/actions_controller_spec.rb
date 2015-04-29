@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe V1::ActionsController, type: :controller do
-  describe "#create" do
+  describe "POST create" do
     render_views
     context "with good params" do
       before do

@@ -10,7 +10,7 @@ class V1::ActionsController < V1::BaseController
       error_messages += ' Activity not found.' if activity.nil?
       @error = error_messages
     end
-    render
+    render template: 'v1/people/show'
   end
 
   private
