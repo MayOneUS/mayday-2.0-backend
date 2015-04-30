@@ -22,23 +22,27 @@ class AllSupporters
   end
 
   def timeline
-    # tracked_sessions = Bill.group(:congressional_session).pluck(:congressional_session)
-    # chambers = %w[house senate]
-    date = 'DATE(COALESCE(introduced_at, cosponsored_at, pledged_support_at))'
-    join = "JOIN sponsorships ON sponsorships.id = ("\
-             "SELECT id FROM ("\
-               "SELECT sponsorships.id, legislator_id, #{date} AS date FROM sponsorships "\
-               "INNER JOIN bills ON bills.id = sponsorships.bill_id "\
-               "WHERE bills.congressional_session = 114 "\
-             ") AS sponsorships "\
-             "WHERE sponsorships.legislator_id = legislators.id "\
-             "ORDER BY date LIMIT 1)"
-    
-    running_count = 0
-    Legislator.joins(join).group(date).order(date).count.map do |date, count|
-      running_count += count
-      [date, running_count]
+    sessions = Bill.group(:congressional_session).pluck(:congressional_session)
+    chambers = %w[house senate]
+    sql = 'SELECT date, SUM(COUNT(legislator_id)) OVER (ORDER BY date) '\
+          'FROM ('\
+            'SELECT DISTINCT ON (legislator_id) legislator_id, DATE(COALESCE(introduced_at, cosponsored_at, pledged_support_at)) AS date '\
+            'FROM sponsorships '\
+            'INNER JOIN bills ON bills.id = sponsorships.bill_id '\
+            'WHERE bills.congressional_session = %d AND bills.chamber = \'%s\' '\
+            'ORDER BY legislator_id, date'\
+          ') AS subq '\
+          'GROUP BY date'
+    output = {}
+    chambers.each do |chamber|
+      chamber_hash = {}
+      sessions.sort.each do |session|
+        timeline = ActiveRecord::Base.connection.execute(sql % [session, chamber]).to_a.map(&:values)
+        chamber_hash[session] = timeline
+      end
+      output[chamber] = chamber_hash
     end
+    output
   end
 
 end

@@ -28,6 +28,7 @@ class Bill < ActiveRecord::Base
 
   scope :current, -> { where(congressional_session: CURRENT_SESSION) }
   scope :session, -> session { where(congressional_session: session) }
+  scope :chamber, -> chamber { where(chamber: chamber) }
 
   def self.fetch(bill_id:)
     if results = Integration::Sunlight.get_bill(bill_id:  bill_id)

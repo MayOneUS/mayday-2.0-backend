@@ -49,7 +49,6 @@ class Legislator < ActiveRecord::Base
   validates :state,    presence: true, if: :senator?
   validates :district, absence:  true, if: :senator?
 
-  scope :chamber, -> chamber { where(chamber: chamber) }
   scope :senate,       -> { where(chamber: 'senate') }
   scope :with_includes,-> { includes({ district: :state }, :state) }
   scope :house,        -> { where(chamber: 'house') }
