@@ -95,7 +95,7 @@ class Person < ActiveRecord::Base
   end
 
   def other_targets(count:, excluding:)
-    Legislator.includes(:state, {:district => :state}).default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
+    Legislator.with_includes.default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
   end
 
   def target_legislators(json: false, count: Ivr::Call::MAXIMUM_CONNECTIONS)

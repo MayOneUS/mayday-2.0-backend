@@ -196,7 +196,7 @@ class Legislator < ActiveRecord::Base
   end
 
   def with_us
-    bills.any?
+    current_bills.any?
   end
 
   def support_description
