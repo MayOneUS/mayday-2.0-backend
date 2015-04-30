@@ -59,3 +59,16 @@ task output_legislators: :environment do
   puts "Outputed csv to #{output_file}"
 
 end
+
+task lookup_bioguide_ids: :environment do
+  require 'rest-client'
+
+  targeted = [['NE',2], ['MA',6], ['MI', 14], ['FL',2], ['CA', 31], ['CA', 35], ['CA', 18], ['NY',7], ['PA', 14], ['PA',2], ['NY',8], ['MO',1], ['MO',5], ['NJ', 10], ['TX', 18], ['CA', 38], ['TX', 34], ['AZ',9], ['CA', 29], ['CA', 37], ['MA',9], ['CA',3], ['MA',1], ['MI',9], ['CA', 43], ['NV',1], ['LA',2], ['IN',1], ['GA', 13], ['CA', 46], ['CA', 36], ['TX', 28], ['NY', 26], ['CA', 16], ['MI',5], ['TX', 15], ['MN',7], ['OH', 14], ['MT',0], ['IL', 10], ['WI',6], ['NV',4], ['ME',2], ['CA', 21], ['CA', 49], ['AZ',2], ['VA',7]]
+
+  targeted.each do |state,district|
+    params =  {state: state, district: district, apikey: ENV['SUNLIGHT_KEY'], chamber: 'house'}
+    query_string = URI.encode(params.map{|k,v| "#{k}=#{v}"}.join("&"))
+    response = JSON.parse(RestClient.get('https://congress.api.sunlightfoundation.com/legislators?'+query_string))
+    puts [state+district.to_s,response['results'][0]['bioguide_id'] ].join(',')
+  end
+end
