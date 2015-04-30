@@ -68,6 +68,12 @@ class Person < ActiveRecord::Base
     location_association || build_location
   end
 
+  def mark_activities_completed(template_ids)
+    Activity.where(template_id: template_ids).each do |activity|
+      actions.create(activity: activity)
+    end
+  end
+
   def completed_activities
     actions.joins(:activity).pluck("activities.template_id")
   end
