@@ -5,7 +5,7 @@ class V1::BillsController < V1::BaseController
   end
 
   def timeline
-    render json: { @bill.bill_id => @bill.timeline }
+    render json: @bill.timeline
   end
 
   private

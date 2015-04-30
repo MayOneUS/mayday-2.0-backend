@@ -24,9 +24,11 @@ class Bill < ActiveRecord::Base
   validates :bill_id, uniqueness: true
 
   CURRENT_SESSION = 114 # better way to handle this?
-  TRACKED_BILL_IDS = %w[hr20-114 hr424-114]
+  TRACKED_BILL_IDS = %w[hr20-114 hr424-114 hr20-113 hr270-113 hr6448-112]
 
   scope :current, -> { where(congressional_session: CURRENT_SESSION) }
+  scope :session, -> session { where(congressional_session: session) }
+  scope :chamber, -> chamber { where(chamber: chamber) }
 
   def self.fetch(bill_id:)
     if results = Integration::Sunlight.get_bill(bill_id:  bill_id)

@@ -61,7 +61,7 @@ class Legislator < ActiveRecord::Base
   scope :current_supporters,-> { joins(sponsorships: :bill).where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current) }
   scope :allowed_states,-> {
     joins({district: :state}, :state)
-    .where('state.abbrev IS IN (:state_abbrev)', state_abbrev: ALLOWED_STATES) }
+    .where('states.abbrev IN (:state_abbrev)', state_abbrev: ALLOWED_STATES) }
 
   attr_accessor :district_code, :state_abbrev
   before_validation :assign_district, :assign_state
