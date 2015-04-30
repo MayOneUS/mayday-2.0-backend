@@ -181,7 +181,7 @@ class Integration::Sunlight
   end
 
   def self.get_object_at_path(hash, path)
-    path.split('.').inject(hash) { |hash, key| hash.try(:fetch, key) }
+    path.split('.').inject(hash) { |hash, key| hash.try(:[], key) }
   end
 
   def self.get_json(endpoint_query)
