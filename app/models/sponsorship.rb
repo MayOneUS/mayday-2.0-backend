@@ -20,6 +20,7 @@ class Sponsorship < ActiveRecord::Base
   scope :cosponsored,     -> { where.not(cosponsored_at: nil) }
   scope :pledged_support, -> { where.not(pledged_support_at: nil) }
   scope :current,         -> { joins(:bill).merge(Bill.current) }
+  scope :most_recent_activity, -> { order('GREATEST(cosponsored_at, introduced_at, pledged_support_at) DESC') }
 
   delegate :name, :congressional_session, to: :bill
 
