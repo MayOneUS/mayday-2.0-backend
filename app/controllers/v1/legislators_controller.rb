@@ -3,7 +3,7 @@ class V1::LegislatorsController < V1::BaseController
   def index
     json = Rails.cache.fetch("legislators#index", expires_in: 12.hours) do
       Legislator.with_includes.includes(:active_campaigns, :sponsorships, :bills).includes(:current_bills)
-        .order(:first_name, :last_name)
+        .order(:last_name,:first_name)
         .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev, :targeted?,
           :with_us, :display_district],
           only: [:id, :with_us, :party, :bioguide_id])
