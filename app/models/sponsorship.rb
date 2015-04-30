@@ -22,6 +22,7 @@ class Sponsorship < ActiveRecord::Base
   scope :current,         -> { joins(:bill).merge(Bill.current) }
   scope :session, -> session { joins(:bill).merge(Bill.session(session)) }
   scope :chamber, -> chamber { joins(:bill).merge(Bill.chamber(chamber)) }
+  scope :most_recent_activity, -> { order('GREATEST(cosponsored_at, introduced_at, pledged_support_at) DESC') }
 
   delegate :name, :congressional_session, to: :bill
 

@@ -17,7 +17,7 @@ class V1::LegislatorsController < V1::BaseController
       Legislator.with_includes.includes(:current_bills).find_by_bioguide_id(params[:bioguide_id])
         .to_json(methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev,
                            :map_key, :current_sponsorships, :with_us, :display_district],
-                 only: [:party, :state_rank, :in_office, :bioguide_id, :id, :twitter_id, :facebook_id])
+                 only: [:party, :state_rank, :in_office, :bioguide_id, :id, :twitter_id, :facebook_id, :phone])
     end
     expires_in 6.hours, :public => true
     render json: json
@@ -29,11 +29,15 @@ class V1::LegislatorsController < V1::BaseController
 
   def newest_supporters
     limit = params[:limit] || 5
-    json = Rails.cache.fetch("legislators#index?limit=#{limit}", expires_in: 12.hours) do
-      Legislator.with_includes.includes({sponsorships: :bill}, :bills)
-        .where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current)
-        .order('sponsorships.cosponsored_at desc').first(limit)
-      end
+    # json = Rails.cache.fetch("legislators#index?limit=#{limit}", expires_in: 12.hours) do
+      json = Legislator.with_includes.joins(sponsorships: :bill)
+        .where('sponsorships.id IS NOT NULL').merge(Bill.current)
+        .merge(Sponsorship.most_recent_activity).first(limit).to_json(
+          methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url, :with_us],
+          only: [:id, :party, :chamber, :state_rank, :last_name, :bioguide_id]
+          # include: {last_activity: {methods: [:current_sponsorship_level, :endcurrent_sponsorship_at]}}
+         )
+    # end
     render json: json
   end
 
