@@ -72,6 +72,13 @@ describe Person do
         Person.create_or_update(hash)
         expect(person.reload.slice(*hash.keys).values).to eq hash.values
       end
+      it "finds existing record even when email case doesn't match" do
+        person = FactoryGirl.create(:person, email: 'user@example.com')
+        hash = { email: 'UsEr@example.com',
+                 phone: '555-555-1111' }
+        Person.create_or_update(hash)
+        expect(person.reload.slice(*hash.keys).values).to eq hash.values.map(&:downcase)
+      end
       it "finds user based on uuid, if present" do
         person = FactoryGirl.create(:person, uuid: 'good-uuid', email: 'user@example.com',)
         hash = { email: 'new_email_address@example.com',
