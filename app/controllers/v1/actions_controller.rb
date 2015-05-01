@@ -24,6 +24,7 @@ class V1::ActionsController < V1::BaseController
   end
 
   def set_person
+    person_params.map{|k,v| person_params[k]=v.strip}
     @person = Person.create_or_update(person_params) if person_params.present?
   end
 
