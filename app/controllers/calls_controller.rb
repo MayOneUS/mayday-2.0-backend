@@ -28,10 +28,7 @@ class CallsController < ApplicationController
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
         r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true, 'callerId' => caller_id
       else
-        audio_key = active_call.exceeded_max_connections? ? 'closing_message' : 'no_targets'
-        r.Play AudioFileFetcher.audio_url_for_key(audio_key)
-        r.Play AudioFileFetcher.audio_url_for_key('goodbye')
-        r.Hangup
+        close_call(r)
       end
     end
 
@@ -50,7 +47,7 @@ class CallsController < ApplicationController
         action: calls_connection_gather_url(connection_id: active_connection.id),
       ) do |gather|
         r.Play AudioFileFetcher.audio_url_for_key('user_response')
-        gather.Pause
+        gather.Pause(length:5)
         r.Play AudioFileFetcher.audio_url_for_key('user_response')
       end
       r.Redirect calls_new_connection_url, method: 'get'
@@ -69,8 +66,12 @@ class CallsController < ApplicationController
     active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
     response = Twilio::TwiML::Response.new do |r|
       connection_count = active_call.connections.size
-      r.Play AudioFileFetcher.encouraging_audio_for_count(connection_count)
-      ready_for_connection?(r)
+      if active_call.exceeded_max_connections?
+        close_call(r)
+      else
+        r.Play AudioFileFetcher.encouraging_audio_for_count(connection_count)
+        ready_for_connection?(r)
+      end
     end
 
     render_twiml response
@@ -85,6 +86,14 @@ class CallsController < ApplicationController
         gather.Pause(length: 5)
         twilio_renderer.Play AudioFileFetcher.audio_url_for_key('press_star_to_continue')
       end
+    end
+    close_call(twilio_renderer)
+  end
+
+  def close_call(twilio_renderer)
+    if active_call.exceeded_max_connections? || !active_call.next_target.present?
+      audio_key = active_call.exceeded_max_connections? ? 'closing_message' : 'no_targets'
+      twilio_renderer.Play AudioFileFetcher.audio_url_for_key(audio_key)
     end
     twilio_renderer.Play AudioFileFetcher.audio_url_for_key('goodbye')
     twilio_renderer.Hangup

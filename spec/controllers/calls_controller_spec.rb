@@ -8,6 +8,7 @@ describe CallsController,  type: :controller do
     allow(@active_call).to receive(:person).and_return(!new_record && person || nil)
     allow(@active_call).to receive(:new_record?).and_return(new_record)
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
+    allow(@active_call).to receive(:next_target).and_return(target_legislators[0])
     allow(@active_call).to receive(:exceeded_max_connections?).and_return(false)
     allow(Ivr::Call).to receive_message_chain(:includes, :find_or_initialize_by).and_return(@active_call)
   end
