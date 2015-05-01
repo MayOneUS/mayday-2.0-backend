@@ -41,7 +41,7 @@ class CallsController < ApplicationController
   # DialCallSid - dialed call's remote_id from twilio (required)
   def connection_gather_prompt
     active_connection = active_call.last_connection
-    active_connection.update(remote_id: params['DialCallSid'])
+    active_connection.update(remote_id: params['DialCallSid'], status: params['DialCallStatus'])
     response = Twilio::TwiML::Response.new do |r|
       r.Gather(
         action: calls_connection_gather_url(connection_id: active_connection.id),
