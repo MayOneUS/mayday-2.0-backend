@@ -27,6 +27,7 @@ gem 'rails_12factor', group: :production # Heroku-required
 gem 'newrelic_rpm'
 gem 'unicorn'
 gem 'sinatra' # Used for the sidekiq UI
+gem 'airbrake'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -42,20 +43,20 @@ group :development, :test do
 end
 
 group :development do
-  gem 'annotate', ">=2.6.0"
+  gem 'annotate', '>=2.6.0'
   gem 'rack-mini-profiler'
-  gem "bullet"
+  gem 'bullet'
 end
 
 group :test do
-  gem "codeclimate-test-reporter"
+  gem 'codeclimate-test-reporter'
   gem 'climate_control'
   gem 'oga' #xml parsing
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'webmock'
-  gem "fakeredis", :require => "fakeredis/rspec"
+  gem 'fakeredis', :require => 'fakeredis/rspec'
   gem 'timecop'
 end
 
-ruby "2.2.0"
+ruby '2.2.0'
