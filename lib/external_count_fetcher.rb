@@ -10,8 +10,8 @@
  class ExternalCountFetcher
   include Redis::Objects
 
-  REDIS_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :reps_calls_count, :house_supporters, :senate_supporters, :donations_total, :donations_count]
-  REDIS_EXPIRE_SECONDS = 3.hours.to_i
+  REDIS_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :reps_calls_count, :house_supporters, :senate_supporters, :donations_total, :donations_count, :letter_signers]
+  REDIS_EXPIRE_SECONDS = 10.minutes.to_i
 
   REDIS_KEYS.each do |key|
     counter key, :expiration => REDIS_EXPIRE_SECONDS
@@ -55,6 +55,7 @@
         when :reps_calls_count    then Ivr::Connection.completed
         when :house_supporters    then Legislator.house.with_us.count
         when :senate_supporters   then Legislator.senate.with_us.count
+        when :letter_signers      then Activity.find_by_template_id('sign-letter-form').try(:actions).try(:count) || 0
         else raise ArgumentError, "Unknown Key: #{key}"
       end
       redis_counter(counter_key).value = count
