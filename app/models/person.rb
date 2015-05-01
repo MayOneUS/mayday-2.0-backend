@@ -49,6 +49,7 @@ class Person < ActiveRecord::Base
     key = nil
     [:uuid, :email, :phone].each do |field|
       if value = person_params.delete(field).presence
+        value.downcase! if field == :email
         key = { field => value }
         break
       end
