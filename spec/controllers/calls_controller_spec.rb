@@ -179,8 +179,8 @@ describe CallsController,  type: :controller do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
       xml_response = Oga.parse_xml(response.body)
 
-      expect(xml_response.css('Redirect').attribute('method')[0].value).to eq('get')
-      expect(xml_response.css('Redirect').text).to eq(calls_new_connection_url)
+      expect(xml_response.css('Gather').attribute('method')[0].value).to eq('get')
+      expect(xml_response.css('Gather').attribute('action')[0].value).to eq(calls_new_connection_url)
     end
   end
 

@@ -9,16 +9,7 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       r.Pause
       r.Play AudioFileFetcher.audio_url_for_key('intro_message')
-      r.Gather(action: calls_new_connection_url, method: 'get', timeout: 30) do |gather|
-        r.Say "Press star when you're ready to start"
-        gather.Pause
-        r.Say "Press star when you're ready to start"
-        gather.Pause
-        r.Say "Press star when you're ready to start"
-
-      end
-      r.Play AudioFileFetcher.audio_url_for_key('goodbye')
-      r.Hangup
+      ready_for_connection?(r)
     end
 
     render_twiml response
@@ -79,13 +70,25 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       connection_count = active_call.connections.size
       r.Play AudioFileFetcher.encouraging_audio_for_count(connection_count)
-      r.Redirect calls_new_connection_url, method: 'get'
+      ready_for_connection?(r)
     end
 
     render_twiml response
   end
 
   private
+
+  def ready_for_connection?(twilio_renderer)
+    twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
+      twilio_renderer.Play AudioFileFetcher.audio_url_for_key('press_star_to_continue')
+      3.times do
+        gather.Pause(length: 5)
+        twilio_renderer.Play AudioFileFetcher.audio_url_for_key('press_star_to_continue')
+      end
+    end
+    twilio_renderer.Play AudioFileFetcher.audio_url_for_key('goodbye')
+    twilio_renderer.Hangup
+  end
 
   def set_header
     response.headers["Content-Type"] = "text/xml"
@@ -114,8 +117,8 @@ class CallsController < ApplicationController
   end
 
   def set_caller_id
-    if params['Caller'] && params['Caller'] !~ /client/
-      params['Caller']
+    if params['To'] && params['Caller'] !~ /client/
+      params['To']
     else
       ENV['TWILIO_APP_PHONE_NUMBER']
     end

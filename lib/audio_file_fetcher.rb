@@ -18,6 +18,7 @@ class AudioFileFetcher
     no_targets
     star_to_disconnect
     user_response
+    press_star_to_continue
   ]
 
   def self.audio_url_for_key(key)
