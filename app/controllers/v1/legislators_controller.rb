@@ -4,8 +4,7 @@ class V1::LegislatorsController < V1::BaseController
     json = Rails.cache.fetch("legislators#index", expires_in: 12.hours) do
       Legislator.with_includes.includes(:active_campaigns, :sponsorships, :bills).includes(:current_bills)
         .order(:last_name,:first_name)
-        .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev, :targeted?,
-          :with_us, :display_district],
+        .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev, :display_district, :with_us, :targeted?, ],
           only: [:id, :with_us, :party, :bioguide_id])
     end
     expires_in 6.hours, :public => true
