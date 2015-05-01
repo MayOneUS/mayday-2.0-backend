@@ -9,7 +9,7 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       r.Pause
       r.Play AudioFileFetcher.audio_url_for_key('intro_message')
-      r.Gather(action: calls_new_connection_url, method: 'get', timeout: 30) do
+      r.Gather(action: calls_new_connection_url, method: 'get', timeout: 30) do |gather|
         r.Say "Press star when you're ready to start"
         gather.Pause
         r.Say "Press star when you're ready to start"
