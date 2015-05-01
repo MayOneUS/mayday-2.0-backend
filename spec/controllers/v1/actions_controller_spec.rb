@@ -10,9 +10,9 @@ RSpec.describe V1::ActionsController, type: :controller do
         FactoryGirl.create(:person, uuid: 'the-uuid', email: 'joe@example.com')
       end
       it "returns person object" do
-        expect(Person).to receive(:create_or_update).with(email: 'joe@example.com')
+        expect(Person).to receive(:create_or_update).with(email: 'Joe@example.com')
           .and_call_original
-        post :create, person: { email: 'joe@example.com' }, template_id: 'real_id'
+        post :create, person: { email: 'Joe@example.com' }, template_id: 'real_id'
         parsed_response = JSON.parse(response.body)
         expect(parsed_response.slice('uuid', 'completed_activities').values)
           .to eq ['the-uuid', ['real_id']]
