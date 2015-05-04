@@ -16,7 +16,7 @@ describe CallsController,  type: :controller do
   def setup_last_connection
     @last_connection = double('last_connection')
     allow(@active_call).to receive(:last_connection).and_return(@last_connection)
-    allow(@last_connection).to receive(:update)
+    allow(@last_connection).to receive(:update!)
     allow(@last_connection).to receive(:id).and_return(123)
   end
 
@@ -24,7 +24,7 @@ describe CallsController,  type: :controller do
     def setup_active_call_with_new_record(new_record: false)
       setup_active_call_double(new_record: new_record)
       setup_last_connection
-      allow(@active_call).to receive(:save)
+      allow(@active_call).to receive(:save!)
       allow(@active_call).to receive(:person=)
       allow(Person).to receive(:find_or_initialize_by)
     end
@@ -33,7 +33,7 @@ describe CallsController,  type: :controller do
         setup_active_call_with_new_record
         post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
 
-        expect(@active_call).not_to have_received(:save)
+        expect(@active_call).not_to have_received(:save!)
         expect(Person).not_to have_received(:find_or_initialize_by)
       end
     end
@@ -42,7 +42,7 @@ describe CallsController,  type: :controller do
         setup_active_call_with_new_record(new_record: true)
         post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
 
-        expect(@active_call).to have_received(:save)
+        expect(@active_call).to have_received(:save!)
         expect(Person).to have_received(:find_or_initialize_by)
       end
     end
@@ -131,9 +131,9 @@ describe CallsController,  type: :controller do
       setup_last_connection
     end
     it "updates active_connection with remote_id" do
-      post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
+      post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc', 'DialCallStatus': 'alkjlr2l3'
 
-      expect(@last_connection).to have_received(:update).with({:remote_id=>"abc"})
+      expect(@last_connection).to have_received(:update!).with(remote_id:"abc",status: 'alkjlr2l3')
     end
     it "says a question to gather user response" do
       post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'

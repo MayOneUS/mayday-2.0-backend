@@ -32,7 +32,7 @@ class Ivr::Call < ActiveRecord::Base
   MAXIMUM_CONNECTIONS = 5
 
   def create_connection!
-    connections.create(legislator: next_target)
+    connections.create!(legislator: next_target)
   end
 
   def legislators_targeted

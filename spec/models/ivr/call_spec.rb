@@ -17,6 +17,7 @@ require 'rails_helper'
 describe Ivr::Call, type: :model do
   describe "#create_connection!" do
     it "creates a connection" do
+      FactoryGirl.create(:representative, :targeted, priority: 1)
       call = FactoryGirl.create(:call)
       expect(call.connections).to be_empty
 

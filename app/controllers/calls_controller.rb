@@ -41,7 +41,7 @@ class CallsController < ApplicationController
   # DialCallSid - dialed call's remote_id from twilio (required)
   def connection_gather_prompt
     active_connection = active_call.last_connection
-    active_connection.update(remote_id: params['DialCallSid'], status: params['DialCallStatus'])
+    active_connection.update!(remote_id: params['DialCallSid'], status: params['DialCallStatus'])
     response = Twilio::TwiML::Response.new do |r|
       r.Gather(
         action: calls_connection_gather_url(connection_id: active_connection.id),
@@ -116,7 +116,7 @@ class CallsController < ApplicationController
     call = Ivr::Call.includes(:person).find_or_initialize_by(remote_id: remote_id)
     if call.new_record?
       call.person = Person.find_or_initialize_by(phone: params[:From])
-      call.save
+      call.save!
     end
     call
   end
