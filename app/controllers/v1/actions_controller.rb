@@ -16,7 +16,7 @@ class V1::ActionsController < V1::BaseController
   private
 
   def activity_param
-    params.require(:template_id, :utm_source, :utm_medium :utm_campaign, :source_url)
+    params.require(:template_id, :utm_source, :utm_medium, :utm_campaign, :source_url)
   end
 
   def person_params
