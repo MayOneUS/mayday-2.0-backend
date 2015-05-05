@@ -4,7 +4,8 @@ class V1::ActionsController < V1::BaseController
   def create
     activity = Activity.find_by(template_id: activity_param)
 
-    action = Action.create(person: @person, activity: activity)
+    action_attributes = {person: @person, activity: activity}.merge(action_params)
+    action = Action.create(action_attributes)
     if action.invalid?
       error_messages = action.errors.full_messages.join('. ') + '.'
       error_messages += ' Activity not found.' if activity.nil?
@@ -16,7 +17,11 @@ class V1::ActionsController < V1::BaseController
   private
 
   def activity_param
-    params.require(:template_id)#.permit(:utm_source, :utm_medium, :utm_campaign, :source_url)
+    params.require(:template_id)
+  end
+
+  def action_params
+    params.permit(:utm_source, :utm_medium, :utm_campaign, :source_url)
   end
 
   def person_params
