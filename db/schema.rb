@@ -11,16 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150429031004) do
+ActiveRecord::Schema.define(version: 20150505043417) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "actions", force: :cascade do |t|
-    t.integer  "person_id",   null: false
-    t.integer  "activity_id", null: false
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.integer  "person_id",    null: false
+    t.integer  "activity_id",  null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.string   "utm_source"
+    t.string   "utm_medium"
+    t.string   "utm_campaign"
+    t.string   "source_url"
   end
 
   add_index "actions", ["activity_id"], name: "index_actions_on_activity_id", using: :btree
