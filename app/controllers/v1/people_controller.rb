@@ -7,7 +7,7 @@ class V1::PeopleController < V1::BaseController
         @person.mark_activities_completed(template_ids)
       end
     else
-      @error = person.error_message_output
+      @error = @person.error_message_output
     end
     render :show
   end
