@@ -4,6 +4,9 @@ describe ExternalCountFetcher do
   before(:all) do
     @fake_counts = {supporter_count: 69087, volunteer_count: 2151, called_voters_count: 0, reps_calls_count: 0, house_supporters: 0, senate_supporters: 0, donations_total: 748608206, donations_count: 65136, letter_signers: 1}
   end
+  before do
+    allow(Activity).to receive_message_chain(:find_by_template_id,:actions,:count).and_return(@fake_counts[:letter_signers])
+  end
 
   let(:count_fetcher){ ExternalCountFetcher.new }
 
@@ -21,12 +24,12 @@ describe ExternalCountFetcher do
   context "with redis instance_variables" do
     it "should set redis expiration times" do
       redis = Redis.new
-      Timecop.freeze(Time.now - 2.hours) do
+      Timecop.freeze(Time.now - ExternalCountFetcher::REDIS_EXPIRE_SECONDS*2/3) do
         count_fetcher.fetch_empty_counts!
         expect(count_fetcher.house_supporters.ttl).to eq(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
       end
       Timecop.freeze do
-        new_time = (ExternalCountFetcher::REDIS_EXPIRE_SECONDS-2.hours.to_i)
+        new_time = (ExternalCountFetcher::REDIS_EXPIRE_SECONDS-20.minutes.to_i)
         expect(count_fetcher.house_supporters.ttl).to be_within(1).of(new_time)
       end
     end
@@ -34,7 +37,7 @@ describe ExternalCountFetcher do
     it "should extend redis expiration times" do
       redis = Redis.new
       Timecop.freeze do
-        Timecop.freeze(Time.now - 2.hours) do
+        Timecop.freeze(Time.now - ExternalCountFetcher::REDIS_EXPIRE_SECONDS*2/3) do
           count_fetcher.fetch_empty_counts!
           expect(count_fetcher.house_supporters.ttl).to eq(ExternalCountFetcher::REDIS_EXPIRE_SECONDS)
         end

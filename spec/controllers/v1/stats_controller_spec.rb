@@ -4,7 +4,10 @@ describe V1::StatsController,  type: :controller do
 
   before(:all) do
     @fake_counts = {supporter_count: 69087, volunteer_count: 2151, called_voters_count: 0, reps_calls_count: 0, house_supporters: 0, senate_supporters: 0, donations_total: 748608206, donations_count: 65136, letter_signers: 1}
+  end
 
+  before do
+    allow(Activity).to receive_message_chain(:find_by_template_id,:actions,:count).and_return(@fake_counts[:letter_signers])
   end
 
   context 'with redis stored counts' do

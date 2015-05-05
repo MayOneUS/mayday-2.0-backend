@@ -11,7 +11,7 @@
   include Redis::Objects
 
   REDIS_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :reps_calls_count, :house_supporters, :senate_supporters, :donations_total, :donations_count, :letter_signers]
-  REDIS_EXPIRE_SECONDS = 10.minutes.to_i
+  REDIS_EXPIRE_SECONDS = 30.minutes.to_i
 
   REDIS_KEYS.each do |key|
     counter key, :expiration => REDIS_EXPIRE_SECONDS
