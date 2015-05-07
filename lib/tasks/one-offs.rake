@@ -60,6 +60,7 @@ task output_legislators: :environment do
 
 end
 
+desc 'lookup bioguide_ids from sunlight for a list of state_abbrev/district.'
 task lookup_bioguide_ids: :environment do
   require 'rest-client'
 
@@ -71,4 +72,33 @@ task lookup_bioguide_ids: :environment do
     response = JSON.parse(RestClient.get('https://congress.api.sunlightfoundation.com/legislators?'+query_string))
     puts [state+district.to_s,response['results'][0]['bioguide_id'] ].join(',')
   end
+end
+
+desc 'update names and pronunciation from dailykos\'s excellent 114 guide'
+task update_from_kos: :environment do
+  require 'csv'
+
+  # doc taken from https://docs.google.com/spreadsheets/d/1lGZQi9AxPHjE0RllvhNEBHFvrJGlnmC43AXnR8dwHMc/edit#gid=1978064869
+  source_doc = '/db/seed_data/legislator_pronunciations.csv'
+
+  CSV.foreach(Rails.root.to_s + source_doc, headers: true) do |csv_row|
+    live_target_ids = %w[A000373 M001196 L000581 G000575 A000371 T000474 E000215 V000081 D000482 F000043 J000294 C001049 C001061 P000604 J000032 S001156 V000132 S001191 C001097 B001270 K000375 G000559 N000015 L000263 W000187 T000468 R000588 V000108 S001157 S000030 R000599 C001063 H001038 C001059 K000380 H000636 P000258 J000295 Z000018 D000613 G000576 H001070 P000611 V000129 I000056 M001197 B001290]
+    state, district = csv_row['code'].split('-')
+    district = '0' if district == 'AL'
+    params =  {state: state, district: district, apikey: ENV['SUNLIGHT_KEY'], chamber: 'house'}
+    query_string = URI.encode(params.map{|k,v| "#{k}=#{v}"}.join("&"))
+    response = JSON.parse(RestClient.get('https://congress.api.sunlightfoundation.com/legislators?'+query_string))
+    result = response['results'][0] && live_target_ids.include?(response['results'][0]['bioguide_id'])
+    puts "#{csv_row['first_name']}, #{csv_row['last_name']}, #{csv_row['phonetic']}" if result
+  end
+end
+
+desc 'output csv_string of potential leaders for TTH'
+task tth_output: :environment do
+  fields = %w[bioguide_id party phone name title state_abbrev state_name district_code display_district image_url]
+  csv_string = CSV.generate do |csv|
+    csv << fields
+    Legislator.with_includes.targeted.each{|l| csv << fields.map{|f| l.send(f) } }
+  end
+  puts csv_string
 end

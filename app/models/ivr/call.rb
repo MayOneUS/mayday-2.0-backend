@@ -29,7 +29,7 @@ class Ivr::Call < ActiveRecord::Base
     failed:    'failed'
   }
 
-  MAXIMUM_CONNECTIONS = 5
+  CONNECTION_LOOP_COUNT = 5
 
   def create_connection!
     connections.create!(legislator: next_target)
@@ -43,8 +43,8 @@ class Ivr::Call < ActiveRecord::Base
     legislators_targeted.first
   end
 
-  def exceeded_max_connections?
-    connections.size >= Ivr::Call::MAXIMUM_CONNECTIONS
+  def finished_loop?
+    connections.size >= Ivr::Call::CONNECTION_LOOP_COUNT && connections.size % Ivr::Call::CONNECTION_LOOP_COUNT == 0
   end
 
 end

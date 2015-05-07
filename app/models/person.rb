@@ -44,6 +44,7 @@ class Person < ActiveRecord::Base
   delegate :update_location, :district, :state, to: :location
 
   FIELDS_ALSO_ON_NB = %w[email first_name is_volunteer last_name phone]
+  DEFAULT_TARGET_COUNT = 100
 
   def self.create_or_update(person_params)
     key = nil
@@ -99,7 +100,7 @@ class Person < ActiveRecord::Base
     Legislator.with_includes.default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
   end
 
-  def target_legislators(json: false, count: Ivr::Call::MAXIMUM_CONNECTIONS)
+  def target_legislators(json: false, count: DEFAULT_TARGET_COUNT)
     locals = unconvinced_legislators || []
     remaining_count = count - locals.size
     others = other_targets(count: remaining_count, excluding: locals)

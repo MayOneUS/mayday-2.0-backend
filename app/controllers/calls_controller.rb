@@ -8,7 +8,7 @@ class CallsController < ApplicationController
   def start
     response = Twilio::TwiML::Response.new do |r|
       r.Pause
-      r.Play AudioFileFetcher.audio_url_for_key('intro_message')
+      play_audio(r, 'intro_message')
       ready_for_connection?(r)
     end
 
@@ -21,10 +21,10 @@ class CallsController < ApplicationController
   # CallSid - default param from twilio (required)
   def new_connection
     response = Twilio::TwiML::Response.new do |r|
-      if active_call.next_target.present? && !active_call.exceeded_max_connections?
+      if active_call.next_target.present? && !active_call.finished_loop?
         connection = active_call.create_connection!
-        r.Play AudioFileFetcher.audio_url_for_key(connection.connecting_message_key)
-        r.Play AudioFileFetcher.audio_url_for_key('star_to_disconnect')
+        play_audio(r, connection.connecting_message_key)
+        play_audio(r, 'star_to_disconnect')
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
         r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true, 'callerId' => caller_id
       else
@@ -46,9 +46,9 @@ class CallsController < ApplicationController
       r.Gather(
         action: calls_connection_gather_url(connection_id: active_connection.id),
       ) do |gather|
-        r.Play AudioFileFetcher.audio_url_for_key('user_response')
+        play_audio(r, 'user_response')
         gather.Pause(length:5)
-        r.Play AudioFileFetcher.audio_url_for_key('user_response')
+        play_audio(r, 'user_response')
       end
       r.Redirect calls_new_connection_url, method: 'get'
     end
@@ -66,7 +66,8 @@ class CallsController < ApplicationController
     active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
     response = Twilio::TwiML::Response.new do |r|
       connection_count = active_call.connections.size
-      if active_call.exceeded_max_connections?
+      if active_call.finished_loop?
+        r.Say 'connection gather closing'
         close_call(r)
       else
         r.Play AudioFileFetcher.encouraging_audio_for_count(connection_count)
@@ -81,22 +82,35 @@ class CallsController < ApplicationController
 
   def ready_for_connection?(twilio_renderer)
     twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
-      twilio_renderer.Play AudioFileFetcher.audio_url_for_key('press_star_to_continue')
+      play_audio(twilio_renderer, 'press_star_to_continue')
       3.times do
         gather.Pause(length: 5)
-        twilio_renderer.Play AudioFileFetcher.audio_url_for_key('press_star_to_continue')
+        play_audio(twilio_renderer, 'press_star_to_continue')
       end
     end
     close_call(twilio_renderer)
   end
 
   def close_call(twilio_renderer)
-    if active_call.exceeded_max_connections? || !active_call.next_target.present?
-      audio_key = active_call.exceeded_max_connections? ? 'closing_message' : 'no_targets'
-      twilio_renderer.Play AudioFileFetcher.audio_url_for_key(audio_key)
+    if active_call.finished_loop? || active_call.next_target.empty?
+      if active_call.finished_loop? && active_call.next_target.present?
+        twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
+          play_audio(twilio_renderer, 'closing_message')
+          2.times do
+            play_audio(twilio_renderer, 'there_are_more')
+            gather.Pause(length: 7)
+          end
+        end
+      else
+        play_audio(twilio_renderer, 'no_targets')
+      end
     end
-    twilio_renderer.Play AudioFileFetcher.audio_url_for_key('goodbye')
+    play_audio(twilio_renderer, 'goodbye')
     twilio_renderer.Hangup
+  end
+
+  def play_audio(twilio_renderer, audio_key)
+    twilio_renderer.Play AudioFileFetcher.audio_url_for_key(audio_key)
   end
 
   def set_header

@@ -9,7 +9,7 @@ describe CallsController,  type: :controller do
     allow(@active_call).to receive(:new_record?).and_return(new_record)
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
     allow(@active_call).to receive(:next_target).and_return(target_legislators[0])
-    allow(@active_call).to receive(:exceeded_max_connections?).and_return(false)
+    allow(@active_call).to receive(:finished_loop?).and_return(false)
     allow(Ivr::Call).to receive_message_chain(:includes, :find_or_initialize_by).and_return(@active_call)
   end
 
@@ -19,6 +19,14 @@ describe CallsController,  type: :controller do
     allow(@last_connection).to receive(:update!)
     allow(@last_connection).to receive(:id).and_return(123)
   end
+
+  def legislator_double
+    legislator = double('legislator')
+    @phone = '555-555-5555'
+    allow(legislator).to receive(:phone).and_return(@phone)
+    legislator
+  end
+
 
   describe "setting up active_call" do
     def setup_active_call_with_new_record(new_record: false)
@@ -63,9 +71,7 @@ describe CallsController,  type: :controller do
   describe "GET new_connection" do
     context "with a target" do
       before do
-        legislator = double('legislator')
-        @phone = '555-555-5555'
-        allow(legislator).to receive(:phone).and_return(@phone)
+        legislator = legislator_double
         setup_active_call_double(target_legislators: [legislator])
         allow(@active_call).to receive(:next_target).and_return(legislator)
 
@@ -86,23 +92,44 @@ describe CallsController,  type: :controller do
         expect(@active_call).to have_received(:create_connection!)
       end
     end
-    context "with max connections" do
+    context "with finished loop" do
       before do
         setup_active_call_double
+        legislator = legislator_double
         allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)
-        allow(@active_call).to receive(:exceeded_max_connections?).and_return(true)
-        allow(@active_call).to receive(:next_target).and_return(nil)
+        allow(@active_call).to receive(:finished_loop?).and_return(true)
+        allow(@active_call).to receive(:next_target).and_return([legislator])
       end
       it "says sorry" do
         get :new_connection, 'CallSid': 123
+        puts response.body
         target_text = Oga.parse_xml(response.body).css('Play').text
         expect(target_text).to match(/closing_message/)
+        expect(target_text).to match(/there_are_more/)
         expect(target_text).to match(/goodbye/)
       end
       it "hangs up" do
         get :new_connection, 'CallSid': 123
         xml_response = Oga.parse_xml(response.body)
         expect(xml_response.css('Hangup')).to be_present
+      end
+    end
+    context "with finished loop and no more targets" do
+      before do
+        setup_active_call_double
+        legislator = legislator_double
+        allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)
+        allow(@active_call).to receive(:finished_loop?).and_return(true)
+        allow(@active_call).to receive(:next_target).and_return([])
+      end
+
+      it "says no_targets" do
+        get :new_connection, 'CallSid': 123
+        target_text = Oga.parse_xml(response.body).css('Play').text
+        expect(target_text).not_to match(/closing_message/)
+        expect(target_text).not_to match(/there_are_more/)
+        expect(target_text).to match(/no_targets/)
+        expect(target_text).to match(/goodbye/)
       end
     end
     context "with no target" do

@@ -85,7 +85,7 @@ describe Ivr::Call, type: :model do
       call.save
     end
   end
-  describe "exceeded_max_connections?" do
+  describe "finished_loop?" do
     def setup_call_with_connections(connections_count=1)
       call = FactoryGirl.build(:call)
       allow(call).to receive(:connections).and_return(Array.new(connections_count,0))
@@ -93,11 +93,15 @@ describe Ivr::Call, type: :model do
     end
     it "returns false with 3 connections" do
       call = setup_call_with_connections(3)
-      expect(call.exceeded_max_connections?).to be false
+      expect(call.finished_loop?).to be false
     end
     it "returns true with 5 connections" do
       call = setup_call_with_connections(5)
-      expect(call.exceeded_max_connections?).to be true
+      expect(call.finished_loop?).to be true
+    end
+    it "returns false with 7 connections" do
+      call = setup_call_with_connections(7)
+      expect(call.finished_loop?).to be false
     end
   end
 end
