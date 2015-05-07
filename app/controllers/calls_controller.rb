@@ -92,7 +92,7 @@ class CallsController < ApplicationController
   end
 
   def close_call(twilio_renderer)
-    if active_call.finished_loop? || active_call.next_target.empty?
+    if active_call.finished_loop? || active_call.next_target.nil?
       if active_call.finished_loop? && active_call.next_target.present?
         twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
           play_audio(twilio_renderer, 'closing_message')
