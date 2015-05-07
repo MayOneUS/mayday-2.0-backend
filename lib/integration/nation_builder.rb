@@ -121,7 +121,6 @@ class Integration::NationBuilder
       when 'validation_failed'
         e.response.parsed['validation_errors'][0]
       else
-        puts e.inspect
         e.response.parsed['message']
       end
     end

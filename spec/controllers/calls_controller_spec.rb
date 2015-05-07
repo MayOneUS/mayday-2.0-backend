@@ -102,7 +102,6 @@ describe CallsController,  type: :controller do
       end
       it "says sorry" do
         get :new_connection, 'CallSid': 123
-        puts response.body
         target_text = Oga.parse_xml(response.body).css('Play').text
         expect(target_text).to match(/closing_message/)
         expect(target_text).to match(/there_are_more/)
