@@ -44,7 +44,7 @@ class CallsController < ApplicationController
     active_connection = active_call.last_connection
     active_connection.update!(remote_id: params['DialCallSid'], status: params['DialCallStatus'])
     response = Twilio::TwiML::Response.new do |r|
-      r.Pause #prevents user from accidentaly pushing * for this gather prompt
+      r.Pause(length:2) #prevents user from accidentaly pushing * for this gather prompt
       r.Gather(
         action: calls_connection_gather_url(connection_id: active_connection.id),
       ) do |gather|
