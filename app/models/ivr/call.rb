@@ -44,7 +44,7 @@ class Ivr::Call < ActiveRecord::Base
   end
 
   def encouraging_count
-    (connections.length % Ivr::Call::CONNECTION_LOOP_COUNT)+1
+    (connections.length % Ivr::Call::CONNECTION_LOOP_COUNT)
   end
 
   def finished_loop?
