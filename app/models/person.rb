@@ -97,7 +97,7 @@ class Person < ActiveRecord::Base
   end
 
   def other_targets(count:, excluding:)
-    Legislator.with_includes.default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
+    Legislator.includes(:current_bills).with_includes.default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
   end
 
   def target_legislators(json: false, count: DEFAULT_TARGET_COUNT)
