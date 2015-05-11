@@ -43,8 +43,12 @@ class Ivr::Call < ActiveRecord::Base
     legislators_targeted.first
   end
 
+  def encouraging_count
+    (connections.length % Ivr::Call::CONNECTION_LOOP_COUNT)+1
+  end
+
   def finished_loop?
-    connections.size >= Ivr::Call::CONNECTION_LOOP_COUNT && connections.size % Ivr::Call::CONNECTION_LOOP_COUNT == 0
+    (connections.length > 0) && connections.length % Ivr::Call::CONNECTION_LOOP_COUNT == 0
   end
 
 end

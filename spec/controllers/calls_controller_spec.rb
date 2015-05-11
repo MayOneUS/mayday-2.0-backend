@@ -6,6 +6,7 @@ describe CallsController,  type: :controller do
     @active_call = double('active_call')
     person = double('person')
     allow(@active_call).to receive(:person).and_return(!new_record && person || nil)
+    allow(@active_call).to receive(:encouraging_count).and_return(1)
     allow(@active_call).to receive(:new_record?).and_return(new_record)
     allow(@active_call).to receive(:target_legislators).and_return(target_legislators)
     allow(@active_call).to receive(:next_target).and_return(target_legislators[0])
@@ -91,26 +92,12 @@ describe CallsController,  type: :controller do
         get :new_connection, 'CallSid': 123
         expect(@active_call).to have_received(:create_connection!)
       end
-    end
-    context "with finished loop" do
-      before do
-        setup_active_call_double
-        legislator = legislator_double
-        allow(@active_call).to receive_message_chain(:connections, :size).and_return(5)
-        allow(@active_call).to receive(:finished_loop?).and_return(true)
-        allow(@active_call).to receive(:next_target).and_return([legislator])
-      end
-      it "says sorry" do
-        get :new_connection, 'CallSid': 123
-        target_text = Oga.parse_xml(response.body).css('Play').text
-        expect(target_text).to match(/closing_message/)
-        expect(target_text).to match(/there_are_more/)
-        expect(target_text).to match(/goodbye/)
-      end
-      it "hangs up" do
-        get :new_connection, 'CallSid': 123
-        xml_response = Oga.parse_xml(response.body)
-        expect(xml_response.css('Hangup')).to be_present
+      context "with finished loop" do
+        it "keeps creating connections" do
+          allow(@active_call).to receive(:finished_loop?).and_return(true)
+          get :new_connection, 'CallSid': 123
+          expect(@active_call).to have_received(:create_connection!)
+        end
       end
     end
     context "with finished loop and no more targets" do
@@ -183,7 +170,7 @@ describe CallsController,  type: :controller do
       allow(Ivr::Connection).to receive(:find).and_return(@connection)
       allow(@connection).to receive(:update)
       setup_active_call_double
-      allow(@active_call).to receive_message_chain(:connections, :size).and_return(1)
+      allow(@active_call).to receive(:encouraging_count).and_return(1)
     end
     it "finds the correct connection" do
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
@@ -194,7 +181,7 @@ describe CallsController,  type: :controller do
       expect(@connection).to have_received(:update).with(status_from_user: Ivr::Connection::USER_RESPONSE_CODES['1'])
     end
     it "plays an encouraging message" do
-      allow(@active_call).to receive_message_chain(:connections, :size).and_return(3)
+      allow(@active_call).to receive(:encouraging_count).and_return(3)
       allow(AudioFileFetcher).to receive(:audio_url_for_key)
       post :connection_gather, 'CallSid': 123, 'Digits': 1, connection_id: 1
 
@@ -208,6 +195,26 @@ describe CallsController,  type: :controller do
 
       expect(xml_response.css('Gather').attribute('method')[0].value).to eq('get')
       expect(xml_response.css('Gather').attribute('action')[0].value).to eq(calls_new_connection_url)
+    end
+    context "with a finished_loop" do
+      before do
+        allow(@active_call).to receive(:finished_loop?).and_return(true)
+        legislator = legislator_double
+        allow(@active_call).to receive(:next_target).and_return(legislator)
+      end
+
+      it "makes closing offer" do
+        get :connection_gather, 'CallSid': 123
+        target_text = Oga.parse_xml(response.body).css('Play').text
+        expect(target_text).to match(/closing_message/)
+        expect(target_text).to match(/there_are_more/)
+        expect(target_text).to match(/goodbye/)
+      end
+      it "hangs up" do
+        get :connection_gather, 'CallSid': 123
+        xml_response = Oga.parse_xml(response.body)
+        expect(xml_response.css('Hangup')).to be_present
+      end
     end
   end
 

@@ -10,6 +10,7 @@ class CallsController < ApplicationController
       r.Pause
       play_audio(r, 'intro_message')
       ready_for_connection?(r)
+      close_call(r)
     end
 
     render_twiml response
@@ -21,7 +22,7 @@ class CallsController < ApplicationController
   # CallSid - default param from twilio (required)
   def new_connection
     response = Twilio::TwiML::Response.new do |r|
-      if active_call.next_target.present? && !active_call.finished_loop?
+      if active_call.next_target.present?
         connection = active_call.create_connection!
         play_audio(r, connection.connecting_message_key)
         play_audio(r, 'star_to_disconnect')
@@ -65,13 +66,12 @@ class CallsController < ApplicationController
     active_connection = Ivr::Connection.find(params[:connection_id])
     active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
     response = Twilio::TwiML::Response.new do |r|
-      connection_count = active_call.connections.size
       if active_call.finished_loop?
-        r.Say 'connection gather closing'
         close_call(r)
       else
-        r.Play AudioFileFetcher.encouraging_audio_for_count(connection_count)
+        r.Play AudioFileFetcher.encouraging_audio_for_count(active_call.encouraging_count)
         ready_for_connection?(r)
+        close_call(r)
       end
     end
 
@@ -88,15 +88,14 @@ class CallsController < ApplicationController
         play_audio(twilio_renderer, 'press_star_to_continue')
       end
     end
-    close_call(twilio_renderer)
   end
 
   def close_call(twilio_renderer)
     if active_call.finished_loop? || active_call.next_target.nil?
-      if active_call.finished_loop? && active_call.next_target.present?
+      if active_call.next_target.present?
         twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
           play_audio(twilio_renderer, 'closing_message')
-          2.times do
+          3.times do
             play_audio(twilio_renderer, 'there_are_more')
             gather.Pause(length: 7)
           end
