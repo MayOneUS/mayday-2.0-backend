@@ -249,4 +249,23 @@ describe Person do
       end
     end
   end
+
+  describe "#create_action" do
+    it "saves a new action with correct associations" do
+      person = FactoryGirl.create(:person)
+      activity = FactoryGirl.create(:activity)
+      action_params = {
+        utm_source: 'expected_source',
+        utm_medium: 'expected_medium',
+        utm_campaign: 'expected_campaign',
+        source_url: 'expected_url'
+      }
+
+      person.create_action(action_params.merge(template_id: activity.template_id))
+
+      expect(person.actions.first.activity).to eq(activity)
+      expect(person.actions.first.attributes).to include(action_params.stringify_keys)
+    end
+    
+  end
 end

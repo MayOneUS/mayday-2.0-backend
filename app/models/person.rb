@@ -130,6 +130,12 @@ class Person < ActiveRecord::Base
     !valid? && errors.full_messages.join('. ') + '.'
   end
 
+  def create_action(params)
+    activity = Activity.find_by(template_id: params[:template_id])
+    action_params = params.slice(:utm_source, :utm_medium, :utm_campaign, :source_url)
+    actions.create!(action_params.merge(activity: activity))
+  end
+
   private
 
   def update_nation_builder

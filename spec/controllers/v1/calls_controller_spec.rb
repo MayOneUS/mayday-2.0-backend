@@ -8,9 +8,11 @@ describe V1::CallsController,  type: :controller do
       @fake_sid = 'werl1l2312'
       call = FactoryGirl.build(:call, remote_id: @fake_sid)
 
-      person = double('person')
-      allow(person).to receive_message_chain(:calls, :create).and_return(call)
-      allow(Person).to receive_message_chain(:create_with, :find_or_create_by).and_return(person)
+      @person = double('person')
+      allow(@person).to receive(:create_action)
+      allow(@person).to receive_message_chain(:calls, :create).and_return(call)
+      allow(@person).to receive_message_chain(:phone).and_return(@target_phone)
+      allow(Person).to receive_message_chain(:create_or_update).and_return(@person)
 
       twilio_call = double('twilio_call')
       allow(twilio_call).to receive(:sid).and_return(@fake_sid)
@@ -24,6 +26,18 @@ describe V1::CallsController,  type: :controller do
       post :create, person: { phone: @target_phone }
       json_response = JSON.parse(response.body)
       expect(json_response['call_sid']).to include(@fake_sid)
+    end
+    it "stores an activity with the right params" do
+      activity = FactoryGirl.create(:activity)
+      expected_params = {
+        template_id: activity.template_id,
+        utm_source: 'expected_source',
+        utm_medium: 'expected_medium',
+        utm_campaign: 'expected_campaign',
+        source_url: 'expected_url'
+      }
+      post :create, {person: {phone: @target_phone}}.merge(expected_params)
+      expect(@person).to have_received(:create_action).with(expected_params)
     end
 
     context "with bad params" do
