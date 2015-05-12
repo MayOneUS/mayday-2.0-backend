@@ -47,6 +47,8 @@ class CallsController < ApplicationController
       r.Pause(length:2) #prevents user from accidentaly pushing * for this gather prompt
       r.Gather(
         action: calls_connection_gather_url(connection_id: active_connection.id),
+        'numDigits' => 1,
+        'finishOnKey' => ''
       ) do |gather|
         play_audio(r, 'user_response')
         gather.Pause(length:5)
@@ -82,7 +84,7 @@ class CallsController < ApplicationController
   private
 
   def ready_for_connection?(twilio_renderer)
-    twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
+    twilio_renderer.Gather(action: calls_new_connection_url, method: 'get', 'numDigits' => 1) do |gather|
       play_audio(twilio_renderer, 'press_star_to_continue')
       3.times do
         gather.Pause(length: 5)
