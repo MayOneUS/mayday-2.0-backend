@@ -4,7 +4,7 @@ class CallsController < ApplicationController
 
   # Public: initiates the call process via a request from twillio
   #
-  # CallSid - default param from twilio (required)
+  # CallSid - default param from twilio (optional)
   def start
     response = Twilio::TwiML::Response.new do |r|
       r.Pause
@@ -64,7 +64,7 @@ class CallsController < ApplicationController
   #
   # CallSid - active_call's remote_id from twilio (required)
   # Digits - the key pressed user response from twilio (required)
-  # remote_id - remote_for the target connection (required)
+  # connection_id - remote_for the target connection (required)
   def connection_gather
     active_connection = Ivr::Connection.find(params[:connection_id])
     active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
