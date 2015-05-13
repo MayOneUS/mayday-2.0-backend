@@ -6,6 +6,7 @@ gem 'redis'
 gem 'redis-objects'
 gem 'redis-rails'
 gem 'database_cleaner'
+gem 'phony_rails'
 
 # Active Job
 gem 'sidekiq'

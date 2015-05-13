@@ -33,6 +33,8 @@ class Person < ActiveRecord::Base
 
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
+  phony_normalize :phone, default_country_code: 'US'
+
 
   attr_writer :address, :zip, :remote_fields
 
@@ -48,17 +50,17 @@ class Person < ActiveRecord::Base
 
   def self.create_or_update(person_params)
     key = nil
-    [:uuid, :email, :phone].each do |field|
-      if value = person_params.delete(field).presence
-        value.downcase! if field == :email
-        key = { field => value }
-        break
-      end
+    search_key, search_value = person_params.slice(:uuid, :email, :phone).first
+    case search_key
+      when :email then search_value.downcase!
+      when :phone then search_value = PhonyRails.normalize_number(search_value)
     end
-    if key
-      find_or_initialize_by(key).tap{ |p| p.update(person_params) }
+
+    if search_key
+      find_or_initialize_by({search_key => search_value})
+        .tap{ |p| p.update!(person_params) }
     else
-      Person.create(person_params)
+      create(person_params)
     end
   end
 

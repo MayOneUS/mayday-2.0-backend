@@ -105,11 +105,14 @@ FactoryGirl.define do
 
   factory :call, class: Ivr::Call do
     person
+    sequence(:remote_id) { |n| "call_sid_#{n}" }
+
   end
 
   factory :connection, class: Ivr::Connection do
     call
     association :legislator, factory: :senator
+    sequence(:remote_id) { |n| "connection_sid_#{n}" }
 
     trait :completed do
       status Ivr::Call::CALL_STATUSES[:completed]

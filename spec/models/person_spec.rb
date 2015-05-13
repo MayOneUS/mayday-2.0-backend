@@ -56,35 +56,46 @@ describe Person do
   describe ".create_or_update" do
     context "new record" do
       it "creates record with appropriate values" do
-        hash = { email:      'user@example.com',
-                 phone:      '555-555-1111',
-                 first_name: 'Bob',
-                 last_name:  'Garfield' }
-        person = Person.create_or_update(hash)
-        expect(person.slice(*hash.keys).values).to eq hash.values
+        create_params = { email: 'user@example.com',
+          phone:        '555-555-1111',
+          first_name:   'Bob',
+          last_name:    'Garfield'}
+        expected_params = create_params
+        expected_params[:phone] = PhonyRails.normalize_number(create_params[:phone], default_country_code: 'US')
+
+        person = Person.create_or_update(create_params.dup)
+        expect(person.slice(*create_params.keys).values).to eq expected_params.values
       end
     end
     context "existing record" do
       it "updates record with appropriate values" do
         person = FactoryGirl.create(:person, email: 'user@example.com')
-        hash = { email: 'user@example.com',
-                 phone: '555-555-1111' }
-        Person.create_or_update(hash)
-        expect(person.reload.slice(*hash.keys).values).to eq hash.values
+        update_params = { email: 'user@example.com', phone: '555-555-1111' }
+
+        Person.create_or_update(update_params.dup)
+        person.reload
+
+        expect(person.email).to eq update_params[:email]
+        expect(person.phone).to eq PhonyRails.normalize_number(update_params[:phone], default_country_code: 'US')
       end
       it "finds existing record even when email case doesn't match" do
         person = FactoryGirl.create(:person, email: 'user@example.com')
-        hash = { email: 'UsEr@example.com',
-                 phone: '555-555-1111' }
-        Person.create_or_update(hash)
-        expect(person.reload.slice(*hash.keys).values).to eq hash.values.map(&:downcase)
+        update_params = { email: 'UsEr@example.com', phone: '555-555-1111' }
+
+        Person.create_or_update(update_params.dup)
+        person.reload
+
+        expect(person.email).to eq update_params[:email].downcase
+        expect(person.phone).to eq PhonyRails.normalize_number(update_params[:phone], default_country_code: 'US')
       end
       it "finds user based on uuid, if present" do
-        person = FactoryGirl.create(:person, uuid: 'good-uuid', email: 'user@example.com',)
-        hash = { email: 'new_email_address@example.com',
-                 uuid:  'good-uuid' }
-        Person.create_or_update(hash)
-        expect(person.reload.slice(*hash.keys).values).to eq hash.values
+        person = FactoryGirl.create(:person)
+        update_params = { email: 'new_unique_email_address@example.com', uuid: person.uuid }
+
+        Person.create_or_update(update_params.dup)
+        person.reload
+
+        expect(person.email).to eq update_params[:email]
       end
     end
   end
@@ -223,8 +234,8 @@ describe Person do
       it "sends call to update NationBuilder" do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
         expect(NbPersonPushJob).to receive(:perform_later).
-          with(email: 'user@example.com', phone: '510-555-1234')
-        FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234')
+          with(email: 'user@example.com', phone: PhonyRails.normalize_number('6305551234', default_country_code: 'US') )
+        FactoryGirl.create(:person, email: 'user@example.com', phone:'630-555-1234')
       end
     end
     context "updating existing user" do
@@ -266,6 +277,6 @@ describe Person do
       expect(person.actions.first.activity).to eq(activity)
       expect(person.actions.first.attributes).to include(action_params.stringify_keys)
     end
-    
+
   end
 end
