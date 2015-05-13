@@ -28,15 +28,16 @@ describe V1::CallsController,  type: :controller do
       expect(json_response['call_sid']).to include(@fake_sid)
     end
     it "stores an activity with the right params" do
-      activity = FactoryGirl.create(:activity)
-      expected_params = {
-        template_id: activity.template_id,
+      activity = FactoryGirl.create(:activity, template_id: Ivr::Call::ACTION_TEMPLATE_ID)
+      post_params = {
         utm_source: 'expected_source',
         utm_medium: 'expected_medium',
         utm_campaign: 'expected_campaign',
         source_url: 'expected_url'
       }
-      post :create, {person: {phone: @target_phone}}.merge(expected_params)
+
+      expected_params = {template_id: activity.template_id}.merge(post_params)
+      post :create, {person: {phone: @target_phone}}.merge(post_params)
       expect(@person).to have_received(:create_action).with(expected_params)
     end
 
