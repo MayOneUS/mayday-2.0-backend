@@ -138,6 +138,42 @@ class Person < ActiveRecord::Base
     actions.create!(action_params.merge(activity: activity))
   end
 
+  def merge!(other, options={})
+    raise "cannot merge wit a new record" if other.new_record?
+    raise "cannot merge with myself" if other == self
+
+    #merge associations
+    (%w[calls actions]).each do |association_name|
+      send(association_name).concat other.send(association_name)
+    end
+
+    #merge attributes
+    updated_attributes = other.attributes.compact!.merge(attributes.compact!)
+    update(updated_attributes)
+    location_attrs = updated_attributes.slice(:address, :zip)
+    update_location(location_attrs) if location_attrs.any?
+
+    #cleanup
+    other.reload.destroy
+    save!
+  end
+
+  def self.merge_duplicates!(records,options)
+    records.each do |record|
+      next if record.nil?
+      records.each do |other|
+        next if other.nil?
+        next if other == record
+        is_comparable = other.send(options[:compare]) == record.send(options[:compare])
+        next unless is_comparable
+
+        #merge and remove the other
+        records[records.index(other)]=nil
+        record.merge!(other)
+      end
+    end.compact
+  end
+
   private
 
   def update_nation_builder
