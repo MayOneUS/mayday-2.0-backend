@@ -52,7 +52,7 @@
         when :donations_count     then Integration::PledgeService.donations_count
         when :donations_total     then Integration::PledgeService.donations_total
         when :called_voters_count then 0
-        when :reps_calls_count    then Ivr::Connection.completed
+        when :reps_calls_count    then Ivr::Connection.completed.count
         when :house_supporters    then Legislator.house.with_us.count
         when :senate_supporters   then Legislator.senate.with_us.count
         when :letter_signers      then Activity.find_by_template_id('sign-letter-form').try(:actions).try(:count) || 0
