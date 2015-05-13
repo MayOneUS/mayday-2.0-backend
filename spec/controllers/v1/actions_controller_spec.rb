@@ -7,12 +7,12 @@ RSpec.describe V1::ActionsController, type: :controller do
       before do
         @activity = FactoryGirl.create(:activity, template_id: 'real_id')
         FactoryGirl.create(:activity)
-        @person = FactoryGirl.create(:person, uuid: 'the-uuid', email: 'joe@example.com')
+        @person = FactoryGirl.create(:person, uuid: 'the-uuid')
       end
       it "returns person object" do
-        expect(Person).to receive(:create_or_update).with(email: 'Joe@example.com')
+        expect(Person).to receive(:create_or_update).with(email: @person.email)
           .and_call_original
-        post :create, person: { email: 'Joe@example.com' }, template_id: 'real_id'
+        post :create, person: { email: @person.email }, template_id: 'real_id'
         parsed_response = JSON.parse(response.body)
         expect(parsed_response.slice('uuid', 'completed_activities').values)
           .to eq ['the-uuid', ['real_id']]
@@ -23,7 +23,7 @@ RSpec.describe V1::ActionsController, type: :controller do
       end
       it 'processes source variables' do
         target_url = 'https://homepage.com'
-        post :create, person: { email: 'Joe@example.com' }, template_id: 'real_id', source_url: target_url
+        post :create, person: { email: @person.email }, template_id: 'real_id', source_url: target_url
 
         target_action = @person.actions.where(activity: @activity).last
         expect(target_action.source_url).to eq(target_url)
