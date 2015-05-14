@@ -40,7 +40,7 @@ describe V1::EventsController,  type: :controller do
       }
 
       expected_params = {template_id: Activity::DEFAULT_TEMPLATE_IDS[:rsvp]}.merge(post_params)
-      post :create_rsvp, {person: {email: person.email}}.merge(post_params)
+      post :create_rsvp, {event_id: 5, person: {email: person.email}}.merge(post_params)
       expect(person).to have_received(:create_action).with(expected_params)
     end
     context "with a person in parameters" do
