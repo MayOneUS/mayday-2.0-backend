@@ -1,7 +1,7 @@
 class V1::CallsController < V1::BaseController
 
   def create
-    person = create_person_and_action(default_template_id: Ivr::Call::ACTION_TEMPLATE_ID)
+    person = create_person_and_action(default_template_id: Activity::DEFAULT_TEMPLATE_IDS[:call])
 
     twilio_call = Integration::Twilio.initiate_call(phone: person.phone)
     call = person.calls.create(remote_id: twilio_call.sid)

@@ -28,7 +28,7 @@ describe V1::CallsController,  type: :controller do
       expect(json_response['call_sid']).to include(@fake_sid)
     end
     it "stores an activity with the right params" do
-      activity = FactoryGirl.create(:activity, template_id: Ivr::Call::ACTION_TEMPLATE_ID)
+      activity = FactoryGirl.create(:activity, template_id: Activity::DEFAULT_TEMPLATE_IDS[:call])
       post_params = {
         utm_source: 'expected_source',
         utm_medium: 'expected_medium',

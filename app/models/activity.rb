@@ -13,4 +13,9 @@
 class Activity < ActiveRecord::Base
   has_many :actions
   validates :template_id, uniqueness: true
+
+  DEFAULT_TEMPLATE_IDS = {
+    rsvp: 'rsvp',
+    call: 'call-congress'
+  }
 end

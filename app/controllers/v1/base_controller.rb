@@ -21,7 +21,7 @@ class V1::BaseController < ApplicationController
     action_params[:template_id] ||= default_template_id
 
     person = Person.create_or_update(person_params)
-    person.create_action(action_params)
+    person.create_action(action_params.symbolize_keys)
 
     person
   end

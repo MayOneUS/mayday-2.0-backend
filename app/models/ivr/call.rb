@@ -30,7 +30,6 @@ class Ivr::Call < ActiveRecord::Base
   }
 
   CONNECTION_LOOP_COUNT = 5
-  ACTION_TEMPLATE_ID = 'call-congress'
 
   def create_connection!
     connections.create!(legislator: next_target)
