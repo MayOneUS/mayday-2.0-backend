@@ -16,16 +16,12 @@ describe V1::EventsController,  type: :controller do
   end
 
   describe "POST create_rsvp" do
+    before do
+      FactoryGirl.create(:activity, template_id: 'attend-event')
+    end
     context "with a person in parameters" do
       it "returns success" do
         post :create_rsvp, event_id: 5, person: {email: 'dude@gmail.com'}
-        expect(response).to be_success
-      end
-    end
-
-    context "with a person_id in parameters" do
-      it "returns success" do
-        post :create_rsvp, event_id: 5, person_id: 10
         expect(response).to be_success
       end
     end
