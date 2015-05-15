@@ -30,8 +30,6 @@ RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 
   config.before(:each) do
-    allow_any_instance_of(Person).to receive(:update_nation_builder).and_return(nil)
-    allow_any_instance_of(Location).to receive(:update_nation_builder).and_return(nil)
     stub_request(:any, /#{Integration::PledgeService::PLEDGE_SERVICE_DOMAIN}/).to_rack(FakePledgeService)
     stub_request(:any, /#{ENV['NATION_BUILDER_DOMAIN']}/).to_rack(FakeNationBuilder)
     stub_request(:any, /#{Integration::MobileCommons::DOMAIN}/).to_rack(FakeMobileCommons)
