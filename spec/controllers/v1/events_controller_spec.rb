@@ -16,34 +16,46 @@ describe V1::EventsController,  type: :controller do
   end
 
   describe "POST create_rsvp" do
-    before do
-      FactoryGirl.create(:activity, template_id: 'attend-event')
-    end
     context "with a person in parameters" do
+      before do
+        @activity = FactoryGirl.create(:activity, template_id: Activity::DEFAULT_TEMPLATE_IDS[:rsvp])
+        @person = FactoryGirl.build(:person)
+        allow(@person).to receive(:create_action)
+        allow(Person).to receive_message_chain(:create_or_update).and_return(@person)
+      end
+
       it "returns success" do
         post :create_rsvp, event_id: 5, person: {email: 'dude@gmail.com'}
         expect(response).to be_success
       end
-    end
-    it "stores an action with the right params" do
-      target_phone = '1-123-123-1234'
-      person = FactoryGirl.build(:person)
-      allow(person).to receive(:create_action)
-      allow(Person).to receive_message_chain(:create_or_update).and_return(person)
+      it "stores an action with the right params" do
+        action_params = {
+          utm_source: 'expected_source',
+          utm_medium: 'expected_medium',
+          utm_campaign: 'expected_campaign',
+          source_url: 'expected_url',
+          template_id: @activity.template_id
+        }
 
-      activity = Activity.new(template_id: Activity::DEFAULT_TEMPLATE_IDS[:rsvp])
-      post_params = {
-        utm_source: 'expected_source',
-        utm_medium: 'expected_medium',
-        utm_campaign: 'expected_campaign',
-        source_url: 'expected_url'
-      }
+        post :create_rsvp, {
+          event_id: 5,
+          person: {email: @person.email, first_name: @person.first_name}
+        }.merge(action_params.except(:template_id))
 
-      expected_params = {template_id: Activity::DEFAULT_TEMPLATE_IDS[:rsvp]}.merge(post_params)
-      post :create_rsvp, {event_id: 5, person: {email: person.email}}.merge(post_params)
-      expect(person).to have_received(:create_action).with(expected_params)
+        expect(@person).to have_received(:create_action).with(action_params)
+      end
+      it "pushes remote_fields to create_or_update" do
+        allow(Integration::NationBuilder).to receive(:parse_person_attributes).and_call_original
+        person_params = {email: @person.email, first_name: @person.first_name, remote_fields: {tags: ['20150501_test_tag'], skills: 'I have skills'}}
+        post :create_rsvp, {
+          event_id: 5,
+          person: person_params
+        }
+
+        expect(Person).to have_received(:create_or_update)
+      end
     end
-    context "with a person in parameters" do
+    context "with missing person parameters" do
       it "returns success" do
         post :create_rsvp, event_id: 5
         expect(response).not_to be_success

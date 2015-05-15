@@ -16,7 +16,8 @@ class V1::BaseController < ApplicationController
   end
 
   def create_person_and_action(default_template_id: nil)
-    person_params = params.require(:person).permit(:uuid, :email, :phone, :zip)
+    person_params = params.require(:person).permit(:uuid, :email, :phone, :zip, :first_name, :last_name)
+    person_params.merge! params[:person].slice(*Person::SUPPLAMENTRY_ATTRIBUTES)
     action_params = params.permit(:template_id, :utm_source, :utm_medium, :utm_campaign, :source_url)
     action_params[:template_id] ||= default_template_id
 

@@ -5,7 +5,7 @@ FactoryGirl.define do
 
   factory :person do
     sequence(:email) { |n| "person#{n}@example.com" }
-    sequence(:phone) { |n| "555555#{n.to_s.rjust(4,'0')}"}
+    sequence(:phone) { |n| PhonyRails.normalize_number("555555#{n.to_s.rjust(4,'0')}", default_country_code: 'US')}
 
     trait :with_district do
       after(:create) do |person|

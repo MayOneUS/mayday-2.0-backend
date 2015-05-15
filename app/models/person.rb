@@ -35,8 +35,8 @@ class Person < ActiveRecord::Base
   validates :phone, presence: true, unless: :email
   phony_normalize :phone, default_country_code: 'US'
 
-
-  attr_writer :address, :zip, :remote_fields
+  SUPPLAMENTRY_ATTRIBUTES = [:address, :zip, :remote_fields]
+  attr_accessor *SUPPLAMENTRY_ATTRIBUTES
 
   before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
@@ -49,7 +49,6 @@ class Person < ActiveRecord::Base
   DEFAULT_TARGET_COUNT = 100
 
   def self.create_or_update(person_params)
-    key = nil
     search_key, search_value = person_params.slice(:uuid, :email, :phone).first
     case search_key
       when :email then search_value.downcase!
@@ -60,7 +59,7 @@ class Person < ActiveRecord::Base
       find_or_initialize_by({search_key => search_value})
         .tap{ |p| p.update!(person_params) }
     else
-      create(person_params)
+      create!(person_params)
     end
   end
 
@@ -179,9 +178,9 @@ class Person < ActiveRecord::Base
 
   def update_nation_builder
     relevant_fields = changed & FIELDS_ALSO_ON_NB
-    if relevant_fields.any? || @remote_fields.present?
-      NbPersonPushJob.perform_later(self.slice(:email, *relevant_fields).
-                                      merge(@remote_fields || {}))
+    if relevant_fields.any? || remote_fields.present?
+      nb_attributes = self.slice(:email, *relevant_fields).merge(remote_fields || {})
+      NbPersonPushJob.perform_later(nb_attributes)
     end
   end
 
@@ -194,8 +193,8 @@ class Person < ActiveRecord::Base
   end
 
   def save_location
-    if @zip
-      update_location(address: @address, zip: @zip)
+    if zip
+      update_location(address: address, zip: zip)
     end
   end
 end

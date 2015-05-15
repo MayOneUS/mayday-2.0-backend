@@ -66,6 +66,32 @@ describe Person do
         person = Person.create_or_update(create_params.dup)
         expect(person.slice(*create_params.keys).values).to eq expected_params.values
       end
+      it "sets up delayed job in NationBuilder" do
+        person = FactoryGirl.build(:person)
+        person_params = person.attributes
+        allow(NbPersonPushJob).to receive(:perform_later).and_call_original
+
+        person = Person.create!(person_params.dup)
+
+        expect(NbPersonPushJob).to have_received(:perform_later).with(person_params.compact)
+      end
+      it "sends appropriate values to NationBuilder" do
+        allow(NbPersonPushJob).to receive(:perform_later).and_call_original
+        remote_fields = {tags:['tags'], skills: 'skills'}
+        person_params = { email: 'user@example.com',
+          phone:        '+15555551111',
+          first_name:   'Bob',
+          last_name:    'Garfield',
+        }
+        post_params = person_params.merge(remote_fields: remote_fields)
+        expected_params = person_params.merge(remote_fields)
+
+        person = Person.create_or_update(post_params)
+
+        expect(person.attributes.values & person_params.values).to eq(person_params.values)
+        expect(person.remote_fields).to eq(remote_fields)
+        expect(NbPersonPushJob).to have_received(:perform_later).with(expected_params.stringify_keys)
+      end
     end
     context "existing record" do
       it "updates record with appropriate values" do
@@ -235,7 +261,7 @@ describe Person do
         expect_any_instance_of(Person).to receive(:update_nation_builder).and_call_original
         expect(NbPersonPushJob).to receive(:perform_later).
           with(email: 'user@example.com', phone: PhonyRails.normalize_number('6305551234', default_country_code: 'US') )
-        FactoryGirl.create(:person, email: 'user@example.com', phone:'630-555-1234')
+        Person.create(email: 'user@example.com', phone:'630-555-1234')
       end
     end
     context "updating existing user" do
