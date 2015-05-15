@@ -24,6 +24,14 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
 
+require "fakeredis"
+redis_opts = {url: ENV['REDIS_URL'] || ENV['REDISTOGO_URL'], size: 1}
+redis_opts.merge!(driver: Redis::Connection::Memory) if defined?(Redis::Connection::Memory)
+
+Sidekiq.configure_client do |config|
+  config.redis = redis_opts
+end
+
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true

@@ -84,7 +84,7 @@ class Integration::NationBuilder
 
   def self.create_rsvp(event_id:, person_id:)
     rescue_oauth_errors do
-      body = {'rsvp': {'person_id': person_id, 'event_id': event_id}}
+      body = {'rsvp': {'person_id': person_id}}
       response = request_handler(endpoint_path: ENDPOINTS[:rsvps_by_event] % event_id, body: body, method: 'post')
       response['rsvp']
     end
