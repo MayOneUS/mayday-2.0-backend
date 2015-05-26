@@ -95,6 +95,8 @@ end
 
 desc 'output csv_string of potential leaders for TTH'
 task tth_output: :environment do
+  require 'csv'
+
   fields = %w[bioguide_id party phone name title state_abbrev state_name district_code display_district image_url]
   csv_string = CSV.generate do |csv|
     csv << fields
@@ -102,3 +104,20 @@ task tth_output: :environment do
   end
   puts csv_string
 end
+
+desc 'print csv_string of callers to date'
+task callers_output: :environment do
+  require 'csv'
+
+  people = Person.joins(:connections).includes(:connections, :calls, location: [:state, :district]).all;0
+  attributes = people.first.attributes.keys + people.first.location.attributes.keys + ['connection_count', 'completed_connections_count']
+  csv_string = CSV.generate do |csv|
+    csv << attributes
+    people.each do |person|
+      person_attrs =  person.attributes.values + person.location.attributes.values + [person.connections.length, person.connections.completed.length]
+      csv <<  person_attrs
+    end;0
+  end;0
+  puts csv_string
+end
+
