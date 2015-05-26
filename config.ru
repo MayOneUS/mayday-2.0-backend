@@ -16,3 +16,16 @@ use Rack::Cors do
       :methods => [:get, :post, :put, :options]
   end
 end
+
+
+# Code to enable the sidekiq monitoring dashboard
+# See also: production.rb
+
+require 'sidekiq/web'
+map '/sidekiq' do
+  use Rack::Auth::Basic, "Protected Area" do |username, password|
+    username == 'sidekiq' && password == ENV["SIDEKIQ_DASHBOARD_PASSWORD"]
+  end
+
+  run Sidekiq::Web
+end
