@@ -52,7 +52,7 @@ class Person < ActiveRecord::Base
     search_key, search_value = person_params.slice(:uuid, :email, :phone).first
     case search_key
       when :email then search_value.downcase!
-      when :phone then search_value = PhonyRails.normalize_number(search_value)
+      when :phone then search_value = PhonyRails.normalize_number(search_value, default_country_code: 'US')
     end
 
     if search_key
