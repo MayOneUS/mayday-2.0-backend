@@ -116,10 +116,19 @@ describe Person do
       end
       it "find existing record by phone with string keys" do
         person = FactoryGirl.create(:person)
-        update_params = { phone: person.phone }
+        find_or_update_params = { phone: person.phone }
 
         expect{
-          @updated_person = Person.create_or_update(update_params.stringify_keys)
+          @updated_person = Person.create_or_update(find_or_update_params.stringify_keys)
+        }.not_to change{ Person.count }
+        expect(@updated_person.id).to eq(person.id)
+      end
+      it "find existing record by phone after email search fails" do
+        person = FactoryGirl.create(:person, email: nil)
+        find_or_update_params = { phone: person.phone, email: 'fake@mail.com' }
+
+        expect{
+          @updated_person = Person.create_or_update(find_or_update_params)
         }.not_to change{ Person.count }
         expect(@updated_person.id).to eq(person.id)
       end

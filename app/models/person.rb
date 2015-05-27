@@ -49,18 +49,25 @@ class Person < ActiveRecord::Base
   DEFAULT_TARGET_COUNT = 100
 
   def self.create_or_update(person_params)
-    search_key, search_value = person_params.symbolize_keys.slice(:uuid, :email, :phone).first
-    case search_key
-      when :email then search_value.downcase!
-      when :phone then search_value = PhonyRails.normalize_number(search_value, default_country_code: 'US')
+    search_values = person_params.symbolize_keys.slice(:uuid, :email, :phone).compact
+
+    search_values.each do |search_key, search_value|
+      case search_key
+        when :email then search_value.downcase!
+        when :phone then search_value = PhonyRails.normalize_number(search_value, default_country_code: 'US')
+      end
+      @person = find_by({search_key => search_value})
+      break if @person.present?
     end
 
-    if search_key
-      find_or_initialize_by({search_key => search_value})
-        .tap{ |p| p.update!(person_params) }
+
+    if search_values.any? && @person.present?
+      @person.update!(person_params)
     else
-      create!(person_params)
+      @person = create!(person_params)
     end
+
+    @person
   end
 
   def self.new_uuid
@@ -164,8 +171,9 @@ class Person < ActiveRecord::Base
       records.each do |other|
         next if other.nil?
         next if other == record
+        next if other.send(options[:compare]).blank? || record.send(options[:compare]).blank?
         is_comparable = other.send(options[:compare]) == record.send(options[:compare])
-        next unless is_comparable && other.send(options[:compare]).present? && record.send(options[:compare]).present?
+        next unless is_comparable
 
         #merge and remove the other
         records[records.index(other)]=nil
