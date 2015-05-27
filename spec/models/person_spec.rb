@@ -114,6 +114,15 @@ describe Person do
         expect(person.email).to eq update_params[:email].downcase
         expect(person.phone).to eq PhonyRails.normalize_number(update_params[:phone], default_country_code: 'US')
       end
+      it "find existing record by phone with string keys" do
+        person = FactoryGirl.create(:person)
+        update_params = { phone: person.phone }
+
+        expect{
+          @updated_person = Person.create_or_update(update_params.stringify_keys)
+        }.not_to change{ Person.count }
+        expect(@updated_person.id).to eq(person.id)
+      end
       it "finds user based on uuid, if present" do
         person = FactoryGirl.create(:person)
         update_params = { email: 'new_unique_email_address@example.com', uuid: person.uuid }

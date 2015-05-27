@@ -49,7 +49,7 @@ class Person < ActiveRecord::Base
   DEFAULT_TARGET_COUNT = 100
 
   def self.create_or_update(person_params)
-    search_key, search_value = person_params.slice(:uuid, :email, :phone).first
+    search_key, search_value = person_params.symbolize_keys.slice(:uuid, :email, :phone).first
     case search_key
       when :email then search_value.downcase!
       when :phone then search_value = PhonyRails.normalize_number(search_value, default_country_code: 'US')
