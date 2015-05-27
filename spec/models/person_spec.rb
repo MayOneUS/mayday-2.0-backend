@@ -95,8 +95,8 @@ describe Person do
     end
     context "existing record" do
       it "updates record with appropriate values" do
-        person = FactoryGirl.create(:person, email: 'user@example.com')
-        update_params = { email: 'user@example.com', phone: '555-555-1111' }
+        person = FactoryGirl.create(:person)
+        update_params = { email: person.email, phone: '555-555-1111' }
 
         Person.create_or_update(update_params.dup)
         person.reload
@@ -105,8 +105,9 @@ describe Person do
         expect(person.phone).to eq PhonyRails.normalize_number(update_params[:phone], default_country_code: 'US')
       end
       it "finds existing record even when email case doesn't match" do
-        person = FactoryGirl.create(:person, email: 'user@example.com')
-        update_params = { email: 'UsEr@example.com', phone: '555-555-1111' }
+        person = FactoryGirl.create(:person)
+        random_case_email = person.email.gsub(/./){|c| rand(2)>0 ? c : c.swapcase }
+        update_params = { email: random_case_email, phone: '555-555-1111' }
 
         Person.create_or_update(update_params.dup)
         person.reload
