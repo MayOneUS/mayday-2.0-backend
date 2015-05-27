@@ -165,7 +165,7 @@ class Person < ActiveRecord::Base
         next if other.nil?
         next if other == record
         is_comparable = other.send(options[:compare]) == record.send(options[:compare])
-        next unless is_comparable
+        next unless is_comparable && other.send(options[:compare]).present? && record.send(options[:compare]).present?
 
         #merge and remove the other
         records[records.index(other)]=nil
