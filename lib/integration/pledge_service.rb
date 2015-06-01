@@ -17,7 +17,7 @@ class Integration::PledgeService
   private
 
   def self.request_handler(endpoint:, result_key:)
-    result = JSON.parse(RestClient.get('https://'+PLEDGE_SERVICE_DOMAIN+endpoint, :verify_ssl => OpenSSL::SSL::VERIFY_NONE))
+    result = JSON.parse(RestClient::Request.execute(method: :get, url: 'https://'+PLEDGE_SERVICE_DOMAIN+endpoint, verify_ssl: OpenSSL::SSL::VERIFY_NONE))
     result[result_key]
   end
 
