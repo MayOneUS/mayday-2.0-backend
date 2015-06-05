@@ -68,7 +68,7 @@ describe Person do
       end
       it "sets up delayed job in NationBuilder" do
         person = FactoryGirl.build(:person)
-        person_params = person.attributes
+        person_params = person.attributes.symbolize_keys
         allow(NbPersonPushJob).to receive(:perform_later).and_call_original
 
         person = Person.create!(person_params.dup)
@@ -90,7 +90,7 @@ describe Person do
 
         expect(person.attributes.values & person_params.values).to eq(person_params.values)
         expect(person.remote_fields).to eq(remote_fields)
-        expect(NbPersonPushJob).to have_received(:perform_later).with(expected_params.stringify_keys)
+        expect(NbPersonPushJob).to have_received(:perform_later).with(expected_params)
       end
     end
     context "existing record" do
@@ -120,7 +120,7 @@ describe Person do
         find_or_update_params = { phone: person.phone }
 
         expect{
-          @updated_person = Person.create_or_update(find_or_update_params.stringify_keys)
+          @updated_person = Person.create_or_update(find_or_update_params)
         }.not_to change{ Person.count }
         expect(@updated_person.id).to eq(person.id)
       end
@@ -284,24 +284,56 @@ describe Person do
       end
     end
     context "updating existing user" do
-      let(:user) { FactoryGirl.create(:person, email: 'user@example.com', phone:'510-555-1234') }
-      before { expect(user).to receive(:update_nation_builder).and_call_original }
+      let(:person) { FactoryGirl.create(:person) }
+      before { expect(person).to receive(:update_nation_builder).and_call_original }
 
       it "sends remote_fields to NationBuilder if present" do
         expect(NbPersonPushJob).to receive(:perform_later).
-          with(email: 'user@example.com', tags: ['test'], foo: 'bar')
-        user.update(remote_fields: { tags: ['test'], foo: 'bar' })
+          with(email: person.email, phone: person.phone, tags: ['test'], foo: 'bar')
+        person.update(remote_fields: { tags: ['test'], foo: 'bar' })
       end
 
       it "sends call to update NationBuilder if relevant field changed" do
         expect(NbPersonPushJob).to receive(:perform_later).
-          with(email: 'user@example.com', first_name: 'Bob')
-        user.update(first_name: 'Bob')
+          with(email: person.email, phone: person.phone, first_name: 'Bob')
+        person.update(first_name: 'Bob')
       end
 
       it "doesn't send call to update NationBuilder if no relevant field changed" do
         expect(NbPersonPushJob).not_to receive(:perform_later)
-        user.update(phone:'510-555-1234')
+        person.update(phone: person.phone)
+      end
+    end
+  end
+
+  describe "call counting" do
+    subject do
+      connection = FactoryGirl.create(:connection, :failed)
+      FactoryGirl.create(:connection, :completed, call: connection.call)
+      connection.person
+    end
+    describe ".set_remote_call_counts!" do
+      it "push the correct params to the update job" do
+        allow(NbPersonPushJob).to receive(:perform_later)
+        expected_arguments = {
+          email: subject.email,
+          phone: subject.phone,
+          representative_call_attempts: 2,
+          representative_calls_count: 1
+        }
+
+        subject.set_remote_call_counts!
+        expect(NbPersonPushJob).to have_received(:perform_later).with(expected_arguments)
+      end
+    end
+    describe "#representative_call_attempts" do
+      it "counts all connections" do
+        expect(subject.representative_call_attempts).to eq(2)
+      end
+    end
+    describe "#representative_calls_count" do
+      it "counts successfuly connections" do
+        expect(subject.representative_calls_count).to eq(1)
       end
     end
   end

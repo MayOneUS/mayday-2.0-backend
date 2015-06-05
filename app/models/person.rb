@@ -182,13 +182,33 @@ class Person < ActiveRecord::Base
     end.compact
   end
 
+  def self.update_nation_builder_call_counts!
+    select(:phone,:email,:id).all.includes(:connections).find_each do |person|
+      person.set_remote_call_counts!
+    end
+  end
+
+  def set_remote_call_counts!
+    self.remote_fields ||= {}
+    remote_fields.merge!(representative_call_attempts: representative_call_attempts, representative_calls_count: representative_calls_count)
+    update_nation_builder if representative_call_attempts > 0
+  end
+
+  def representative_call_attempts
+    connections.length
+  end
+
+  def representative_calls_count
+    connections.completed.count
+  end
+
   private
 
   def update_nation_builder
     relevant_fields = changed & FIELDS_ALSO_ON_NB
     if relevant_fields.any? || remote_fields.present?
-      nb_attributes = self.slice(:email, *relevant_fields).merge(remote_fields || {})
-      NbPersonPushJob.perform_later(nb_attributes)
+      nb_attributes = self.slice(:email, :phone, *relevant_fields).merge(remote_fields || {}).compact
+      NbPersonPushJob.perform_later(nb_attributes.symbolize_keys)
     end
   end
 
