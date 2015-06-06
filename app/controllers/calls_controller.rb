@@ -145,7 +145,7 @@ class CallsController < ApplicationController
     if params['To'] && params['Caller'] !~ /client/
       params['To']
     else
-      ENV['TWILIO_APP_PHONE_NUMBER']
+      Integration::Twilio::APP_PHONE_NUMBERS[:call_congress]
     end
   end
 

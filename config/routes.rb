@@ -11,6 +11,9 @@ Rails.application.routes.draw do
     end
     resources :stats,       only: :index
     resources :calls,       only: :create
+    namespace :ivr do
+      resources :recordings, only: :create
+    end
     resources :actions,     only: :create
     resources :activities,  only: :index
     resources :nominations, only: :create
