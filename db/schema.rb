@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150505043417) do
+ActiveRecord::Schema.define(version: 20150605235804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,38 +55,12 @@ ActiveRecord::Schema.define(version: 20150505043417) do
 
   add_index "bills", ["bill_id"], name: "index_bills_on_bill_id", unique: true, using: :btree
 
-  create_table "calls", force: :cascade do |t|
-    t.string   "remote_id"
-    t.integer  "person_id"
-    t.string   "status"
-    t.integer  "duration"
-    t.datetime "ended_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "calls", ["person_id"], name: "index_calls_on_person_id", using: :btree
-
   create_table "campaigns", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "ended_at"
   end
-
-  create_table "connections", force: :cascade do |t|
-    t.string   "remote_id"
-    t.integer  "call_id"
-    t.integer  "legislator_id"
-    t.string   "status_from_user"
-    t.string   "status"
-    t.integer  "duration"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-  end
-
-  add_index "connections", ["call_id"], name: "index_connections_on_call_id", using: :btree
-  add_index "connections", ["legislator_id"], name: "index_connections_on_legislator_id", using: :btree
 
   create_table "districts", force: :cascade do |t|
     t.string   "district"
@@ -114,6 +88,43 @@ ActiveRecord::Schema.define(version: 20150505043417) do
   end
 
   add_index "events", ["remote_id"], name: "index_events_on_remote_id", unique: true, using: :btree
+
+  create_table "ivr_calls", force: :cascade do |t|
+    t.string   "remote_id"
+    t.integer  "person_id"
+    t.string   "status"
+    t.integer  "duration"
+    t.datetime "ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "ivr_calls", ["person_id"], name: "index_ivr_calls_on_person_id", using: :btree
+
+  create_table "ivr_connections", force: :cascade do |t|
+    t.string   "remote_id"
+    t.integer  "call_id"
+    t.integer  "legislator_id"
+    t.string   "status_from_user"
+    t.string   "status"
+    t.integer  "duration"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "ivr_connections", ["call_id"], name: "index_ivr_connections_on_call_id", using: :btree
+  add_index "ivr_connections", ["legislator_id"], name: "index_ivr_connections_on_legislator_id", using: :btree
+
+  create_table "ivr_recordings", force: :cascade do |t|
+    t.integer  "duration"
+    t.string   "recording_url"
+    t.string   "state"
+    t.integer  "call_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "ivr_recordings", ["call_id"], name: "index_ivr_recordings_on_call_id", using: :btree
 
   create_table "legislators", force: :cascade do |t|
     t.string   "bioguide_id",         null: false
@@ -231,10 +242,10 @@ ActiveRecord::Schema.define(version: 20150505043417) do
 
   add_foreign_key "actions", "activities"
   add_foreign_key "actions", "people"
-  add_foreign_key "calls", "people"
-  add_foreign_key "connections", "calls"
-  add_foreign_key "connections", "legislators"
   add_foreign_key "districts", "states"
+  add_foreign_key "ivr_calls", "people"
+  add_foreign_key "ivr_connections", "ivr_calls", column: "call_id"
+  add_foreign_key "ivr_connections", "legislators"
   add_foreign_key "legislators", "districts"
   add_foreign_key "legislators", "states"
   add_foreign_key "locations", "districts"

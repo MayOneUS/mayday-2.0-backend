@@ -1,4 +1,4 @@
-class Ivr::ApplicationController < Ivr::ApplicationController
+class Ivr::ApplicationController < ApplicationController
   after_filter :set_header
 
   private

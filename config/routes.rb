@@ -33,6 +33,13 @@ Rails.application.routes.draw do
   post '/calls/connection_gather_prompt', to: 'calls#connection_gather_prompt'
   post '/calls/connection_gather',        to: 'calls#connection_gather'
 
+  namespace :ivr do
+    post '/recordings/start',            to: 'recordings#start'
+    post '/recordings/new_recording',    to: 'recordings#new_recording'
+    post '/recordings/re_record_prompt', to: 'recordings#re_record_prompt'
+  end
+
+
   require 'sidekiq/api'
   get "/queue-status" => proc { [200, {"Content-Type" => "text/plain"}, [Sidekiq::Queue.new.size < 100 ? "OK" : "UHOH" ]] }
   get "/queue-latency" => proc { [200, {"Content-Type" => "text/plain"}, [Sidekiq::Queue.new.latency < 30 ? "OK" : "UHOH" ]] }

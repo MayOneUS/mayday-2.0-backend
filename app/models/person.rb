@@ -189,9 +189,8 @@ class Person < ActiveRecord::Base
   end
 
   def set_remote_call_counts!
-    self.remote_fields ||= {}
-    remote_fields.merge!(representative_call_attempts: representative_call_attempts, representative_calls_count: representative_calls_count)
-    update_nation_builder if representative_call_attempts > 0
+    remote_fields = {representative_call_attempts: representative_call_attempts, representative_calls_count: representative_calls_count}
+    update_remote_attributes(remote_fields) if representative_call_attempts > 0
   end
 
   def representative_call_attempts
@@ -200,6 +199,12 @@ class Person < ActiveRecord::Base
 
   def representative_calls_count
     connections.completed.count
+  end
+
+  def update_remote_attributes(remote_attributes)
+    self.remote_fields ||= {}
+    remote_fields.merge!(remote_attributes)
+    update_nation_builder
   end
 
   private

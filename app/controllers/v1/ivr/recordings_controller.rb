@@ -1,7 +1,7 @@
 class V1::Ivr::RecordingssController < V1::BaseController
 
   def create
-    person = create_person_and_action(default_template_id: Activity::DEFAULT_TEMPLATE_IDS[:record])
+    person = create_person_and_action(default_template_id: Activity::DEFAULT_TEMPLATE_IDS[:record_message])
 
     twilio_app_number = Integration::Twilio::APP_PHONE_NUMBERS[:record_message]
     twilio_call = Integration::Twilio.initiate_call(phone: person.phone, app_number: twilio_app_number)
