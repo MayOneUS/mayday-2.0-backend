@@ -57,7 +57,22 @@ task output_legislators: :environment do
   end
 
   puts "Outputed csv to #{output_file}"
+end
 
+task output_legislator_phone_numbers: :environment do
+  require 'csv'
+
+  output_file = "#{Rails.root}/app/assets/data/leg_phones.csv"
+  legislators = Legislator.with_includes.includes({sponsorships: :bill})
+
+  CSV.open(output_file, "wb") do |csv|
+    csv << legislators.first.__send__(:serializable_hash).keys
+    legislators.each do |leg|
+      csv << leg.__send__(:serializable_hash).values
+    end
+  end
+
+  puts "Outputed csv to #{output_file}"
 end
 
 desc 'lookup bioguide_ids from sunlight for a list of state_abbrev/district.'

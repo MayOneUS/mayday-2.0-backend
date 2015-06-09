@@ -214,11 +214,10 @@ class Legislator < ActiveRecord::Base
 
   private
 
-  def serializable_hash(options)
-    options ||= {}
+  def serializable_hash(options={})
     extras = options.delete(:extras) || {}
     options = { methods: [:name, :title, :state_abbrev, :state_name, :district_code, :display_district, :eligible, :image_url, :with_us],
-                only: [:id, :party, :chamber, :state_rank, :last_name, :bioguide_id] }.merge(options)
+                only: [:id, :party, :chamber, :state_rank, :last_name, :bioguide_id, :phone] }.merge(options)
     super(options).merge(extras)
   end
 
