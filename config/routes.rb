@@ -36,7 +36,7 @@ Rails.application.routes.draw do
     post '/calls/connection_gather',        to: 'calls#connection_gather'
 
     post '/recordings/start',            to: 'recordings#start'
-    post '/recordings/new_recording',    to: 'recordings#new_recording'
+    get '/recordings/new_recording',     to: 'recordings#new_recording'
     post '/recordings/re_record_prompt', to: 'recordings#re_record_prompt'
   end
 

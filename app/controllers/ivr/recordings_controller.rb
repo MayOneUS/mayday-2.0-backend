@@ -37,7 +37,7 @@ class Ivr::RecordingsController < Ivr::ApplicationController
   # RecordingUrl - dialed call's remote_id from twilio (required)
   def re_record_prompt
     instructions_statment = 'In just a momement, we will play your recording back to you.  If you\'re satisfied with
-        your recording, you can hang up at anytime.  Press any button if you wish to re record.'
+        your recording, hang up.  If you wish to re re cord, press any button to go back.'
     active_recording = active_call.recordings.create!(duration: params['RecordingDuration'], recording_url: params['RecordingUrl'])
     response = Twilio::TwiML::Response.new do |r|
       r.Say 'Thank you.'
