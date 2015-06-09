@@ -139,28 +139,32 @@ describe Ivr::CallsController,  type: :controller do
   end
 
   describe "POST connection_gather_prompt" do
-    before do
+    it "updates active_connection with remote_id" do
       setup_active_call_double
       setup_last_connection
-    end
-    it "updates active_connection with remote_id" do
       post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc', 'DialCallStatus': 'alkjlr2l3'
-
       expect(@last_connection).to have_received(:update!).with(remote_id:"abc",status: 'alkjlr2l3')
     end
-    it "says a question to gather user response" do
-      post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
-      xml_response = Oga.parse_xml(response.body)
-
-      expect(xml_response.css('Play').text).to match(/user_response/)
-    end
-    it "renders a twilio gather with the proper action" do
-      post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc'
-      xml_response = Oga.parse_xml(response.body)
-
-      action_url = xml_response.css('Gather').attribute('action')[0].value
-      expected_url = ivr_calls_connection_gather_url(connection_id: @last_connection.id)
-      expect(action_url).to eq(expected_url)
+    context do
+      subject do
+        setup_active_call_double
+        setup_last_connection
+        post :connection_gather_prompt, 'CallSid': 123, 'DialCallSid': 'abc', 'DialCallStatus': 'alkjlr2l3'
+        Oga.parse_xml(response.body)
+      end
+      it "says a question to gather user response" do
+        expect(subject.css('Play').text).to match(/user_response/)
+      end
+      it "renders a twilio gather with the proper action" do
+        action_urls = subject.css('Gather').attribute('action').map(&:value)
+        expected_url = ivr_calls_connection_gather_url(connection_id: @last_connection.id)
+        expect(action_urls).to include(expected_url)
+      end
+      it "asks if user is ready for new connection if they don't respond" do
+        action_urls = subject.css('Gather').attribute('action').map(&:value)
+        expected_url = ivr_calls_new_connection_url
+        expect(action_urls).to include(expected_url)
+      end
     end
   end
 

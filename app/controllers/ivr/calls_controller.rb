@@ -52,7 +52,7 @@ class Ivr::CallsController < Ivr::ApplicationController
         gather.Pause(length:5)
         play_audio(r, 'user_response')
       end
-      r.Redirect ivr_calls_new_connection_url, method: 'get'
+      ready_for_connection?(r)
     end
 
     render_twiml response
