@@ -5,18 +5,18 @@ Rails.application.routes.draw do
       get :newest_supporters, on: :collection
       get :supporters_map, on: :collection, defaults: {format: :js}
     end
-    resources :people,      only: :create do
-      get :delete_all, on: :collection
+    resources :people, only: :create do
+      get :delete_all,    on: :collection
       get '/:identifier', on: :collection, action: :show, constraints: { identifier: /[^\/]+/} #allow email as identifier
     end
     resources :stats,       only: :index
-    resources :calls,       only: :create
-    namespace :ivr do
-      resources :recordings, only: :create
-    end
     resources :actions,     only: :create
     resources :activities,  only: :index
     resources :nominations, only: :create
+
+    namespace :ivr do
+      resources :calls, only: :create
+    end
 
     resources :events,  only: :index do
       post :create_rsvp, on: :collection
@@ -28,12 +28,13 @@ Rails.application.routes.draw do
     get '/bills/supporter_counts', to: 'bills#supporter_counts'
     get '/bills/timeline', to: 'bills#timeline'
   end
-  post '/calls/start',                    to: 'calls#start'
-  get  '/calls/new_connection',           to: 'calls#new_connection'
-  post '/calls/connection_gather_prompt', to: 'calls#connection_gather_prompt'
-  post '/calls/connection_gather',        to: 'calls#connection_gather'
 
   namespace :ivr do
+    post '/calls/start',                    to: 'calls#start'
+    get  '/calls/new_connection',           to: 'calls#new_connection'
+    post '/calls/connection_gather_prompt', to: 'calls#connection_gather_prompt'
+    post '/calls/connection_gather',        to: 'calls#connection_gather'
+
     post '/recordings/start',            to: 'recordings#start'
     post '/recordings/new_recording',    to: 'recordings#new_recording'
     post '/recordings/re_record_prompt', to: 'recordings#re_record_prompt'

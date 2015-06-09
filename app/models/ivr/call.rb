@@ -14,6 +14,7 @@
 
 class Ivr::Call < ActiveRecord::Base
   has_many :connections, class_name: 'Ivr::Connection', dependent: :destroy
+  has_many :recordings, class_name: 'Ivr::Recording', dependent: :destroy
   has_many :called_legislators, -> { merge(Ivr::Connection.completed) }, through: :connections, source: :legislator
   has_many :attempted_legislators, through: :connections, source: :legislator
   has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Ivr::Connection'

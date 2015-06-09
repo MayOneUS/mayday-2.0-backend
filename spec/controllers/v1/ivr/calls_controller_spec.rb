@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe V1::CallsController,  type: :controller do
+describe V1::Ivr::CallsController,  type: :controller do
 
   describe "#create" do
     before do
@@ -19,8 +19,14 @@ describe V1::CallsController,  type: :controller do
       allow(Integration::Twilio).to receive(:initiate_call).and_return(twilio_call)
     end
     it "initates a twilio call" do
+      expected_number = Integration::Twilio::APP_PHONE_NUMBERS[:call_congress]
       post :create, person: { phone: @target_phone }
-      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone)
+      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone, app_number: expected_number)
+    end
+    it "initates a twilio call for recording voicemails" do
+      expected_number = Integration::Twilio::APP_PHONE_NUMBERS[:record_message]
+      post :create, person: { phone: @target_phone }, call_type: 'record_message'
+      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone, app_number: expected_number)
     end
     it "returns the twilio call sid" do
       post :create, person: { phone: @target_phone }
@@ -28,7 +34,7 @@ describe V1::CallsController,  type: :controller do
       expect(json_response['call_sid']).to include(@fake_sid)
     end
     it "stores an activity with the right params" do
-      activity = FactoryGirl.create(:activity, template_id: Activity::DEFAULT_TEMPLATE_IDS[:call])
+      activity = FactoryGirl.create(:activity, template_id: Activity::DEFAULT_TEMPLATE_IDS[:call_congress])
       post_params = {
         utm_source: 'expected_source',
         utm_medium: 'expected_medium',

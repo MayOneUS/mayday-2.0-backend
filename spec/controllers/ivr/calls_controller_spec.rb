@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe CallsController,  type: :controller do
+describe Ivr::CallsController,  type: :controller do
 
   def setup_active_call_double(target_legislators:[], new_record:false)
     @active_call = double('active_call')
@@ -65,7 +65,7 @@ describe CallsController,  type: :controller do
       expect(response).to be_success
       expect(xml_response.css('Gather')).to be_present
       expect(xml_response.css('Gather').attribute('method')[0].value).to eq('get')
-      expect(xml_response.css('Gather').attribute('action')[0].value).to eq(calls_new_connection_url)
+      expect(xml_response.css('Gather').attribute('action')[0].value).to eq(ivr_calls_new_connection_url)
     end
   end
 
@@ -159,7 +159,7 @@ describe CallsController,  type: :controller do
       xml_response = Oga.parse_xml(response.body)
 
       action_url = xml_response.css('Gather').attribute('action')[0].value
-      expected_url = calls_connection_gather_url(connection_id: @last_connection.id)
+      expected_url = ivr_calls_connection_gather_url(connection_id: @last_connection.id)
       expect(action_url).to eq(expected_url)
     end
   end
@@ -194,7 +194,7 @@ describe CallsController,  type: :controller do
       xml_response = Oga.parse_xml(response.body)
 
       expect(xml_response.css('Gather').attribute('method')[0].value).to eq('get')
-      expect(xml_response.css('Gather').attribute('action')[0].value).to eq(calls_new_connection_url)
+      expect(xml_response.css('Gather').attribute('action')[0].value).to eq(ivr_calls_new_connection_url)
     end
     context "with a finished_loop" do
       before do

@@ -1,4 +1,4 @@
-class Ivr::CallsController < Ivr::ApplicationController
+class Ivr::RecordingsController < Ivr::ApplicationController
 
   after_filter :set_header
 
@@ -6,6 +6,7 @@ class Ivr::CallsController < Ivr::ApplicationController
   #
   # CallSid - default param from twilio (optional)
   def start
+    find_or_create_active_call
     response = Twilio::TwiML::Response.new do |r|
       r.Pause
       play_audio(r, 'intro_message')
@@ -36,17 +37,17 @@ class Ivr::CallsController < Ivr::ApplicationController
   # RecordingUrl - dialed call's remote_id from twilio (required)
   def re_record_prompt
     instructions_statment = 'In just a momement, we will play your recording back to you.  If you\'re satisfied with
-        your recording, you can hang up at anytime.  Press any key if you wish to re record.'
-    active_call.recordings.create!(duration: params['RecordingDuration'], recording_url: params['RecordingUrl'])
+        your recording, you can hang up at anytime.  Press any button if you wish to re record.'
+    active_recording = active_call.recordings.create!(duration: params['RecordingDuration'], recording_url: params['RecordingUrl'])
     response = Twilio::TwiML::Response.new do |r|
       r.Say 'Thank you.'
       r.Say instructions_statment
       r.Gather(
-        action: ivr_recordings_new_recording_prompt_url,
+        action: ivr_recordings_new_recording_url,
         'numDigits' => 1,
         'finishOnKey' => ''
       ) do |gather|
-        r.Play(active_recording.remote_url)
+        r.Play(active_recording.recording_url)
         r.Say instructions_statment
       end
       play_audio(r, 'goodbye')
@@ -59,11 +60,12 @@ class Ivr::CallsController < Ivr::ApplicationController
   private
 
   def ready_for_connection?(twilio_renderer)
+    instructions_statment = 'Press star when you\'re ready to start recording'
     twilio_renderer.Gather(action: ivr_recordings_new_recording_url, method: 'get', 'numDigits' => 1) do |gather|
-      play_audio(twilio_renderer, 'press_star_to_continue')
+      gather.Say instructions_statment
       3.times do
         gather.Pause(length: 5)
-        play_audio(twilio_renderer, 'press_star_to_continue')
+        gather.Say instructions_statment
       end
     end
   end

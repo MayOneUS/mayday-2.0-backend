@@ -1,6 +1,4 @@
-class CallsController < ApplicationController
-
-  after_filter :set_header
+class Ivr::CallsController < Ivr::ApplicationController
 
   # Public: initiates the call process via a request from twillio
   #
@@ -27,7 +25,7 @@ class CallsController < ApplicationController
         play_audio(r, connection.connecting_message_key)
         play_audio(r, 'star_to_disconnect')
         target_number = ENV['FAKE_CONGRESS_NUMBER'] || connection.legislator.phone
-        r.Dial target_number, 'action' => calls_connection_gather_prompt_url, 'hangupOnStar' => true, 'callerId' => caller_id
+        r.Dial target_number, 'action' => ivr_calls_connection_gather_prompt_url, 'hangupOnStar' => true, 'callerId' => caller_id
       else
         close_call(r)
       end
@@ -46,7 +44,7 @@ class CallsController < ApplicationController
     response = Twilio::TwiML::Response.new do |r|
       r.Pause(length:2) #prevents user from accidentaly pushing * for this gather prompt
       r.Gather(
-        action: calls_connection_gather_url(connection_id: active_connection.id),
+        action: ivr_calls_connection_gather_url(connection_id: active_connection.id),
         'numDigits' => 1,
         'finishOnKey' => ''
       ) do |gather|
@@ -54,7 +52,7 @@ class CallsController < ApplicationController
         gather.Pause(length:5)
         play_audio(r, 'user_response')
       end
-      r.Redirect calls_new_connection_url, method: 'get'
+      r.Redirect ivr_calls_new_connection_url, method: 'get'
     end
 
     render_twiml response
@@ -84,7 +82,7 @@ class CallsController < ApplicationController
   private
 
   def ready_for_connection?(twilio_renderer)
-    twilio_renderer.Gather(action: calls_new_connection_url, method: 'get', 'numDigits' => 1) do |gather|
+    twilio_renderer.Gather(action: ivr_calls_new_connection_url, method: 'get', 'numDigits' => 1) do |gather|
       play_audio(twilio_renderer, 'press_star_to_continue')
       3.times do
         gather.Pause(length: 5)
@@ -96,7 +94,7 @@ class CallsController < ApplicationController
   def close_call(twilio_renderer)
     if active_call.finished_loop? || active_call.next_target.nil?
       if active_call.next_target.present?
-        twilio_renderer.Gather(action: calls_new_connection_url, method: 'get') do |gather|
+        twilio_renderer.Gather(action: ivr_calls_new_connection_url, method: 'get') do |gather|
           play_audio(twilio_renderer, 'closing_message')
           3.times do
             play_audio(twilio_renderer, 'there_are_more')
@@ -109,32 +107,6 @@ class CallsController < ApplicationController
     end
     play_audio(twilio_renderer, 'goodbye')
     twilio_renderer.Hangup
-  end
-
-  def play_audio(twilio_renderer, audio_key)
-    twilio_renderer.Play AudioFileFetcher.audio_url_for_key(audio_key)
-  end
-
-  def set_header
-    response.headers["Content-Type"] = "text/xml"
-  end
-
-  def render_twiml(response)
-    render text: response.text
-  end
-
-  def active_call
-    @call ||= find_or_create_active_call
-  end
-
-  def find_or_create_active_call
-    remote_id = params['CallSid'] || params[:remote_id]
-    call = Ivr::Call.includes(:person).find_or_initialize_by(remote_id: remote_id)
-    if call.new_record?
-      call.person = Person.find_or_initialize_by(phone: params[:From])
-      call.save!
-    end
-    call
   end
 
   def caller_id
