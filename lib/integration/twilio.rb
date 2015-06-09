@@ -7,7 +7,7 @@ class Integration::Twilio
 
   APP_SID_IDS = {
     call_congress: ENV['TWILIO_APP_SID'],
-    record_message: ENV['TWILIO_RECORDING APP_SID']
+    record_message: ENV['TWILIO_RECORDING_APP_SID']
   }
 
   def self.initiate_call(phone:, app_key:)
