@@ -14,7 +14,7 @@ class Integration::NationBuilder
   ALLOWED_PARAMS_PERSON = [:birthdate, :do_not_call, :first_name, :last_name, :email, :email_opt_in, :employer, :is_volunteer,
     :mobile_opt_in, :mobile, :occupation, :phone, :recruiter_id, :sex, :request_ip, :skills, :rootstrikers_subscription, :uuid,
     :pledge_page_slug, :fundraising, :email_subscription, :maydayin30_entry_url, :voting_district_id, :map_lookup_district,
-    :representative_call_attempts, :representative_calls_count, :voter_calls_count,
+    :representative_call_attempts, :representative_calls_count, :voter_calls_count, :recorded_message_url
     registered_address: [:address1, :address2, :city, :state, :zip], tags: []]
   MAPPINGS_PERSON = {
     email: nil,
