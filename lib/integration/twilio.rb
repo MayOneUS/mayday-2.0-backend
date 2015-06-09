@@ -13,6 +13,11 @@ class Integration::Twilio
     )
   end
 
+  def self.end_call(call_sid:)
+    call = client.calls.get(call_sid)
+    call.hangup
+  end
+
   private
 
   def self.client
