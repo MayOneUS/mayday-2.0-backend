@@ -214,10 +214,10 @@ describe Legislator do
   describe "#serializable_hash" do
     let(:senator) { FactoryGirl.create(:senator) }
     let(:keys) do
-      [
-        'id', 'chamber', 'party', 'state_rank', 'name', 'title', 'image_url',
-        'display_district', 'state_abbrev', 'district_code', 'eligible',
-        'state_name', 'with_us', 'last_name', 'bioguide_id'
+      %w[
+        id chamber party state_rank name title image_url
+        display_district state_abbrev district_code eligible
+        state_name with_us last_name bioguide_id phone
       ]
     end
 
