@@ -5,11 +5,19 @@ class Integration::Twilio
     record_message: ENV['TWILIO_APP_RECORDING_NUMBER']
   }
 
-  def self.initiate_call(phone:, app_number: APP_PHONE_NUMBERS[:call_congress])
+  APP_SID_IDS = {
+    call_congress: ENV['TWILIO_APP_SID'],
+    record_message: ENV['TWILIO_RECORDING APP_SID']
+  }
+
+  def self.initiate_call(phone:, app_key:)
+    app_number = APP_PHONE_NUMBERS[app_key]
+    app_sid = APP_SID_IDS[app_key]
+
     client.calls.create(
       'from' => app_number,
       'to' => phone,
-      'ApplicationSid' => ENV['TWILIO_APP_SID']
+      'ApplicationSid' => app_sid
     )
   end
 

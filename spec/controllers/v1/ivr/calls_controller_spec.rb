@@ -19,14 +19,14 @@ describe V1::Ivr::CallsController,  type: :controller do
       allow(Integration::Twilio).to receive(:initiate_call).and_return(twilio_call)
     end
     it "initates a twilio call" do
-      expected_number = Integration::Twilio::APP_PHONE_NUMBERS[:call_congress]
+      expected_key = :call_congress
       post :create, person: { phone: @target_phone }
-      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone, app_number: expected_number)
+      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone, app_key: expected_key)
     end
     it "initates a twilio call for recording voicemails" do
-      expected_number = Integration::Twilio::APP_PHONE_NUMBERS[:record_message]
+      expected_key = :record_message
       post :create, person: { phone: @target_phone }, call_type: 'record_message'
-      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone, app_number: expected_number)
+      expect(Integration::Twilio).to have_received(:initiate_call).with(phone: @target_phone, app_key: expected_key)
     end
     it "returns the twilio call sid" do
       post :create, person: { phone: @target_phone }
