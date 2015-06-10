@@ -61,7 +61,7 @@ class Ivr::RecordingsController < Ivr::ApplicationController
   def ready_for_connection?(twilio_renderer)
     instructions_statment = 'Press star when you\'re ready to start recording'
     twilio_renderer.Gather(action: ivr_recordings_new_recording_url, method: 'get', 'numDigits' => 1) do |gather|
-      play_audio(r, 'recording_tool_intro')
+      play_audio(gather, 'recording_tool_intro')
       gather.Say instructions_statment
       3.times do
         gather.Pause(length: 5)
