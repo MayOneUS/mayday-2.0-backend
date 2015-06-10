@@ -43,6 +43,7 @@ class Ivr::RecordingsController < Ivr::ApplicationController
       r.Say instructions_statment
       r.Gather(
         action: ivr_recordings_new_recording_url,
+        method: 'get',
         'numDigits' => 1,
         'finishOnKey' => ''
       ) do |gather|
