@@ -9,7 +9,6 @@ class Ivr::RecordingsController < Ivr::ApplicationController
     find_or_create_active_call
     response = Twilio::TwiML::Response.new do |r|
       r.Pause
-      play_audio(r, 'intro_message')
       ready_for_connection?(r)
       r.Say('Please try again later.')
       play_audio(r, 'goodbye')
@@ -62,6 +61,7 @@ class Ivr::RecordingsController < Ivr::ApplicationController
   def ready_for_connection?(twilio_renderer)
     instructions_statment = 'Press star when you\'re ready to start recording'
     twilio_renderer.Gather(action: ivr_recordings_new_recording_url, method: 'get', 'numDigits' => 1) do |gather|
+      play_audio(r, 'recording_tool_intro')
       gather.Say instructions_statment
       3.times do
         gather.Pause(length: 5)

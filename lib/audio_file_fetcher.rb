@@ -19,6 +19,7 @@ class AudioFileFetcher
     star_to_disconnect
     user_response
     press_star_to_continue
+    recording_tool_intro
     there_are_more
   ]
 
