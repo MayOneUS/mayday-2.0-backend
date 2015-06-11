@@ -12,7 +12,11 @@ Rails.application.routes.draw do
     resources :stats,       only: :index
     resources :actions,     only: :create
     resources :activities,  only: :index
-    resources :nominations, only: :create
+
+    namespace :google do
+      resources :nominations, only: :create
+      resources :district_meetings, only: :create
+    end
 
     namespace :ivr do
       resources :calls, only: :create

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe V1::NominationsController,  type: :controller do
+describe V1::Google::NominationsController,  type: :controller do
   describe "POST create" do
     context "legislator suggestion" do
       it "submits form" do
@@ -8,7 +8,7 @@ describe V1::NominationsController,  type: :controller do
         expect(Person).to receive(:create_or_update).
           with(email: 'user@example.com', zip: '94703')
         expect(GoogleFormsSubmitJob).to receive(:perform_later).
-          with("1sQtLTyZWA6KDsi7-ToB2VyOGaz44MZEHQ_fUvlX8VQ0",
+          with(V1::Google::NominationsController::FORM_ID,
                { "entry.1935590346" => "Senator",
                  "entry.26710114"   => "Joe Smith",
                  "entry.1027714876" => senator.state_abbrev,
@@ -27,7 +27,7 @@ describe V1::NominationsController,  type: :controller do
         expect(Person).to receive(:create_or_update).
           with(email: 'user@example.com')
         expect(GoogleFormsSubmitJob).to receive(:perform_later).
-          with("1sQtLTyZWA6KDsi7-ToB2VyOGaz44MZEHQ_fUvlX8VQ0",
+          with(V1::Google::NominationsController::FORM_ID,
                { "entry.396578243"  => "foo",
                  "entry.1787607491" => "user@example.com" })
 
