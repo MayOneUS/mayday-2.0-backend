@@ -5,9 +5,6 @@ class V1::Google::ApplicationController < V1::BaseController
   def create
     Person.create_or_update(person_params)
     if form_params.values.any?(&:present?)
-      puts self.class::FORM_ID
-
-      puts submission_data.inspect
       GoogleFormsSubmitJob.perform_later(self.class::FORM_ID, submission_data)
       submitted = true
     else
