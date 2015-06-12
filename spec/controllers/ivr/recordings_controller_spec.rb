@@ -50,7 +50,7 @@ describe Ivr::RecordingsController,  type: :controller do
       Oga.parse_xml(response.body)
     end
     it "renders recording twiml" do
-      expect(subject.css('Say').text).to match(/Your recording will begin/)
+      expect(subject.css('Play').text).to match(/recording_begin_at_beep/)
       expect(subject.css('Record')).to be_present
     end
     it "renders correct action" do

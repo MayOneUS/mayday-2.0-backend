@@ -22,7 +22,7 @@ class Ivr::RecordingsController < Ivr::ApplicationController
   # CallSid - default param from twilio (required)
   def new_recording
     response = Twilio::TwiML::Response.new do |r|
-      r.Say 'Your recording will begin at the beep.  Press 7 when you\'re finished recording'
+      play_audio(r, 'recording_begin_at_beep')
       r.Record(action: ivr_recordings_re_record_prompt_url, method: 'post', 'finishOnKey' => '7')
     end
 
@@ -35,12 +35,11 @@ class Ivr::RecordingsController < Ivr::ApplicationController
   # RecordingDuration - dialed call's remote_id from twilio (required)
   # RecordingUrl - dialed call's remote_id from twilio (required)
   def re_record_prompt
-    instructions_statment = 'In just a moment, we will play your recording back to you.  If you\'re satisfied with
-        your recording, hang up.  If you wish to re re cord, press any button to go back.'
     active_recording = active_call.recordings.create!(duration: params['RecordingDuration'], recording_url: params['RecordingUrl'])
     response = Twilio::TwiML::Response.new do |r|
       r.Say 'Thank you.'
-      r.Say instructions_statment
+      play_audio(r, 'recording_play_back')
+      play_audio(r, 'recording_recrcord_instructions')
       r.Gather(
         action: ivr_recordings_new_recording_url,
         method: 'get',
@@ -48,7 +47,8 @@ class Ivr::RecordingsController < Ivr::ApplicationController
         'finishOnKey' => ''
       ) do |gather|
         r.Play(active_recording.recording_url)
-        r.Say instructions_statment
+        play_audio(r, 'recording_play_back')
+        play_audio(r, 'recording_recrcord_instructions')
       end
       play_audio(r, 'goodbye')
       r.Hangup
@@ -60,13 +60,12 @@ class Ivr::RecordingsController < Ivr::ApplicationController
   private
 
   def ready_for_connection?(twilio_renderer)
-    instructions_statment = 'Press star when you\'re ready to start recording'
     twilio_renderer.Gather(action: ivr_recordings_new_recording_url, method: 'get', 'numDigits' => 1) do |gather|
       play_audio(gather, 'recording_tool_intro')
-      gather.Say instructions_statment
+      play_audio(gather, 'recording_press_star_start')
       3.times do
         gather.Pause(length: 5)
-        gather.Say instructions_statment
+        play_audio(gather, 'recording_press_star_start')
       end
     end
   end
