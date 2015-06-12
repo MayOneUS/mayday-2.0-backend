@@ -9,8 +9,8 @@ class V1::Google::DistrictMeetingsController < V1::Google::ApplicationController
     phone:                 'entry.1049559909',
     zip:                   'entry.828776517',
     volunteer_tasks:       'entry.493925815',
-    political_leaning:     'entry.396578243',
-    congress_relationship: 'entry.396578243',
+    political_leaning:     'entry.976801239',
+    congress_relationship: 'entry.1981079718',
   }
 
 end
