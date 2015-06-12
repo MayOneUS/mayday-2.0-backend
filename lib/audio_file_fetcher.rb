@@ -20,6 +20,7 @@ class AudioFileFetcher
     user_response
     press_star_to_continue
     recording_tool_intro
+    recording_tool_intro_senate
     recording_begin_at_beep
     recording_play_back
     recording_recrcord_instructions
