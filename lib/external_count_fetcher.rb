@@ -6,11 +6,13 @@
 #   # => {}
 #
 #   ExternalCountFecther.new.counts
-#   # => {supporter_count: 12, volunteer_count: 12, called_voters_count: 12, reps_calls_count: 12, house_supporters: 12, senate_supporters: 12, donations_total: 12, donations_count: 12}
- class ExternalCountFetcher
+#   # => {supporter_count: 12, volunteer_count: 12, called_voters_count: 12, reps_calls_count: 12, house_supporters: 12,
+#     senate_supporters: 12, donations_total: 12, donations_count: 12, recordings_uniq: 10, recordings_total: 20}
+class ExternalCountFetcher
   include Redis::Objects
 
-  REDIS_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :reps_calls_count, :house_supporters, :senate_supporters, :donations_total, :donations_count, :letter_signers]
+  REDIS_KEYS = [:supporter_count, :volunteer_count, :called_voters_count, :reps_calls_count, :house_supporters,
+    :senate_supporters, :donations_total, :donations_count, :letter_signers, :recordings_uniq, :recordings_total]
   REDIS_EXPIRE_SECONDS = 30.minutes.to_i
 
   REDIS_KEYS.each do |key|
@@ -56,6 +58,8 @@
         when :house_supporters    then Legislator.house.with_us.count
         when :senate_supporters   then Legislator.senate.with_us.count
         when :letter_signers      then Activity.find_by_template_id('sign-letter-form').try(:actions).try(:count) || 0
+        when :recordings_uniq     then Person.joins(calls: :recordings).uniq.count
+        when :recordings_total    then Person.joins(calls: :recordings).count
         else raise ArgumentError, "Unknown Key: #{key}"
       end
       redis_counter(counter_key).value = count
