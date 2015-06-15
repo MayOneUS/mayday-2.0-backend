@@ -38,16 +38,17 @@ class Legislator < ActiveRecord::Base
   has_many :campaigns, through: :targets
   has_many :active_campaigns, -> { merge(Campaign.active) }, through: :targets, source: :campaign
   has_many :sponsorships, dependent: :destroy
-  has_many :current_sponsorships, -> { current }, class_name: "Sponsorship"
+  has_many :current_sponsorships, -> { current }, class_name: 'Sponsorship'
   has_many :bills, through: :sponsorships
   has_many :current_bills, through: :current_sponsorships, source: :bill
+  has_many :ivr_connections, class_name: 'Ivr::Connection'
 
   validates :bioguide_id, presence: true, uniqueness: true
   validates :chamber, inclusion: { in: %w(house senate) }
   validates :district, presence: true, if: :representative?
   validates :state,    absence:  true, if: :representative?
-  validates :state,    presence: true, if: :senator?
   validates :district, absence:  true, if: :senator?
+  validates :state,    presence: true, if: :senator?
 
   scope :senate,       -> { where(chamber: 'senate') }
   scope :with_includes,-> { includes({ district: :state }, :state) }
