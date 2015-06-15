@@ -1,6 +1,6 @@
 class V1::Google::DistrictMeetingsController < V1::Google::ApplicationController
   FORM_ID = '13Fvsp8EVE-2wgwM1GqeWQD9XXqr15U29HOv5GcoZH8A'
-  FORM_FIELDS = %i[volunteer_tasks political_leaning congress_relationship]
+  FORM_FIELDS = %i[political_leaning congress_relationship volunteer_letter volunteer_attend volunteer_call]
 
   # NOTE: values for these mappings must match the options in the google form.
   MAPPINGS = {
