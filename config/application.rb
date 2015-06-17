@@ -32,6 +32,7 @@ module Mayday
     config.serve_static_files = false
 
     config.autoload_paths << Rails.root.join('lib')
+    config.eager_load_paths += ["#{Rails.root}/lib}"]
 
     #this works on most hosts, but not on heroku.  heroku config is in config.ru
     config.middleware.insert_before 0, "Rack::Cors", :debug => false, :logger => (-> { Rails.logger }) do
