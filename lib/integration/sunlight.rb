@@ -91,34 +91,35 @@ class Integration::Sunlight
     }
   }
 
-  def self.get_legislators(params = {})
-    get_all = params.delete(:get_all)
-    url = endpoint_url(:legislators, params)
+  def self.fetch_legislator(query_params: {})
+    url = endpoint_url(:legislators, query_params)
 
-    output = {}
+    response = get_results_page(url_and_page(url, 1))
+    parsed_response = parse_results(:legislator, response['results'])
+    parsed_response[0]
+  end
+
+  def self.fetch_legislators(query_params: {})
+    url = endpoint_url(:legislators, query_params)
+
     if response = get_results_page(url_and_page(url, 1))
-      results_count = response['results_count']
-      results       = response['results']
       page_count    = response['page_count']
+      results       = response['results']
 
-      output ['results_count'] = results_count
-
-      if get_all
-        (2..page_count).each do |n|
-          response = get_results_page(url_and_page(url, n))
-          results += response['results']
-        end
+      (2..page_count).each do |n|
+        response = get_results_page(url_and_page(url, n))
+        results += response['results']
       end
-      output['legislators'] = parse_results(:legislator, results)
+
+      parse_results(:legislator, results)
     end
-    output
   end
 
   def self.get_bill(bill_id:)
     fields = JSON_PATHS[:bill].join(',')
     params = { bill_id: bill_id, fields: fields }
     url = endpoint_url(:bills, params)
-    if response = get_json(url) 
+    if response = fetch_json(url) 
       if response[RESULTS_COUNT_KEY] == 1
         results = response[RESULTS_KEY].first
         parse(:bill, results)
@@ -129,7 +130,7 @@ class Integration::Sunlight
   private
 
   def self.get_results_page(url)
-    response = get_json(url)
+    response = fetch_json(url)
     results_count = response[RESULTS_COUNT_KEY]
     results = response[RESULTS_KEY]
     page_info = response[PAGE_KEY]
@@ -184,7 +185,7 @@ class Integration::Sunlight
     path.split('.').inject(hash) { |hash, key| hash.try(:[], key) }
   end
 
-  def self.get_json(endpoint_query)
+  def self.fetch_json(endpoint_query)
     JSON.parse(RestClient.get(endpoint_query))
   end
 

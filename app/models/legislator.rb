@@ -79,20 +79,15 @@ class Legislator < ActiveRecord::Base
       state = state.abbrev
     end
 
-    results = Integration::Sunlight.get_legislators(bioguide_id:  bioguide_id,
-                                                    district: district,
-                                                    state:    state,
-                                                    senate_class: senate_class)
-
-    if stats = results['legislators'].try(:first)
-      create_or_update(stats)
-    end
+    query_params = {bioguide_id: bioguide_id, district: district, state: state, senate_class: senate_class}.compact!
+    legislator_data = Integration::Sunlight.fetch_legislator(query_params: query_params)
+    create_or_update(legislator_data) if legislator_data
   end
 
-  def self.fetch_all
-    results = Integration::Sunlight.get_legislators(get_all: true)
+  def self.fetch_all(query_params={})
+    legislators = Integration::Sunlight.fetch_legislators(query_params: query_params)
 
-    if legislators = results['legislators']
+    if legislators
       legislators.each do |stats|
         create_or_update(stats)
       end
@@ -110,10 +105,9 @@ class Legislator < ActiveRecord::Base
   end
 
   def refetch
-    results = Integration::Sunlight.get_legislators(bioguide_id: bioguide_id)
-    if stats = results['legislators'].try(:first)
-      update(stats)
-    end
+    query_params = {bioguide_id: bioguide_id}
+    legislator_data = Integration::Sunlight.fetch_legislator(query_params: query_params)
+    update(legislator_data) if legislator_data
   end
 
   def senator?
