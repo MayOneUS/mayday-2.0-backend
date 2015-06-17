@@ -69,6 +69,7 @@ class Integration::NationBuilder
   def self.create_or_update_person(attributes:)
     rescue_oauth_errors do
       body = {'person': parse_person_attributes(attributes)}
+      Rails.logger.info "Pushing person to NationBuilder: #{body}"
       response = request_handler(endpoint_path: ENDPOINTS[:people], body: body, method: 'put')
       response['person']
     end
