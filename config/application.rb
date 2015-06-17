@@ -1,3 +1,5 @@
+rails_loading_start = Time.now
+
 require File.expand_path('../boot', __FILE__)
 
 require "active_model/railtie"
@@ -52,3 +54,6 @@ module Mayday
     config.middleware.use Rack::Deflater
   end
 end
+
+
+puts "Rails loaded in #{Time.now-rails_loading_start}s running Ruby #{RUBY_VERSION}" if Rails.env.test? || Rails.env.development?
