@@ -17,9 +17,9 @@ class Ivr::Recording < ActiveRecord::Base
 
   after_save :post_to_crm
 
-  def post_to_crm
-    if recording_url_changed?
-      custom_column = "recorded_message_#{call.campaign_ref}"
+  def post_to_crm(forced: false)
+    if recording_url_changed? || forced
+      custom_column = "recorded_message_#{call.campaign_ref}".downcase
       remote_attributes = {tags: [Activity::DEFAULT_TEMPLATE_IDS[:record_message]], custom_column => recording_url}
       person.update_remote_attributes(remote_attributes)
     end
