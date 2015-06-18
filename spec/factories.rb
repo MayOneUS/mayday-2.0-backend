@@ -106,7 +106,7 @@ FactoryGirl.define do
   factory :call, class: Ivr::Call do
     person
     sequence(:remote_id) { |n| "call_sid_#{n}" }
-
+    sequence(:campaign_ref) { |n| "campaign_ref_#{n}" }
   end
 
   factory :connection, class: Ivr::Connection do
@@ -122,6 +122,12 @@ FactoryGirl.define do
     trait :failed do
       status Ivr::Call::CALL_STATUSES[:failed]
     end
+  end
+
+  factory :ivr_recording, class: Ivr::Recording do
+    call
+    sequence(:recording_url) { |n| "http://somewebsite.com/00#{n}" }
+    sequence(:duration) { |n| 300+n }
   end
 
   factory :activity do

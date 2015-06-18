@@ -24,4 +24,9 @@ class Ivr::Recording < ActiveRecord::Base
       person.update_remote_attributes(remote_attributes)
     end
   end
+
+  # return number of uniq recording per user per campaign_ref
+  def self.uniq_count
+    Ivr::Recording.includes(:call).all.to_a.uniq{|r| [r.call.person_id, r.call.campaign_ref] }.size
+  end
 end
