@@ -15,6 +15,7 @@ class Integration::NationBuilder
     :mobile_opt_in, :mobile, :occupation, :phone, :recruiter_id, :sex, :request_ip, :skills, :rootstrikers_subscription, :uuid,
     :pledge_page_slug, :fundraising, :email_subscription, :maydayin30_entry_url, :voting_district_id, :map_lookup_district,
     :representative_call_attempts, :representative_calls_count, :voter_calls_count, :recorded_message_url,
+    :recorded_message_20150611_s1538, :recorded_message_20150329_hr20,
     registered_address: [:address1, :address2, :city, :state, :zip], tags: []]
   MAPPINGS_PERSON = {
     email: nil,
