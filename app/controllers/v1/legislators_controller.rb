@@ -2,7 +2,7 @@ class V1::LegislatorsController < V1::BaseController
 
   def index
     json = Rails.cache.fetch("legislators#index", expires_in: 12.hours) do
-      Legislator.with_includes.includes(:active_campaigns, :sponsorships, :bills).includes(:current_bills)
+      Legislator.with_includes.includes(:active_campaigns, :sponsorships, :bills, :current_bills)
         .order(:last_name,:first_name)
         .to_json( methods: [:name, :title, :state_name, :eligible, :image_url, :state_abbrev, :display_district, :with_us, :targeted?, ],
           only: [:id, :with_us, :party, :bioguide_id])
@@ -28,7 +28,7 @@ class V1::LegislatorsController < V1::BaseController
 
   def newest_supporters
     limit = params[:limit] || 5
-    # json = Rails.cache.fetch("legislators#index?limit=#{limit}", expires_in: 12.hours) do
+    json = Rails.cache.fetch("legislators#index?limit=#{limit}", expires_in: 12.hours) do
       json = Legislator.with_includes.joins(sponsorships: :bill)
         .where('sponsorships.id IS NOT NULL').merge(Bill.current)
         .merge(Sponsorship.most_recent_activity).first(limit).to_json(
@@ -36,7 +36,7 @@ class V1::LegislatorsController < V1::BaseController
           only: [:id, :party, :chamber, :state_rank, :last_name, :bioguide_id]
           # include: {last_activity: {methods: [:current_sponsorship_level, :endcurrent_sponsorship_at]}}
          )
-    # end
+    end
     render json: json
   end
 

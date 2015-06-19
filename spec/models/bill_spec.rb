@@ -23,7 +23,7 @@ describe Bill do
         hash = { bill_id: 'hr1',
                  chamber: 'senate',
                  congressional_session: 114 }
-        bill = Bill.create_or_update(hash)
+        bill = Bill.create_or_update(hash.dup)
         expect(bill.slice(*hash.keys).values).to eq hash.values
       end
     end
@@ -33,7 +33,7 @@ describe Bill do
         bill = FactoryGirl.create(:bill, bill_id: 'hr2', congressional_session: 90)
         hash = { bill_id: 'hr2',
                  congressional_session: 94 }
-        Bill.create_or_update(hash)
+        Bill.create_or_update(hash.dup)
         expect(bill.reload.slice(*hash.keys).values).to eq hash.values
       end
     end
