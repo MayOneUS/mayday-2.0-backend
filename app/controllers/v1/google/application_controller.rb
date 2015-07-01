@@ -1,10 +1,10 @@
 class V1::Google::ApplicationController < V1::BaseController
 
-  DEFAULT_FORM_PARAMS = %i[email zip first_name last_name phone]
+  DEFAULT_FORM_PARAMS = %i[email zip first_name last_name phone person]
 
   def create
-    Person.create_or_update(person_params)
-    if form_params.values.any?(&:present?)
+    person = Person.create_or_update(person_params)
+    if form_params.values.any?(&:present?) || (person && person.valid?)
       GoogleFormsSubmitJob.perform_later(self.class::FORM_ID, submission_data)
       submitted = true
     else
@@ -16,7 +16,9 @@ class V1::Google::ApplicationController < V1::BaseController
   private
 
   def person_params
-    params.permit(:email, :phone, :first_name, :last_name, :zip, :is_volunteer, :remote_fields)
+    person_params = params.permit(Person::PERMITTED_PUBLIC_FIELDS)
+    nested_person_params = params.permit(:person).try(:permit, Person::PERMITTED_PUBLIC_FIELDS)
+    person_params.merge(nested_person_params)
   end
 
   def submission_data

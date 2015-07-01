@@ -18,6 +18,7 @@ class Ivr::Call < ActiveRecord::Base
   has_many :called_legislators, -> { merge(Ivr::Connection.completed) }, through: :connections, source: :legislator
   has_many :attempted_legislators, through: :connections, source: :legislator
   has_one :last_connection, -> { order 'created_at desc' }, class_name: 'Ivr::Connection'
+  has_one :last_recording, -> { order 'created_at desc' }, class_name: 'Ivr::Recording'
   belongs_to :person, required: true
 
   delegate :target_legislators, :all_called_legislators, to: :person

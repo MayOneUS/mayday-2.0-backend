@@ -6,7 +6,8 @@ Rails.application.routes.draw do
       get :supporters_map, on: :collection, defaults: {format: :js}
     end
     resources :people, only: :create do
-      get :delete_all,    on: :collection
+      get :targets, on: :collection, action: :targets
+      post :targets, on: :collection, action: :targets
       get '/:identifier', on: :collection, action: :show, constraints: { identifier: /[^\/]+/} #allow email as identifier
     end
     resources :stats,       only: :index

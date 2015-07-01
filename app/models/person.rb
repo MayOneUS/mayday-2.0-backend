@@ -43,10 +43,17 @@ class Person < ActiveRecord::Base
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
 
+  scope :identify, -> identifier {
+    includes(:actions)
+    .where('email = :identifier OR uuid = :identifier OR phone = :identifier', identifier: identifier)
+  }
+
   alias_method :location_association, :location
   delegate :update_location, :district, :state, to: :location
 
-  FIELDS_ALSO_ON_NB = %w[email first_name is_volunteer last_name phone]
+
+  FIELDS_ALSO_ON_NB = %w[email first_name last_name is_volunteer phone]
+  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :address, :zip, :is_volunteer, remote_fields: [:event_id, :skills, tags: []]]
   DEFAULT_TARGET_COUNT = 100
 
   def self.create_or_update(person_params)
@@ -61,13 +68,11 @@ class Person < ActiveRecord::Base
       break if @person.present?
     end
 
-
     if search_values.any? && @person.present?
-      @person.update!(person_params)
+      @person.update(person_params)
     else
-      @person = create!(person_params)
+      @person = create(person_params)
     end
-
     @person
   end
 
@@ -184,7 +189,7 @@ class Person < ActiveRecord::Base
   end
 
   def self.update_nation_builder_call_counts!
-    select(:phone,:email,:id).all.includes(:connections).find_each do |person|
+    select(:phone,:email,:id).includes(:connections).find_each do |person|
       person.set_remote_call_counts!
     end
   end
@@ -227,8 +232,7 @@ class Person < ActiveRecord::Base
   end
 
   def save_location
-    if zip
-      update_location(address: address, zip: zip)
-    end
+    update_location(address: address, zip: zip) if zip
   end
+
 end

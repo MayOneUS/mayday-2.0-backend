@@ -27,6 +27,14 @@ class Ivr::Recording < ActiveRecord::Base
 
   # return number of uniq recording per user per campaign_ref
   def self.uniq_count
-    Ivr::Recording.includes(:call).all.to_a.uniq{|r| [r.call.person_id, r.call.campaign_ref] }.size
+    uniq_recordings.size
+  end
+
+  def self.uniq_recordings
+    Ivr::Recording.order('created_at desc').includes(:call).all.to_a.uniq{|r| [r.call.person_id, r.call.campaign_ref] }
+  end
+
+  def self.post_all_uniq_to_crm!(forced: false)
+    uniq_recordings.each{|recording| recording.post_to_crm(forced: forced) }
   end
 end

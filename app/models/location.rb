@@ -50,6 +50,10 @@ class Location < ActiveRecord::Base
     (state || district).try(:abbrev)
   end
 
+  def state_name
+    state.try(:name)
+  end
+
   private
 
   def updated_zip?(zip)
