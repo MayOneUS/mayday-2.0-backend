@@ -22,8 +22,6 @@ class V1::Google::ApplicationController < V1::BaseController
   def fetch_person_params
     person_params = params.permit(Person::PERMITTED_PUBLIC_FIELDS)
     nested_person_params = params.permit(person: Person::PERMITTED_PUBLIC_FIELDS)[:person]  || {}
-    puts "person_params: #{person_params.inspect}"
-    nested_person_params = params.permit(person: Person::PERMITTED_PUBLIC_FIELDS)[:person]
     person_params.merge(nested_person_params)
   end
 
