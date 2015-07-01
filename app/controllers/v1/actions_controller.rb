@@ -29,7 +29,7 @@ class V1::ActionsController < V1::BaseController
   end
 
   def set_person
-    person_params.map{|k,v| person_params[k]=v.strip}
+    person_params.map{|k,v| person_params[k] = v.try(:strip) || v }
     @person = Person.create_or_update(person_params) if person_params.present?
   end
 
