@@ -16,8 +16,12 @@ class V1::Google::ApplicationController < V1::BaseController
   private
 
   def person_params
+    @person_params ||= fetch_person_params
+  end
+
+  def fetch_person_params
     person_params = params.permit(Person::PERMITTED_PUBLIC_FIELDS)
-    nested_person_params = params.permit(:person).try(:permit, Person::PERMITTED_PUBLIC_FIELDS)
+    nested_person_params = params.permit(person: Person::PERMITTED_PUBLIC_FIELDS)[:person]
     person_params.merge(nested_person_params)
   end
 
@@ -26,8 +30,12 @@ class V1::Google::ApplicationController < V1::BaseController
   end
 
   def form_params
+    @form_params ||= fetch_form_params
+  end
+
+  def fetch_form_params
     allowed_params = (self.class::DEFAULT_FORM_PARAMS + self.class::MAPPINGS.keys).uniq
-    params.permit(allowed_params)
+    params.permit(*allowed_params).merge(person_params)
   end
 
   def form_data

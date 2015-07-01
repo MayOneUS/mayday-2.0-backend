@@ -36,9 +36,6 @@ class Person < ActiveRecord::Base
   validates :phone, presence: true, unless: :email
   phony_normalize :phone, default_country_code: 'US'
 
-  SUPPLAMENTRY_ATTRIBUTES = [:address, :zip, :remote_fields]
-  attr_accessor *SUPPLAMENTRY_ATTRIBUTES
-
   before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
   after_save :update_nation_builder, :save_location
@@ -51,10 +48,13 @@ class Person < ActiveRecord::Base
   alias_method :location_association, :location
   delegate :update_location, :district, :state, to: :location
 
-
   FIELDS_ALSO_ON_NB = %w[email first_name last_name is_volunteer phone]
-  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :address, :zip, :is_volunteer, remote_fields: [:event_id, :skills, tags: []]]
+  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :address, :city, :zip, :is_volunteer, remote_fields: [:event_id, :skills, tags: []]]
+  LOCATION_ATTRIBUTES = [:address, :zip, :city]
   DEFAULT_TARGET_COUNT = 100
+
+  SUPPLAMENTRY_ATTRIBUTES = [:remote_fields] + LOCATION_ATTRIBUTES
+  attr_accessor *SUPPLAMENTRY_ATTRIBUTES
 
   def self.create_or_update(person_params)
     search_values = person_params.symbolize_keys.slice(:uuid, :email, :phone).compact
@@ -163,7 +163,7 @@ class Person < ActiveRecord::Base
     #merge attributes
     updated_attributes = other.attributes.compact!.merge(attributes.compact!)
     update(updated_attributes)
-    location_attrs = updated_attributes.slice(:address, :zip)
+    location_attrs = updated_attributes.slice(LOCATION_ATTRIBUTES)
     update_location(location_attrs) if location_attrs.any?
 
     #cleanup
@@ -232,7 +232,7 @@ class Person < ActiveRecord::Base
   end
 
   def save_location
-    update_location(address: address, zip: zip) if zip
+    update_location(address: address, zip: zip, city: city) if zip
   end
 
 end
