@@ -116,7 +116,7 @@ describe V1::PeopleController,  type: :controller do
 
         it "updates location" do
           expect_any_instance_of(Location).to receive(:update_location).
-            with( {address: '2020 Oregon St', zip: '94703'}) { true }
+            with( {address: '2020 Oregon St', zip: '94703', city: nil}) { true }
 
           get :targets, person: {email: Faker::Internet.email, address: '2020 Oregon St', zip: '94703'}
         end

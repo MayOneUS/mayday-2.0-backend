@@ -149,7 +149,7 @@ describe Person do
 
     it "calls update location if zip present" do
       expect_any_instance_of(Location).to receive(:update_location).
-        with(address: '2020 Oregon St', zip: '94703') { true }
+        with(address: '2020 Oregon St', zip: '94703', city: nil) { true }
       Person.create(email: 'user@example.com', address: '2020 Oregon St', zip: '94703')
     end
 
