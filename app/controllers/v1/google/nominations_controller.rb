@@ -1,6 +1,5 @@
 class V1::Google::NominationsController < V1::Google::ApplicationController
   FORM_ID = '1sQtLTyZWA6KDsi7-ToB2VyOGaz44MZEHQ_fUvlX8VQ0'
-  FORM_FIELDS = %i[legislator_id selection_comment other_comment]
 
   MAPPINGS = {
     email:             'entry.1787607491',

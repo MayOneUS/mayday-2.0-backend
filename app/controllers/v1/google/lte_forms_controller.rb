@@ -1,6 +1,5 @@
 class V1::Google::LteFormsController < V1::Google::ApplicationController
   FORM_ID = '134sHDoCuId_Sh0NP0fC8Ifo07pZ6Y2yweI84l-MHIAQ'
-  FORM_FIELDS = %i[political_leaning congress_relationship volunteer_letter volunteer_attend volunteer_call]
 
   # NOTE: values for these mappings must match the options in the google form.
   MAPPINGS = {

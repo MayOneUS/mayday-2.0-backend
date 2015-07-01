@@ -26,7 +26,7 @@ class V1::Google::ApplicationController < V1::BaseController
   end
 
   def form_params
-    allowed_params = self.class::DEFAULT_FORM_PARAMS + self.class::FORM_FIELDS
+    allowed_params = (self.class::DEFAULT_FORM_PARAMS + self.class::MAPPINGS.keys).uniq
     params.permit(allowed_params)
   end
 
