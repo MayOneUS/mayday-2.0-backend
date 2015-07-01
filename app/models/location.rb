@@ -32,6 +32,11 @@ class Location < ActiveRecord::Base
         state:      source.try(:state),
         zip_code:   source.try(:zip_code) || address_params[:zip]
       }.compact!
+
+      if new_attributes.nil?
+        Airbrake.notify(error_messasage: 'Error in lookup - perhaps service is down?')
+        new_attributes = {}
+      end
       new_attributes[:district] = source.is_a?(District) ? source : source.try(:single_district)
 
       update_attributes(new_attributes)
