@@ -28,6 +28,10 @@ RSpec.describe V1::ActionsController, type: :controller do
         target_action = @person.actions.where(activity: @activity).last
         expect(target_action.source_url).to eq(target_url)
       end
+      it 'passes along tags in remote_fields' do
+        post :create, person: { email: @person.email, remote_fields: {tags: %w[one two]} }, template_id: 'real_id'
+        expect(response).to be_success
+      end
     end
     context "with bad params" do
       it "returns error if person is missing" do
