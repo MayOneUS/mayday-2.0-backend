@@ -1,4 +1,5 @@
-class Integration::NationBuilder
+module Integration
+class NationBuilder
 
   STANDARD_HEADERS = {'Accept' => 'application/json', 'Content-Type' => 'application/json'}
   ENDPOINTS = {
@@ -160,4 +161,5 @@ class Integration::NationBuilder
     Hash[hash.map {|k, v| [mappings[k] || k, v] }]
   end
 
+end
 end
