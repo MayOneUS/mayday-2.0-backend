@@ -135,6 +135,25 @@ We monitor these URLs using [Pingdom](https://www.pingdom.com/) and alert our Sl
 
 We also run the sidekiq dashboard UI on our Heroku servers. You can access it by going to `/sidekiq`. Ask another MAYDAY Tech Team member for the password to this dashboard on our staging and production servers.
 
+### Troubleshooting
+
+Sometimes the production site has hiccups. Here are tips on how to solve some common ones:
+
+#### Maxing out Postgres connections
+
+Sometimes a New Relic alert gets triggered because our Heroku dynos can't connect to the Postgres database. This is most likely because the Postgres database has run out connections - our current plan only allows for 20.
+
+Until we can figure out something better, solve this by running `heroku pg:psql --app mayone-prod`. Then run:
+
+```
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE datname = current_database()
+  AND pid <> pg_backend_pid();
+```
+
+That will terminate all connections to the Postgres database. You should then run `heroku restart --app mayone-prod` **immediately** so that all worker and web dynos reestablish their connections to the database.
+
 ## Contributing / Code Review Process
 
 Key Goal: Ensure at least two parties have reviewed any code commited for "production."
