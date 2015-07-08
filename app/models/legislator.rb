@@ -204,7 +204,7 @@ class Legislator < ActiveRecord::Base
   end
 
   def targeted?
-    active_campaigns.any? && !sponsorships.any?
+    active_campaigns.any? && !current_sponsorships.any?
   end
 
   private
