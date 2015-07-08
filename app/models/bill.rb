@@ -24,7 +24,8 @@ class Bill < ActiveRecord::Base
   validates :bill_id, uniqueness: true
 
   CURRENT_SESSION = 114 # better way to handle this?
-  TRACKED_BILL_IDS = %w[hr20-114 hr424-114 hr20-113 hr270-113 hr6448-112 s1538-114]
+  TRACKED_BILL_IDS = %w[hr20-114 hr424-114 s1538-114 hr20-113 hr270-113 hr6448-112]
+  CHAMBER_SIZES = {senate: 100, house: 435}
 
   scope :current, -> { where(congressional_session: CURRENT_SESSION) }
   scope :session, -> session { where(congressional_session: session) }
@@ -91,7 +92,7 @@ class Bill < ActiveRecord::Base
   end
 
   def chamber_size
-    Legislator.where(chamber: chamber).in_office.count # need to remove extra states or this will return 439
+    CHAMBER_SIZES[chamber.to_sym]
   end
 
   def name

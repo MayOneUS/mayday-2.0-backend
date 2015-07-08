@@ -1,5 +1,6 @@
 class V1::BillsController < V1::BaseController
   before_action :set_bill
+
   def supporter_counts
     render
   end
