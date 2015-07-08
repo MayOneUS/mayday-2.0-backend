@@ -154,6 +154,26 @@ describe Legislator do
 
   end
 
+  describe "#targeted?" do
+    it "is not targeted by default?" do
+      rep = FactoryGirl.create(:representative)
+      expect(rep.targeted?).to be_falsy
+    end
+    context "in a campaign" do
+      it "is targeted" do
+        rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+        expect(rep.targeted?).to be_truthy
+      end
+
+      context "a cosponsor" do
+        it "is not targeted" do
+          rep = FactoryGirl.create(:representative, :targeted, :cosponsor, priority: 1)
+          expect(rep.targeted?).to be_falsy
+        end
+      end
+    end
+  end
+
   describe "#title" do
     it "returns Senator for senators" do
       expect(FactoryGirl.build(:senator).title).to eq('Senator')
