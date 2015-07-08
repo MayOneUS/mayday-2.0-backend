@@ -13,6 +13,7 @@ describe Ivr::RecordingsController,  type: :controller do
 
     @active_call = double('active_call')
     allow(@active_call).to receive(:new_record?).and_return(false)
+    allow(@active_call).to receive(:campaign_ref).and_return(Ivr::RecordingsController::HOUSE_RECORDING_STRING)
     allow(@active_call).to receive_message_chain(:recordings, :create!).and_return(recording)
     allow(@active_call).to receive(:person).and_return(person)
     allow(Ivr::Call).to receive_message_chain(:includes, :find_or_initialize_by).and_return(@active_call)
@@ -27,6 +28,22 @@ describe Ivr::RecordingsController,  type: :controller do
       expect(xml_response.css('Gather')).to be_present
       expect(xml_response.css('Gather').attribute('method')[0].value).to eq('get')
       expect(xml_response.css('Gather').attribute('action')[0].value).to eq(ivr_recordings_new_recording_url)
+    end
+    it "plays the senate intro message as default" do
+      setup_active_call_double
+      allow(@active_call).to receive(:campaign_ref).and_return('someotherrandomstring')
+
+      get :start, 'CallSid': 123
+      xml_response = Oga.parse_xml(response.body)
+
+      expect(xml_response.css('Play').text).to include('recording_tool_intro_senate')
+    end
+    it "plays the house intro message" do
+      setup_active_call_double
+      get :start, 'CallSid': 123
+      xml_response = Oga.parse_xml(response.body)
+
+      expect(xml_response.css('Play').text).to include('recording_tool_intro')
     end
     it "creates a new call when none exists" do
       post_params = {

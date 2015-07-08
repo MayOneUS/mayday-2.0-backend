@@ -1,6 +1,7 @@
 class Ivr::RecordingsController < Ivr::ApplicationController
 
   after_filter :set_header
+  HOUSE_RECORDING_STRING = 'hr20'
 
   # Public: initiates the call process via a request from twillio
   #
@@ -61,7 +62,11 @@ class Ivr::RecordingsController < Ivr::ApplicationController
 
   def ready_for_connection?(twilio_renderer)
     twilio_renderer.Gather(action: ivr_recordings_new_recording_url, method: 'get', 'numDigits' => 1) do |gather|
-      play_audio(gather, 'recording_tool_intro_senate')
+      if active_call.campaign_ref =~ /#{HOUSE_RECORDING_STRING}/i
+        play_audio(gather, 'recording_tool_intro')
+      else
+        play_audio(gather, 'recording_tool_intro_senate')
+      end
       play_audio(gather, 'recording_press_star_start')
       3.times do
         gather.Pause(length: 5)
