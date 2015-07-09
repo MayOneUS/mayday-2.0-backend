@@ -145,7 +145,7 @@ class Person < ActiveRecord::Base
   end
 
   def create_action(params)
-    if activity = Activity.find_by(template_id: params[:template_id])
+    if activity = Activity.find_or_create_by(template_id: params[:template_id])
       action_params = params.slice(:utm_source, :utm_medium, :utm_campaign, :source_url)
       actions.create!(action_params.merge(activity: activity))
     end
