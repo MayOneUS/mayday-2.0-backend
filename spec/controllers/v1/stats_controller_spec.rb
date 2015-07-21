@@ -10,7 +10,7 @@ describe V1::StatsController,  type: :controller do
 
   before do
     allow(Activity).to receive_message_chain(:find_by_template_id,:actions,:count).and_return(@fake_counts[:letter_signers])
-    allow(Ivr::Recording).to receive(:uniq_count).and_return(@fake_counts[:recordings_uniq])
+    allow(Ivr::Recording).to receive_message_chain(:active_recordings, :length).and_return(@fake_counts[:recordings_uniq])
     allow(Ivr::Recording).to receive(:count).and_return(@fake_counts[:recordings_total])
   end
 
