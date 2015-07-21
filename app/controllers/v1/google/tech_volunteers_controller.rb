@@ -18,6 +18,10 @@ class V1::Google::TechVolunteersController < V1::Google::ApplicationController
     skill_data_science:  'entry_1474537175',
     skill_other:         'entry_1720449155',
     meeting_time:        'entry_985686648',
+    july_23_2pm:         'entry_58968344',
+    july_26_9pm:         'entry_1549379093',
+    july_29_2pm:         'entry_1535876375',
+    july_29_9pm:         'entry_1990840195'
   }
 
 end
