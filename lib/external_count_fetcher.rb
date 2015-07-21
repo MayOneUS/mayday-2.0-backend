@@ -58,7 +58,7 @@ class ExternalCountFetcher
         when :house_supporters    then Legislator.house.with_us.count
         when :senate_supporters   then Legislator.senate.with_us.count
         when :letter_signers      then Activity.find_by_template_id('sign-letter-form').try(:actions).try(:count) || 0
-        when :recordings_uniq     then Ivr::Recording.uniq_count
+        when :recordings_uniq     then Ivr::Recording.active_recordings.length
         when :recordings_total    then Ivr::Recording.count
         else raise ArgumentError, "Unknown Key: #{key}"
       end

@@ -17,6 +17,10 @@ class Ivr::Recording < ActiveRecord::Base
 
   after_save :post_to_crm
 
+  def self.active_recordings
+    Ivr::Call.where(call_type: 'record_message').includes(:person, :last_recording).to_a.uniq{|call| [call.person_id, call.campaign_ref] }.map(&:last_recording)
+  end
+
   def post_to_crm(forced: false)
     if recording_url_changed? || forced
       custom_column = "recorded_message_#{call.campaign_ref}".downcase
