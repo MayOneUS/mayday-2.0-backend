@@ -1,15 +1,18 @@
 # == Schema Information
 #
-# Table name: calls
+# Table name: ivr_calls
 #
-#  id         :integer          not null, primary key
-#  remote_id  :string
-#  person_id  :integer
-#  status     :string
-#  duration   :integer
-#  ended_at   :datetime
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id                  :integer          not null, primary key
+#  remote_id           :string
+#  person_id           :integer
+#  status              :string
+#  duration            :integer
+#  ended_at            :datetime
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  call_type           :string
+#  remote_origin_phone :string
+#  campaign_ref        :string
 #
 
 class Ivr::Call < ActiveRecord::Base

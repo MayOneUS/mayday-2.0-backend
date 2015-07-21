@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: connections
+# Table name: ivr_connections
 #
 #  id               :integer          not null, primary key
 #  remote_id        :string
