@@ -32,6 +32,11 @@ RSpec.describe V1::ActionsController, type: :controller do
         post :create, person: { email: @person.email, remote_fields: {tags: %w[one two]} }, template_id: 'real_id'
         expect(response).to be_success
       end
+      it 'creates new activity when none are found' do
+        expect{
+          post :create, person: { email: @person.email }, template_id: 'new_template_id'
+        }.to change{Activity.count}
+      end
     end
     context "with bad params" do
       it "returns error if person is missing" do
@@ -39,10 +44,10 @@ RSpec.describe V1::ActionsController, type: :controller do
         expect(JSON.parse(response.body)['success']).to be_nil
         expect(JSON.parse(response.body)['error']).to eq 'person is required'
       end
-      it "returns error if person is incomplete or template_id is bad" do
-        post :create, person: { foo: 'bar' }, template_id: 'fake_id'
+      it "returns error if person is incomplete" do
+        post :create, person: { foo: 'bar' }, template_id: 'new_id'
         expect(JSON.parse(response.body)['success']).to be_nil
-        expect(JSON.parse(response.body)['error']).to eq "Person can't be blank. Activity can't be blank. Activity not found."
+        expect(JSON.parse(response.body)['error']).to eq "Person can't be blank."
       end
       it "returns error if template_id is not provided" do
         post :create, person: { foo: 'bar' }

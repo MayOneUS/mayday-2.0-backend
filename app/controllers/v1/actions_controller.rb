@@ -2,7 +2,7 @@ class V1::ActionsController < V1::BaseController
   before_action :set_person
 
   def create
-    activity = Activity.find_by(template_id: activity_param)
+    activity = Activity.find_or_create_by(template_id: activity_param)
 
     action_attributes = {person: @person, activity: activity}.merge(action_params)
     action = Action.create(action_attributes)
