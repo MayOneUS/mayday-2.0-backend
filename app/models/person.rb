@@ -126,7 +126,11 @@ class Person < ActiveRecord::Base
   end
 
   def completed_activity?(activity)
-    activities.include?(activity)
+    completed_activity_ids.include?(activity.id)
+  end
+
+  def completed_activity_ids
+    @completed_activity_ids ||= activity_ids
   end
 
   def activities_hash
