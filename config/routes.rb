@@ -32,8 +32,11 @@ Rails.application.routes.draw do
       get :press_releases, on: :collection
     end
     get '/people/targets', to: 'people#targets'
+    get '/bills/:id/supporter_counts', to: 'bills#supporter_counts'
     get '/bills/supporter_counts', to: 'bills#supporter_counts'
+    get '/bills/:id/timeline', to: 'bills#timeline'
     get '/bills/timeline', to: 'bills#timeline'
+
   end
 
   namespace :ivr do
