@@ -67,7 +67,7 @@ class Ivr::CallsController < Ivr::ApplicationController
     active_connection = Ivr::Connection.find(params[:connection_id])
     active_connection.update(status_from_user: Ivr::Connection::USER_RESPONSE_CODES[params['Digits']])
     response = Twilio::TwiML::Response.new do |r|
-      if active_call.finished_loop?
+      if active_call.finished_loop?  || active_call.next_target.nil?
         close_call(r)
       else
         r.Play AudioFileFetcher.encouraging_audio_for_count(active_call.encouraging_count)
@@ -102,7 +102,7 @@ class Ivr::CallsController < Ivr::ApplicationController
           end
         end
       else
-        play_audio(twilio_renderer, 'no_targets')
+        twilio_renderer.Say('You\'re all done. Thanks for supporting fundamental reform of the way elections are funded.')
       end
     end
     play_audio(twilio_renderer, 'goodbye')
