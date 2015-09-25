@@ -12,6 +12,7 @@ class AudioFileFetcher
     encouraging_2
     encouraging_3
     encouraging_4
+    encouraging_5
     goodbye
     intro_message
     no_connection

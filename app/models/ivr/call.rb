@@ -38,7 +38,7 @@ class Ivr::Call < ActiveRecord::Base
     failed:    'failed'
   }
 
-  CONNECTION_LOOP_COUNT = 5
+  CONNECTION_LOOP_MAX = 6
 
   def set_default_campaign
     self.campaign ||= Campaign.active_default
@@ -65,11 +65,11 @@ class Ivr::Call < ActiveRecord::Base
   end
 
   def encouraging_count
-    (connections.length % Ivr::Call::CONNECTION_LOOP_COUNT)
+    (connections.length % CONNECTION_LOOP_MAX)
   end
 
   def finished_loop?
-    (connections.length > 0) && connections.length % Ivr::Call::CONNECTION_LOOP_COUNT == 0
+    (connections.length > 0) && connections.length % Ivr::Call::CONNECTION_LOOP_MAX == 0
   end
 
 end

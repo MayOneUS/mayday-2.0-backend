@@ -122,16 +122,16 @@ describe Ivr::Call, type: :model do
       allow(call).to receive(:connections).and_return(Array.new(connections_count,0))
       call
     end
-    it "returns false with 3 connections" do
-      call = setup_call_with_connections(3)
+    it "returns false with loop_max_size-2 connections" do
+      call = setup_call_with_connections(Ivr::Call::CONNECTION_LOOP_MAX - 2)
       expect(call.finished_loop?).to be false
     end
-    it "returns true with 5 connections" do
-      call = setup_call_with_connections(5)
+    it "returns true with loop_max_size connections" do
+      call = setup_call_with_connections(Ivr::Call::CONNECTION_LOOP_MAX)
       expect(call.finished_loop?).to be true
     end
-    it "returns false with 7 connections" do
-      call = setup_call_with_connections(7)
+    it "returns false with loop_max_size+2 connections" do
+      call = setup_call_with_connections(Ivr::Call::CONNECTION_LOOP_MAX + 2)
       expect(call.finished_loop?).to be false
     end
   end

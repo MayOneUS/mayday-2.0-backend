@@ -17,12 +17,12 @@ describe AudioFileFetcher do
 
   describe "#encouraging_audio_for_count" do
     it "returns an encouraging_audio url" do
-      target_count = Ivr::Call::CONNECTION_LOOP_COUNT-1
+      target_count = Ivr::Call::CONNECTION_LOOP_MAX-1
       expected_url = AudioFileFetcher.encouraging_audio_for_count(target_count)
       expect(expected_url).to match(/encouraging_#{target_count}/)
     end
     it "raise an error for invalid keys" do
-      target_count = Ivr::Call::CONNECTION_LOOP_COUNT
+      target_count = Ivr::Call::CONNECTION_LOOP_MAX
       expect{
         AudioFileFetcher.encouraging_audio_for_count(target_count)
       }.to raise_error(ArgumentError)
