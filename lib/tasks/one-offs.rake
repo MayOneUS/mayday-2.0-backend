@@ -144,7 +144,7 @@ namespace :ivr do
     require 'open-uri'
     require 'csv'
     target_recordings = Ivr::Recording.active_recordings.compact
-    attributes = %i[id name created_at recording_url duration file_name campaign_ref phone]
+    attributes = %i[id name created_at file_name duration campaign_ref phone]
 
     csv_string = CSV.generate do |csv|
       csv << attributes
@@ -160,8 +160,7 @@ namespace :ivr do
           recording.call.person.phone
         ]
         puts "storing #{recording.recording_url} as #{file_name}"
-        `wget -nc #{recording.recording_url}`
-        `mv #{recording.recording_url.sub(/.+\/Recordings\//,'')} #{file_name} `
+        `wget -nc -c -O #{file_name} #{recording.recording_url}`
       end;0
     end;0
 
