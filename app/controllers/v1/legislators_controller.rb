@@ -23,7 +23,7 @@ class V1::LegislatorsController < V1::BaseController
   end
 
   def targeted
-    render json: Legislator.with_includes.includes(:bills).targeted
+    render json: Legislator.with_includes.includes(:bills).default_targeted
   end
 
   def newest_supporters

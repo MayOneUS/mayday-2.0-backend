@@ -11,7 +11,8 @@ class V1::Ivr::CallsController < V1::BaseController
       remote_id: twilio_call.sid,
       call_type: call_type,
       remote_origin_phone: twilio_app_number,
-      campaign_ref: params[:campaign_ref]
+      campaign_ref: params[:campaign_ref],
+      campaign_id: params[:campaign_id]
     )
 
     output = {call_sid: call.remote_id}

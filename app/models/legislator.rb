@@ -50,17 +50,16 @@ class Legislator < ActiveRecord::Base
   validates :district, absence:  true, if: :senator?
   validates :state,    presence: true, if: :senator?
 
-  scope :senate,       -> { where(chamber: 'senate') }
-  scope :with_includes,-> { includes({ district: :state }, :state) }
-  scope :house,        -> { where(chamber: 'house') }
-  scope :eligible,     -> { where('term_end < ?', 2.years.from_now) }
-  scope :targeted,     -> { joins(:campaigns).merge(Campaign.active) }
-  scope :priority,     -> { targeted.merge(Target.priority) }
-  scope :unconvinced,  -> { includes(:sponsorships).where(:sponsorships => { :id => nil }) }
-  scope :with_us,      -> { joins(sponsorships: :bill) }
-  scope :in_office,    -> { where(in_office: true) }
+  scope :senate,            -> { where(chamber: 'senate') }
+  scope :with_includes,     -> { includes({ district: :state }, :state) }
+  scope :house,             -> { where(chamber: 'house') }
+  scope :eligible,          -> { where('term_end < ?', 2.years.from_now) }
+  scope :default_targeted,  -> { joins(:campaigns).merge(Campaign.active).merge(Target.priority) }
+  scope :unconvinced,       -> { includes(:sponsorships).where(:sponsorships => { :id => nil }) }
+  scope :with_us,           -> { joins(sponsorships: :bill) }
+  scope :in_office,         -> { where(in_office: true) }
   scope :current_supporters,-> { joins(sponsorships: :bill).where('sponsorships.id IS NOT NULL').distinct.merge(Bill.current) }
-  scope :allowed_states,-> {
+  scope :allowed_states,    -> {
     joins({district: :state}, :state)
     .where('states.abbrev IN (:state_abbrev)', state_abbrev: ALLOWED_STATES) }
 
@@ -100,8 +99,8 @@ class Legislator < ActiveRecord::Base
     find_or_initialize_by(bioguide_id: bioguide_id).tap{|l| l.update(hash)}
   end
 
-  def self.default_targets
-    priority
+  def self.targeted_by_campaign(id)
+    default_targeted.where(campaigns: {id: id})
   end
 
   def refetch

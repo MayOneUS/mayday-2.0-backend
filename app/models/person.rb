@@ -106,18 +106,23 @@ class Person < ActiveRecord::Base
     legislators && legislators.include?(legislator)
   end
 
-  def unconvinced_legislators
+  def unconvinced_local_legislators
     legislators && legislators.unconvinced.eligible
   end
 
-  def other_targets(count:, excluding:)
-    Legislator.includes(:current_bills).with_includes.default_targets.where.not(id: excluding.map(&:id)).limit(count) || []
+  def other_targets(count:, excluding:, campaign_id: nil)
+    legislators_scope = Legislator.includes(:current_bills).with_includes
+    if campaign_id.nil?
+      legislators_scope.default_targeted
+    else
+      legislators_scope.targeted_by_campaign(campaign_id)
+    end.where.not(id: excluding.map(&:id)).limit(count) || []
   end
 
-  def target_legislators(json: false, count: DEFAULT_TARGET_COUNT)
-    locals = unconvinced_legislators || []
+  def target_legislators(json: false, count: DEFAULT_TARGET_COUNT, campaign_id: nil)
+    locals = unconvinced_local_legislators || []
     remaining_count = count - locals.size
-    others = other_targets(count: remaining_count, excluding: locals)
+    others = other_targets(count: remaining_count, excluding: locals, campaign_id: campaign_id)
     if json
       locals.as_json(extras: { 'local' => true }) + others.as_json(extras: { 'local' => false })
     else
@@ -156,7 +161,7 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def merge!(other, options={})
+  def merge!(other)
     raise "cannot merge wit a new record" if other.new_record?
     raise "cannot merge with myself" if other == self
 
@@ -176,14 +181,14 @@ class Person < ActiveRecord::Base
     save!
   end
 
-  def self.merge_duplicates!(records,options)
+  def self.merge_duplicates!(records, compare_on:)
     records.each do |record|
       next if record.nil?
       records.each do |other|
         next if other.nil?
         next if other == record
-        next if other.send(options[:compare]).blank? || record.send(options[:compare]).blank?
-        is_comparable = other.send(options[:compare]) == record.send(options[:compare])
+        next if other.send(compare_on).blank? || record.send(compare_on).blank?
+        is_comparable = other.send(compare_on) == record.send(compare_on)
         next unless is_comparable
 
         #merge and remove the other

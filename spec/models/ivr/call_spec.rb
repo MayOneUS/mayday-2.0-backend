@@ -13,11 +13,27 @@
 #  call_type           :string
 #  remote_origin_phone :string
 #  campaign_ref        :string
+#  campaign_id         :integer
 #
 
 require 'rails_helper'
 
 describe Ivr::Call, type: :model do
+  describe "#create" do
+    context "with an active default campaign" do
+      it "stores the default as the parent campaign" do
+        default_campaign = FactoryGirl.create(:campaign, is_default: true)
+        call = FactoryGirl.create(:call)
+        expect(call.campaign).to eq(default_campaign)
+      end
+      it "won't reset a call's existing campaign" do
+        default_campaign = FactoryGirl.create(:campaign, is_default: true)
+        other_campaign = FactoryGirl.create(:campaign)
+        call = FactoryGirl.create(:call, campaign: other_campaign)
+        expect(call.campaign).to eq(other_campaign)
+      end
+    end
+  end
   describe "#create_connection!" do
     it "creates a connection" do
       FactoryGirl.create(:representative, :targeted, priority: 1)
@@ -74,6 +90,18 @@ describe Ivr::Call, type: :model do
         expect(legislators_targeted).to include(@legislators[1])
         expect(legislators_targeted).to include(@legislators[2])
         expect(legislators_targeted).not_to include(@legislators[0])
+      end
+
+      it "returns legislators that haven been called in other campaigns" do
+        legislators_targeted_setup
+        alternative_campaign = FactoryGirl.create(:campaign_with_reps, count: 3)
+        target_in_two_campaigns = FactoryGirl.create(:rep_target, legislator: @legislators[0])
+
+        target_person = @call.person
+        second_call = FactoryGirl.create(:call, person: target_person, campaign_id: target_in_two_campaigns.campaign_id)
+        legislators_targeted = second_call.legislators_targeted
+
+        expect(legislators_targeted).to include(target_in_two_campaigns.legislator)
       end
 
     end

@@ -120,11 +120,20 @@ describe Legislator do
   end
 
   describe "scopes" do
-    describe ".priority" do
-      it "only returns priority targets" do
-        rep = FactoryGirl.create(:representative, :targeted, priority: 1)
-        FactoryGirl.create(:representative, :targeted)
-        expect(Legislator.priority).to eq [rep]
+    describe ".default_targeted" do
+      subject do
+        @rep = FactoryGirl.create(:representative, :targeted, priority: 1)
+        @rep2 = FactoryGirl.create(:representative, :targeted)
+        @rep3 = FactoryGirl.create(:representative)
+        Legislator.default_targeted
+      end
+      it "only returns default targets" do
+        expect(subject.length).to eq(2)
+        expect(subject).not_to include(@rep3)
+      end
+      it "returns targets in priority order" do
+        expect(subject[0]).to eq(@rep)
+        expect(subject[1]).to eq(@rep2)
       end
     end
 
@@ -152,6 +161,21 @@ describe Legislator do
       end
     end
 
+  end
+
+  describe ".targeted_by_campaign" do
+    subject do
+      campaign = FactoryGirl.create(:campaign_with_reps, count: 3)
+      @alternative_target = FactoryGirl.create(:rep_target)
+      Legislator.targeted_by_campaign(campaign.id)
+    end
+    it "returns the right number of legislators from targeted campaign" do
+      expect(subject.length).to eq(3)
+    end
+    it "doesn't return legislators from other campaigns" do
+      expect(subject).not_to include(@alternative_target)
+    end
+    
   end
 
   describe "#targeted?" do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150611180719) do
+ActiveRecord::Schema.define(version: 20150924234313) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(version: 20150611180719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "ended_at"
+    t.boolean  "is_default"
   end
 
   create_table "districts", force: :cascade do |t|
@@ -100,6 +101,7 @@ ActiveRecord::Schema.define(version: 20150611180719) do
     t.string   "call_type"
     t.string   "remote_origin_phone"
     t.string   "campaign_ref"
+    t.integer  "campaign_id"
   end
 
   add_index "ivr_calls", ["person_id"], name: "index_ivr_calls_on_person_id", using: :btree

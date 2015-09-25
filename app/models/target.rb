@@ -14,5 +14,5 @@ class Target < ActiveRecord::Base
   belongs_to :campaign
   belongs_to :legislator
 
-  scope :priority, -> { where.not(priority: nil).order(:priority) }
+  scope :priority, -> { order('priority DESC NULLS LAST') }
 end

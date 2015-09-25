@@ -191,16 +191,15 @@ describe Person do
 
     describe "#other_targets" do
 
-      it "only returns priority legislators" do
-        FactoryGirl.create(:representative, :targeted)
-        priority_rep = FactoryGirl.create(:representative, :targeted, priority: 1)
-
-        expect(voter.other_targets(count: 5, excluding: [])).to eq [priority_rep]
+      it "only returns targeted legislators" do
+        targeted_reps = FactoryGirl.create_list(:representative, 2, :targeted)
+        result_reps = voter.other_targets(count: 5, excluding: [])
+        expect(result_reps).to eq(targeted_reps)
       end
 
       it "excludes legislators" do
         rep1 = FactoryGirl.create(:representative, :targeted, priority: 1)
-        rep2 = FactoryGirl.create(:representative, :targeted, priority: 1)
+        rep2 = FactoryGirl.create(:representative, :targeted, priority: 2)
 
         expect(voter.other_targets(count: 5, excluding: [rep1])).to eq [rep2]
       end
