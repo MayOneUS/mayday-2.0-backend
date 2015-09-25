@@ -6,7 +6,7 @@ namespace :db do
 
     desc "Seed a fake campaign"
     task dummy_campaign: :environment do
-      campaign = Campaign.create(name: "TEST campaign #{Time.now.strftime("%Y-%m-%d")}")
+      campaign = Campaign.create(name: "TEST campaign #{Time.now.strftime("%Y-%m-%d")}", is_default: true)
       # ids = %w[M001196 B001296 A000373 T000474 A000371 L000581 E000215 P000604 F000043 J000032 S001156 C001066 C001049 D000482 C001097 G000571 C001061 J000294 G000575 N000188 V000081 V000132]
       ids = ["T000193", "B000490", "L000563", "G000559", "K000380", "L000263", "D000623", "V000108", "H001038", "C001063", "R000599"] #fake targets from 04/17
       campaign.legislators = Legislator.where(bioguide_id: ids)
