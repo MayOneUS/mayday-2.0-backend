@@ -175,7 +175,6 @@ describe Legislator do
     it "doesn't return legislators from other campaigns" do
       expect(subject).not_to include(@alternative_target)
     end
-    
   end
 
   describe "#targeted?" do

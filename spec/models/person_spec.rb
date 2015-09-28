@@ -222,9 +222,9 @@ describe Person do
           expect(person.target_legislators).to eq [rep]
         end
 
-        it "returns local target followed by other targets" do
+        it "returns local target followed by other targets, if targeted" do
           rep = FactoryGirl.create(:representative, :targeted, priority: 1)
-          unconvinced_senator = FactoryGirl.create(:senator, state: voter.state)
+          unconvinced_senator = FactoryGirl.create(:senator, :targeted, state: voter.state)
           expect(legislators).to eq [unconvinced_senator, rep]
         end
 
@@ -243,6 +243,20 @@ describe Person do
         it "doesn't include ineligible senators" do
           senator = FactoryGirl.create(:senator, state: voter.state, term_end: 3.years.from_now)
           expect(legislators).not_to include senator
+        end
+
+        it "doesn't return untargeted locals" do
+          local_rep = FactoryGirl.create(:representative, district: voter.district)
+          expect(legislators).not_to include local_rep
+        end
+
+        it "doesn't return untargeted locals into the current campaign" do
+          local_rep = FactoryGirl.create(:representative, :targeted, district: voter.district)
+          campaign = FactoryGirl.create(:campaign_with_reps, count: 3)
+
+          targeted = voter.target_legislators(campaign_id: campaign.id)
+
+          expect(targeted).not_to include local_rep
         end
       end
 
