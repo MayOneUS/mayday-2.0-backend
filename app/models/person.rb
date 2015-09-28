@@ -106,7 +106,19 @@ class Person < ActiveRecord::Base
     legislators && legislators.include?(legislator)
   end
 
-  def unconvinced_local_legislators(campaign_id: nil)
+  def unconvinced_local_legislators
+    legislators && legislators.unconvinced.eligible
+  end
+
+  def targeted_local_legislators(campaign_id: nil)
+    if campaign_id.nil?
+      legislators && unconvinced_local_legislators.default_targeted
+    else
+      local_legislators_targeted_by(campaign_id: campaign_id)
+    end
+  end
+
+  def local_legislators_targeted_by(campaign_id:)
     legislators && legislators.unconvinced.eligible.targeted_by_campaign(campaign_id)
   end
 
@@ -120,11 +132,11 @@ class Person < ActiveRecord::Base
   end
 
   def target_legislators(json: false, count: DEFAULT_TARGET_COUNT, campaign_id: nil)
-    locals = unconvinced_local_legislators(campaign_id: campaign_id) || []
+    locals = targeted_local_legislators(campaign_id: campaign_id) || []
     remaining_count = count - locals.length
     others = other_targets(count: remaining_count, excluding: locals, campaign_id: campaign_id)
     if json
-      locals.as_json(extras: { 'local' => true }) + others.as_json(extras: { 'local' => false })
+      locals.as_json(extras: { local: true }) + others.as_json(extras: { local: false })
     else
       locals + others
     end

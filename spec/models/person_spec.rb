@@ -268,9 +268,9 @@ describe Person do
         end
 
         it "sets local attribute for all targets" do
-          FactoryGirl.create(:senator, state: voter.state)
+          FactoryGirl.create(:senator, :targeted, state: voter.state)
           FactoryGirl.create(:representative, :targeted, priority: 1)
-          locals = voter.target_legislators(json: true).map{|l| l['local']}
+          locals = voter.target_legislators(json: true).map{|leg| leg[:local] }
           expect(locals).to eq [true, false]
         end
 
