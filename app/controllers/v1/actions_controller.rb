@@ -1,5 +1,5 @@
 class V1::ActionsController < V1::BaseController
-  before_action :set_person
+  before_action :set_person, only: :create
 
   def create
     activity = Activity.find_or_create_by(template_id: activity_param)
@@ -14,6 +14,17 @@ class V1::ActionsController < V1::BaseController
     render template: 'v1/people/show'
   end
 
+  def count
+    finder = Action
+    finder = finder.by_type(params[:activity_type]) if params[:activity_type].present?
+    if params[:start_at].present?
+      start_at = DateTime.parse(params[:start_at])
+      end_at = DateTime.parse(params[:end_at]) if params[:end_at].present?
+      finder = finder.by_date(start_at, end_at)
+    end
+    render json: {count: finder.count}
+  end
+
   private
 
   def activity_param
@@ -21,7 +32,7 @@ class V1::ActionsController < V1::BaseController
   end
 
   def action_params
-    params.permit(:utm_source, :utm_medium, :utm_campaign, :source_url)
+    params.permit(:utm_source, :utm_medium, :utm_campaign, :source_url, :donation_amount)
   end
 
   def person_params

@@ -134,6 +134,16 @@ FactoryGirl.define do
     sequence(:sort_order)
     sequence(:name) { |n| "Activity #{n}" }
     sequence(:template_id) { |n| "template_#{n}" }
+    sequence(:activity_type) { |n| "activity_type_#{n}" }
+  end
+
+  factory :action do
+    association :person
+    association :activity
+    sequence(:utm_source){ |n| "utm_source_#{n}"}
+    sequence(:utm_medium){ |n| "utm_medium_#{n}"}
+    sequence(:utm_campaign){ |n| "utm_campaign_#{n}"}
+    source_url Faker::Internet.url
   end
 
   factory :bill do

@@ -1,8 +1,39 @@
 require 'rails_helper'
 
 RSpec.describe V1::ActionsController, type: :controller do
+  render_views
+
+  describe "GET count" do
+    before(:all) do
+      @main_activity = FactoryGirl.create(:activity)
+      FactoryGirl.create_list(:action, 3, activity: @main_activity)
+      Timecop.freeze(4.days.ago) do
+        FactoryGirl.create_list(:action, 2)
+      end
+    end
+    it "gets all actions count" do
+      get :count
+      parsed_response = JSON.parse(response.body)
+      expect(parsed_response['count']).to eq(5)
+    end
+    it "gets action count filtered by type" do
+      get :count, activity_type: @main_activity.activity_type
+      parsed_response = JSON.parse(response.body)
+      expect(parsed_response['count']).to eq(3)
+    end
+    it "gets action count filtered by start_at" do
+      get :count, start_at: 2.days.ago
+      parsed_response = JSON.parse(response.body)
+      expect(parsed_response['count']).to eq(3)
+    end
+    it "gets action count filtered by start_at and end_at" do
+      get :count, start_at: 5.days.ago, end_at: 2.days.ago
+      parsed_response = JSON.parse(response.body)
+      expect(parsed_response['count']).to eq(2)
+    end
+  end
+
   describe "POST create" do
-    render_views
     context "with good params" do
       before do
         @activity = FactoryGirl.create(:activity, template_id: 'real_id')
@@ -56,4 +87,5 @@ RSpec.describe V1::ActionsController, type: :controller do
       end
     end
   end
+
 end
