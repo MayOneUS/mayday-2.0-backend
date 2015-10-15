@@ -2,12 +2,13 @@
 #
 # Table name: activities
 #
-#  id          :integer          not null, primary key
-#  name        :string
-#  template_id :string
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  sort_order  :integer
+#  id            :integer          not null, primary key
+#  name          :string
+#  template_id   :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  sort_order    :integer
+#  activity_type :string
 #
 
 class Activity < ActiveRecord::Base

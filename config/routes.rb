@@ -11,7 +11,9 @@ Rails.application.routes.draw do
       get '/:identifier', on: :collection, action: :show, constraints: { identifier: /[^\/]+/} #allow email as identifier
     end
     resources :stats,       only: :index
-    resources :actions,     only: :create
+    resources :actions,     only: :create do
+      get :count, on: :collection
+    end
     resources :activities,  only: :index
 
     namespace :google do

@@ -11,34 +11,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150924234313) do
+ActiveRecord::Schema.define(version: 20151015120755) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "actions", force: :cascade do |t|
-    t.integer  "person_id",    null: false
-    t.integer  "activity_id",  null: false
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.integer  "person_id",       null: false
+    t.integer  "activity_id",     null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.string   "utm_source"
     t.string   "utm_medium"
     t.string   "utm_campaign"
     t.string   "source_url"
+    t.float    "donation_amount"
   end
 
   add_index "actions", ["activity_id"], name: "index_actions_on_activity_id", using: :btree
+  add_index "actions", ["donation_amount"], name: "index_actions_on_donation_amount", using: :btree
   add_index "actions", ["person_id", "activity_id"], name: "index_actions_on_person_id_and_activity_id", using: :btree
   add_index "actions", ["person_id"], name: "index_actions_on_person_id", using: :btree
 
   create_table "activities", force: :cascade do |t|
     t.string   "name"
     t.string   "template_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
     t.integer  "sort_order"
+    t.string   "activity_type"
   end
 
+  add_index "activities", ["activity_type"], name: "index_activities_on_activity_type", using: :btree
   add_index "activities", ["template_id"], name: "index_activities_on_template_id", unique: true, using: :btree
 
   create_table "bills", force: :cascade do |t|
