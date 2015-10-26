@@ -69,8 +69,9 @@ class ExternalCountFetcher
 
   def fetch_supporter_counts(reset: false)
     if !@previously_called && !reset || (!redis_counter(:supporter_count).exists? || !redis_counter(:volunteer_count).exists?)
-      Integration::NationBuilder.list_counts.each do |key,count|
-        redis_counter(key).value = count
+      Integration::NationBuilder.list_counts.each do |counter_key,count|
+        redis_counter(counter_key).value = count
+        redis_counter(counter_key).expire(REDIS_EXPIRE_SECONDS) if reset
       end
     end
     @previously_called ||= true #only call once per instance
