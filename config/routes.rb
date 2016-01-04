@@ -16,12 +16,7 @@ Rails.application.routes.draw do
     end
     resources :activities,  only: :index
 
-    namespace :google do
-      resources :nominations, only: :create
-      resources :district_meetings, only: :create
-      resources :lte_forms, only: :create
-      resources :tech_volunteers, only: :create
-    end
+    resources :google_forms, only: :create
 
     namespace :ivr do
       resources :calls, only: :create
