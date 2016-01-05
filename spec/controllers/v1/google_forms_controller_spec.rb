@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe V1::GoogleFormsController,  type: :controller do
+
   describe 'POST create' do
     before do
       person = double('person')
@@ -18,7 +19,7 @@ describe V1::GoogleFormsController,  type: :controller do
     context 'with a google email mapping' do
       it 'store user and submits to google' do
         fake_email = Faker::Internet.email
-        @google_form_metadata[:field_mappings][:email] = 'entry_222'
+        @google_form_metadata[:field_mappings][:email] = 'entry_333'
 
         post :create,
           person: {email: fake_email },
@@ -48,5 +49,25 @@ describe V1::GoogleFormsController,  type: :controller do
         expect(GoogleFormsSubmitJob).to have_received(:perform_later)
       end
     end
+
+    context 'with no google_form_submission_data' do
+      it 'submits person data to google' do
+        fake_email = Faker::Internet.email
+        @google_form_metadata[:field_mappings][:email] = 'entry_333'
+
+
+        post :create,
+          person: {email: fake_email },
+          google_form_metadata: @google_form_metadata
+
+        expect(GoogleFormsSubmitJob).to have_received(:perform_later).with(
+          @google_form_metadata[:form_id],
+          {
+            @google_form_metadata[:field_mappings][:email] => fake_email
+          }
+        )
+      end
+    end
   end
+
 end

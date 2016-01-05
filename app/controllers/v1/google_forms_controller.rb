@@ -13,8 +13,8 @@ class V1::GoogleFormsController < V1::BaseController
   #    example: {javascript_skill_level: 'advanced', legislator_nominatoin: 'Jack Russel'}
   def create
     person = Person.create_or_update(person_params)
-    if google_form_params.values.any?(&:present?) || (person && person.valid?)
-      GoogleFormsSubmitJob.perform_later(google_form_params[:form_id], google_form_mapped_data)
+    if google_form_data_params.values.any?(&:present?) || (person && person.valid?)
+      GoogleFormsSubmitJob.perform_later(google_form_metadata_params[:form_id], google_form_mapped_data)
       submitted = true
     else
       submitted = false
@@ -34,18 +34,19 @@ class V1::GoogleFormsController < V1::BaseController
     person_params.merge(nested_person_params)
   end
 
-  def google_form_params
+  def google_form_metadata_params
     params.require(:google_form_metadata).permit(:form_id, field_mappings: params[:google_form_metadata][:field_mappings].try(:keys))
   end
 
-  def google_form_only_params
+  def google_form_data_params
     mergeable_person_params = person_params.except(DEFAULT_PERSON_FIELDS_NOT_ON_GOOGLE)
-    params.require(:google_form_submission_data).permit(google_form_params[:field_mappings].keys).merge(mergeable_person_params).symbolize_keys
+    google_data_params = params.permit(google_form_submission_data: google_form_metadata_params[:field_mappings].keys)
+    mergeable_person_params.merge(google_data_params[:google_form_submission_data] || {}).symbolize_keys
   end
 
   def google_form_mapped_data
-    google_form_only_params.each_with_object({}) do |(internal_key, value), output_hash|
-      target_key = google_form_params[:field_mappings][internal_key]
+    google_form_data_params.each_with_object({}) do |(internal_key, value), output_hash|
+      target_key = google_form_metadata_params[:field_mappings][internal_key]
       output_hash[target_key] = value if target_key.present?
     end
   end
