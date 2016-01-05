@@ -258,6 +258,8 @@ GEM
       rack
       raindrops (~> 0.7)
     uniform_notifier (1.9.0)
+    validates_email_format_of (1.6.3)
+      i18n
     versionist (1.4.1)
       activesupport (>= 3)
       railties (>= 3)
@@ -315,6 +317,7 @@ DEPENDENCIES
   timecop
   twilio-ruby
   unicorn
+  validates_email_format_of
   versionist
   web-console (~> 2.0)
   webmock

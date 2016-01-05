@@ -8,6 +8,7 @@ gem 'redis-objects'
 gem 'redis-rails'
 gem 'database_cleaner'
 gem 'phony_rails', :require => false
+gem 'validates_email_format_of'
 
 # Active Job
 gem 'sidekiq'
