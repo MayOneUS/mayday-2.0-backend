@@ -15,17 +15,17 @@ class V1::PaymentsController < V1::BaseController
   #  * utm_campaign - action utm_campaign
   #  * source_url - action source_url
   def create
-    payment_creator = Donation.new(payment_params)
-    if payment_creator.process
+    donation = Donation.new(donation_params)
+    if donation.process!
       render json: { status: 'success' }
     else
-      render json: { errors: payment_creator.errors }
+      render json: { errors: donation.errors }
     end
   end
 
   private
 
-  def payment_params
+  def donation_params
     params.permit(:email, :employer, :occupation, :stripe_token, :recurring,
                   :utm_source, :utm_medium, :utm_campaign, :source_url,
                   :amount_in_cents)

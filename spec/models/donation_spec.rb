@@ -21,7 +21,7 @@ describe Donation do
         recurring: true, email: 'user@example.com', occupation: 'job',
         employer: 'work place')
 
-      donation.process
+      donation.process!
 
       expect(Stripe::Customer).to have_received(:create).
         with(plan: 'one_dollar_monthly',
@@ -39,7 +39,7 @@ describe Donation do
       donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
         email: 'user@example.com', occupation: 'job', employer: 'work place')
 
-      donation.process
+      donation.process!
 
       expect(Stripe::Charge).to have_received(:create).
         with(hash_including(amount: 400, source: 'test token', currency: 'usd'))
@@ -52,7 +52,7 @@ describe Donation do
       donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
         email: 'user@example.com', occupation: 'job', employer: 'work place')
 
-      donation.process
+      donation.process!
 
       expect(NbPersonPushJob).to have_received(:perform_later).
         with(email: 'user@example.com', occupation: 'job',
@@ -65,7 +65,7 @@ describe Donation do
       donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
         email: 'user@example.com', occupation: 'job', employer: 'work place')
 
-      donation.process
+      donation.process!
 
       expect(person).to have_received(:create_action).
         with(hash_including(template_id: 'donate', donation_amount_in_cents: 400))

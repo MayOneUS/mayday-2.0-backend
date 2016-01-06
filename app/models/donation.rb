@@ -12,7 +12,7 @@ class Donation
   validates :amount_in_cents, presence: true,
     numericality: { greater_than: 0, only_integer: true }
 
-  def process
+  def process!
     if valid?
       process_payment
       record_donation
@@ -22,7 +22,7 @@ class Donation
     end
 
   rescue Stripe::CardError => e
-    errors.add(:stripe_token, e)
+    errors.add(:stripe_token, e.json_body[:error][:message])
     false
   end
 
