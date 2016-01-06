@@ -87,10 +87,10 @@ class NationBuilder
     end
   end
 
-  def self.create_donation(amount:, person_id:)
+  def self.create_donation(amount_in_cents:, person_id:)
     rescue_oauth_errors do
       body = { 'donation': { donor_id: person_id,
-                             amount_in_cents: amount,
+                             amount_in_cents: amount_in_cents,
                              payment_type_name: 'Square',
                              succeeded_at: Time.now } }
       response = request_handler(endpoint_path: ENDPOINTS[:donations], body: body, method: 'post')

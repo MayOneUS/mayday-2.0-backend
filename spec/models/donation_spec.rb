@@ -48,15 +48,14 @@ describe Donation do
     it "updates CRM with donation info" do
       allow(Stripe::Charge).to receive(:create)
       stub_person_find_or_initialize_by
-      allow(NbPersonPushJob).to receive(:perform_later)
+      allow(NbDonationCreateJob).to receive(:perform_later)
       donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
         email: 'user@example.com', occupation: 'job', employer: 'work place')
 
       donation.process!
 
-      expect(NbPersonPushJob).to have_received(:perform_later).
-        with(email: 'user@example.com', occupation: 'job',
-             employer: 'work place', donation_amount: 400)
+      expect(NbDonationCreateJob).to have_received(:perform_later).
+        with(400, { email: 'user@example.com', occupation: 'job', employer: 'work place' })
     end
 
     it "creates donate action on person" do

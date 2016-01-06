@@ -39,10 +39,8 @@ class Donation
   end
 
   def record_donation
-    NbPersonPushJob.perform_later(email: email,
-                                  employer: employer,
-                                  occupation: occupation,
-                                  donation_amount: amount_as_integer)
+    person = { email: email, employer: employer, occupation: occupation }
+    NbDonationCreateJob.perform_later(amount_as_integer, person)
   end
 
   def create_donate_action

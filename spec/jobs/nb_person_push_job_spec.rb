@@ -24,17 +24,6 @@ RSpec.describe NbPersonPushJob, type: :job do
         .with(event_id: 4, person_id: 6)
     end
 
-    it "creates a donation when donation_amount is present" do
-      stub_nb_method(:create_or_update_person,
-                     with_args: { attributes: { email: 'user@example.com' } },
-                     returning: { 'id' => 6 })
-      stub_nb_method(:create_donation)
-
-      NbPersonPushJob.new.perform(email: 'user@example.com', donation_amount: 300 )
-
-      expect(Integration::NationBuilder).to have_received(:create_donation).
-        with(amount: 300, person_id: 6)
-    end
   end
 
   def stub_nb_method(method, with_args: nil, returning: nil)

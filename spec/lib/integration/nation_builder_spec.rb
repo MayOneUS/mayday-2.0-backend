@@ -78,7 +78,7 @@ describe Integration::NationBuilder do
 
   describe "#create_donation" do
     it "responds with a parsed donation object" do
-      response = Integration::NationBuilder.create_donation(amount: 400, person_id: 84961)
+      response = Integration::NationBuilder.create_donation(amount_in_cents: 400, person_id: 84961)
       expect(response).to have_key('id')
       expect(response['id']).to eq(@donation_id)
     end

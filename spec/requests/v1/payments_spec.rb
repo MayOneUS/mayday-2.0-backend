@@ -6,7 +6,7 @@ RSpec.describe "POST /payments" do
       person = create(:person)
       customer = stub_stripe_customer_create(id: 'customer id',
                                              subscription_id: 'subscription id')
-      allow(NbPersonPushJob).to receive(:perform_later)
+      allow(NbDonationCreateJob).to receive(:perform_later)
 
       post "/payments", amount_in_cents: 400, stripe_token: 'test token',
         recurring: true, email: person.email, occupation: 'job',
@@ -17,8 +17,8 @@ RSpec.describe "POST /payments" do
              plan: 'one_dollar_monthly',
              email: person.email,
              quantity: 4)
-      expect(NbPersonPushJob).to have_received(:perform_later).
-        with(email: person.email, occupation: 'job', employer: 'work place', donation_amount: 400)
+      expect(NbDonationCreateJob).to have_received(:perform_later).
+        with(400, { email: person.email, occupation: 'job', employer: 'work place' })
       person.reload
       expect(person.stripe_id).to eq 'customer id'
       expect(person.subscription.remote_id).to eq 'subscription id'
@@ -31,7 +31,7 @@ RSpec.describe "POST /payments" do
   context "simple payment, new person" do
     it "creates person and action and updates CRM" do
       allow(Stripe::Charge).to receive(:create)
-      allow(NbPersonPushJob).to receive(:perform_later)
+      allow(NbDonationCreateJob).to receive(:perform_later)
 
       post "/payments", amount_in_cents: 300, stripe_token: 'test token',
         email: 'test@example.com', occupation: 'job', employer: 'work place'
@@ -39,8 +39,8 @@ RSpec.describe "POST /payments" do
       expect(Stripe::Charge).to have_received(:create).
         with(hash_including(amount: 300, source: 'test token',
                             currency: 'usd'))
-      expect(NbPersonPushJob).to have_received(:perform_later).
-        with(email: 'test@example.com', occupation: 'job', employer: 'work place', donation_amount: 300)
+      expect(NbDonationCreateJob).to have_received(:perform_later).
+        with(300, { email: 'test@example.com', occupation: 'job', employer: 'work place' })
       person = Person.find_by(email: 'test@example.com')
       action = person.actions.last
       expect(action.donation_amount_in_cents).to eq 300
