@@ -7,7 +7,7 @@ class NbPersonPushJob < ActiveJob::Base
     response = Integration::NationBuilder.create_or_update_person(nb_args) || {}
     person_id = response['id']
 
-    if person_id.present? && event_id.present?
+    if event_id.present? && person_id.present?
       Integration::NationBuilder.create_rsvp(event_id: event_id, person_id: person_id)
     end
   end
