@@ -16,7 +16,7 @@ class V1::PaymentsController < V1::BaseController
   #  * source_url - action source_url
   def create
     donation = Donation.new(donation_params)
-    if donation.process!
+    if donation.process
       render json: { status: 'success' }
     else
       render json: { errors: donation.errors }

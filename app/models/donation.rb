@@ -14,8 +14,9 @@ class Donation
   validates :amount_in_cents, presence: true,
     numericality: { greater_than: 0, only_integer: true }
 
-  def process!
+  def process
     if valid?
+      find_or_create_person
       process_payment
       record_donation
       create_donate_action
@@ -29,6 +30,8 @@ class Donation
   end
 
   private
+
+  attr_reader :person
 
   def process_payment
     if recurring
@@ -58,14 +61,9 @@ class Donation
     @template_id ||= Activity::DEFAULT_TEMPLATE_IDS[:donate]
   end
 
-  def person
-    @person ||= find_or_create_person
-  end
-
   def find_or_create_person
-    person = Person.find_or_initialize_by(email: email)
-    person.update(skip_nb_update: true)
-    person
+    @person = Person.find_or_initialize_by(email: email)
+    @person.update(skip_nb_update: true)
   end
 
   def create_stripe_customer
