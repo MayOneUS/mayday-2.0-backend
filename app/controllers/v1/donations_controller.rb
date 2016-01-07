@@ -1,4 +1,4 @@
-class V1::PaymentsController < V1::BaseController
+class V1::DonationsController < V1::BaseController
 
   # Receives person, payment and action attributes. Creates/updates a person
   # creates an action, and creates a stripe single or recurring payment

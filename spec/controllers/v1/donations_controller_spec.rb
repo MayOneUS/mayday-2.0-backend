@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe V1::PaymentsController, type: :controller do
+describe V1::DonationsController, type: :controller do
 
   describe "POST create" do
     it "displays error message if donation processing fails" do

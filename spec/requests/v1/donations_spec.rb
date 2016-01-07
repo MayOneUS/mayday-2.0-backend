@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "POST /payments" do
+RSpec.describe "POST /donationdonations" do
   context "recurring payment, existing person" do
     it "creates subscription and action and updates CRM" do
       person = create(:person)
@@ -8,7 +8,7 @@ RSpec.describe "POST /payments" do
                                              subscription_id: 'subscription id')
       allow(NbDonationCreateJob).to receive(:perform_later)
 
-      post "/payments", amount_in_cents: 400, stripe_token: 'test token',
+      post "/donations", amount_in_cents: 400, stripe_token: 'test token',
         recurring: true, email: person.email, occupation: 'job',
         employer: 'work place'
 
@@ -33,7 +33,7 @@ RSpec.describe "POST /payments" do
       allow(Stripe::Charge).to receive(:create)
       allow(NbDonationCreateJob).to receive(:perform_later)
 
-      post "/payments", amount_in_cents: 300, stripe_token: 'test token',
+      post "/donations", amount_in_cents: 300, stripe_token: 'test token',
         email: 'test@example.com', occupation: 'job', employer: 'work place'
 
       expect(Stripe::Charge).to have_received(:create).
