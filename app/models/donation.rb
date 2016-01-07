@@ -6,8 +6,7 @@ class Donation
 
   attr_writer :template_id
 
-  validates :email, presence: true,
-    email_format: { message: 'is not a valid email' }
+  validates :email, presence: true, email_format: true
   validates :employer, presence: true
   validates :occupation, presence: true
   validates :stripe_token, presence: true

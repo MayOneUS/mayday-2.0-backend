@@ -4,8 +4,7 @@ require 'validates_email_format_of/rspec_matcher'
 describe Donation do
 
   it { should validate_presence_of(:email) }
-  it { should validate_email_format_of(:email).
-       with_message('is not a valid email') }
+  it { should validate_email_format_of(:email) }
   it { should validate_presence_of(:stripe_token) }
   it { should validate_presence_of(:employer) }
   it { should validate_presence_of(:occupation) }
