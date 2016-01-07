@@ -27,7 +27,7 @@ class V1::PaymentsController < V1::BaseController
 
   def donation_params
     params.permit(:email, :employer, :occupation, :stripe_token, :recurring,
-                  :utm_source, :utm_medium, :utm_campaign, :source_url,
-                  :amount_in_cents)
+                  :amount_in_cents, :utm_source, :utm_medium, :utm_campaign,
+                  :source_url, :template_id)
   end
 end

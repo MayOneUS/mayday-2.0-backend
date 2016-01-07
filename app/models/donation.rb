@@ -4,6 +4,8 @@ class Donation
   attr_accessor :email, :employer, :occupation, :stripe_token, :recurring,
     :utm_source, :utm_medium, :utm_campaign, :source_url, :amount_in_cents
 
+  attr_writer :template_id
+
   validates :email, presence: true,
     email_format: { message: 'is not a valid email' }
   validates :employer, presence: true
@@ -48,8 +50,12 @@ class Donation
                          utm_medium: utm_medium,
                          utm_campaign: utm_campaign,
                          source_url: source_url,
-                         template_id: 'donate',
+                         template_id: template_id,
                          donation_amount_in_cents: amount_as_integer)
+  end
+
+  def template_id
+    @template_id ||= Activity::DEFAULT_TEMPLATE_IDS[:donate]
   end
 
   def person
