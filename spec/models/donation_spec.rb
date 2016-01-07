@@ -78,7 +78,7 @@ describe Donation do
   end
 
   def stub_stripe_customer_create(id: '', subscription_id: '')
-    subscriptions = OpenStruct.new(data: [OpenStruct.new(id: subscription_id)])
+    subscriptions = [OpenStruct.new(id: subscription_id)]
     customer = double('customer', id: id, subscriptions: subscriptions)
     allow(Stripe::Customer).to receive(:create).and_return(customer)
   end

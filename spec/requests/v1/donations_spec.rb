@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "POST /donationdonations" do
+RSpec.describe "POST /donation" do
   context "recurring payment, existing person" do
     it "creates subscription and action and updates CRM" do
       person = create(:person)
@@ -49,7 +49,7 @@ RSpec.describe "POST /donationdonations" do
   end
 
   def stub_stripe_customer_create(id: '', subscription_id: '')
-    subscriptions = OpenStruct.new(data: [OpenStruct.new(id: subscription_id)])
+    subscriptions = [OpenStruct.new(id: subscription_id)]
     customer = double('customer', id: id, subscriptions: subscriptions)
     allow(Stripe::Customer).to receive(:create).and_return(customer)
   end

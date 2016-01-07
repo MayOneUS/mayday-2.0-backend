@@ -84,13 +84,12 @@ class Donation
     amount_in_cents.to_i
   end
 
-  StripeCustomer = Struct.new(:stripe_customer) do
-    def id
-      stripe_customer.id
-    end
+  class StripeCustomer
+    attr_reader :id, :subscription_id
 
-    def subscription_id
-      stripe_customer.subscriptions.data.first.id
+    def initialize(stripe_customer)
+      @id = stripe_customer.id
+      @subscription_id = stripe_customer.subscriptions.first.id
     end
   end
 end
