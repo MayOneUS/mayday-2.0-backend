@@ -2,13 +2,19 @@ require 'rails_helper'
 
 describe "GET /donation_pages" do
   it "lists donation pages" do
-    donation_page = create(:donation_page)
+    worst_page = create(:donation_page)
+    best_page = create(:donation_page)
+    ok_page = create(:donation_page)
+    create(:action, donation_page: worst_page, donation_amount_in_cents: 100)
+    create(:action, donation_page: ok_page, donation_amount_in_cents: 200)
+    create(:action, donation_page: best_page, donation_amount_in_cents: 100)
+    create(:action, donation_page: best_page, donation_amount_in_cents: 200)
 
-    get '/donation_pages'
+    get '/donation_pages', limit: 2
 
-    expect(json_body.length).to eq 1
-    expect(json_body.first).
-      to match_donation_page(donation_page, :slug, :visible_user_name)
+    expect(json_body.length).to eq 2
+    expect(json_body.map{ |d| d['slug'] }).to eq [best_page.slug, ok_page.slug]
+    expect(json_body.map{ |d| d['funds_raised_in_cents'] }).to eq [300, 200]
   end
 end
 

@@ -2,7 +2,7 @@ class V1::DonationPagesController < ApplicationController
   before_action :set_donation_page, only: [:show, :update, :destroy]
 
   def index
-    @donation_pages = DonationPage.all
+    @donation_pages = DonationPage.by_funds_raised.limit(limit)
 
     render :index
   end
@@ -74,5 +74,9 @@ class V1::DonationPagesController < ApplicationController
     person = Person.find_or_initialize_by(email: person_params[:email])
     person.assign_attributes(person_params)
     person
+  end
+
+  def limit
+    params[:limit] || 10
   end
 end
