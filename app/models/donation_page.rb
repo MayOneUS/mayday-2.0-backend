@@ -12,8 +12,14 @@ class DonationPage < ActiveRecord::Base
 
   def self.by_funds_raised
     joins(:actions).
-      select('donation_pages.slug, donation_pages.visible_user_name, sum(actions.donation_amount_in_cents) as funds_raised_in_cents').
-      group('donation_pages.slug, donation_pages.visible_user_name').
+      select('
+        donation_pages.id,
+        donation_pages.slug,
+        donation_pages.visible_user_name,
+        sum(actions.donation_amount_in_cents) as funds_raised_in_cents,
+        count(actions.donation_amount_in_cents) as donations_count
+      ').
+      group('donation_pages.id, donation_pages.slug, donation_pages.visible_user_name').
       order('funds_raised_in_cents desc')
   end
 
