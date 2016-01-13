@@ -69,15 +69,11 @@ To hook up this app with Heroku's command line tool in your development environm
 1. Get someone to add you as a collaborator on the staging Heroku app
 1. Install the Heroku toolbelt on your machine: https://toolbelt.herokuapp.com/
 1. Once installed, run the `heroku login` command
-1. `cd` into your clone of this repository, and run `heroku git:remote --app mayone-staging`
+1. `cd` into your clone of this repository, and run `heroku git:remote -r staging --app mayone-staging`
 
 You can test if it works by running a command like `heroku logs`.
 
-### Step Two Staging
-
-To access the step two staging Heroku app, follow the instructions for the staging app and then run `git remote add step-two https://git.heroku.com/mayday-step-two.git`.
-
-You can now run commands against the step two staging app like this: `heroku logs -a mayday-step-two`.
+You can now deploy to staging the standard Heroku way. Example: `git push mayone-staging master`
 
 ### Common Staging Commands
 
@@ -141,18 +137,9 @@ Sometimes the production site has hiccups. Here are tips on how to solve some co
 
 #### Maxing out Postgres connections
 
-Sometimes a New Relic alert gets triggered because our Heroku dynos can't connect to the Postgres database. This is most likely because the Postgres database has run out connections - our current plan only allows for 20.
+About every other month, a New Relic alert gets triggered because our Heroku dynos can't connect to the Postgres database. This is most likely because the Postgres database has run out connections - our current plan only allows for 20.
 
-Until we can figure out something better, solve this by running `heroku pg:psql --app mayone-prod`. Then run:
-
-```
-SELECT pg_terminate_backend(pg_stat_activity.pid)
-FROM pg_stat_activity
-WHERE datname = current_database()
-  AND pid <> pg_backend_pid();
-```
-
-That will terminate all connections to the Postgres database. You should then run `heroku restart --app mayone-prod` **immediately** so that all worker and web dynos reestablish their connections to the database.
+Until we can figure out something better, solve this by running killing the current connections. Run `heroku pg:killall -amayone-prod`. That will terminate all connections to the Postgres database. You should then run `heroku restart --app mayone-prod` **immediately** so that all worker and web dynos reestablish their connections to the database.  We haven't prioritized resolving this as it doesn't seem related to traffic congestion.
 
 ## Contributing / Code Review Process
 
