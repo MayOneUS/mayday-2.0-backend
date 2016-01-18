@@ -9,6 +9,8 @@ describe "PersonWithRemoteFields" do
       person_with_remote_fields = PersonWithRemoteFields
         .find_or_build(email: 'user@example.com', first_name: 'joe')
 
+      expect(Person).to have_received(:find_or_initialize_by).
+        with(email: 'user@example.com')
       expect(person_with_remote_fields).to eq person
       expect(person_with_remote_fields.first_name).to eq 'joe'
     end
@@ -71,7 +73,7 @@ describe "PersonWithRemoteFields" do
 
     context "with old-style remote params" do
       # params can be passed in with a nested hash of remote_fields (old-style)
-      # or with flat hash of remotes fields and local person fields.
+      # or with flat hash of local person fields and remote fields.
       it "updates remote" do
         allow(NbPersonPushJob).to receive(:perform_later)
         person = PersonWithRemoteFields.
