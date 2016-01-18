@@ -8,7 +8,7 @@ class V1::DonationsController < V1::BaseController
   #  * occupation - string - person occupation
   #  * amount_in_cents - int - donation amount in cents
   #  * recurring - true - pass true if recurring donation
-  #  * stripe_token - token returned by Stripe.js to identify credit card
+  #  * card_token - token returned by Stripe.js to identify credit card
   #  * template_id - action template_id
   #  * utm_source - action utm_source
   #  * utm_medium - action utm_medium
@@ -26,7 +26,7 @@ class V1::DonationsController < V1::BaseController
   private
 
   def donation_params
-    params.permit(:email, :employer, :occupation, :stripe_token, :recurring,
+    params.permit(:email, :employer, :occupation, :card_token, :recurring,
                   :amount_in_cents, :utm_source, :utm_medium, :utm_campaign,
                   :source_url, :template_id)
   end

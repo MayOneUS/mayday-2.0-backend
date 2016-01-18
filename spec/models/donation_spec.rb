@@ -4,9 +4,8 @@ require 'validates_email_format_of/rspec_matcher'
 describe Donation do
 
   it { should validate_presence_of(:email) }
-  it { should validate_email_format_of(:email).
-       with_message('is not a valid email') }
-  it { should validate_presence_of(:stripe_token) }
+  it { should validate_email_format_of(:email) }
+  it { should validate_presence_of(:card_token) }
   it { should validate_presence_of(:employer) }
   it { should validate_presence_of(:occupation) }
   it { should validate_presence_of(:amount_in_cents) }
@@ -15,60 +14,61 @@ describe Donation do
   describe "process" do
     it "creates subscription if recurring is true" do
       person = stub_person_find_or_initialize_by
-      stub_stripe_customer_create(id: 'customer id',
-                                  subscription_id: 'subscription id')
-      donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
-        recurring: true, email: 'user@example.com', occupation: 'job',
-        employer: 'work place')
+      stub_payment_processor(customer_id: 'cus1', subscription_id: 'sub1')
+      donation = build(:donation, recurring: true)
 
       donation.process
 
-      expect(Stripe::Customer).to have_received(:create).
-        with(plan: 'one_dollar_monthly',
-         email: 'user@example.com',
-         quantity: 4,
-         source: 'test token')
-      expect(person).to have_received(:update).with(stripe_id: 'customer id')
+      expect_new_payment_processor_for(donation)
+      expect(person).to have_received(:update).with(stripe_id: 'cus1')
       expect(person).to have_received(:create_subscription).
-        with(remote_id: 'subscription id')
+        with(remote_id: 'sub1')
     end
 
-    it "charges stripe once if recurring is falsy" do
-      allow(Stripe::Charge).to receive(:create)
+    it "charges card once if recurring is falsy" do
+      processor = stub_payment_processor
       stub_person_find_or_initialize_by
-      donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
-        email: 'user@example.com', occupation: 'job', employer: 'work place')
+      donation = build(:donation, recurring: false)
 
       donation.process
 
-      expect(Stripe::Charge).to have_received(:create).
-        with(hash_including(amount: 400, source: 'test token', currency: 'usd'))
+      expect_new_payment_processor_for(donation)
+      expect(processor).to have_received(:charge)
     end
 
     it "updates CRM with donation info" do
-      allow(Stripe::Charge).to receive(:create)
+      stub_payment_processor
       stub_person_find_or_initialize_by
       allow(NbDonationCreateJob).to receive(:perform_later)
-      donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
-        email: 'user@example.com', occupation: 'job', employer: 'work place')
+      donation = build(:donation)
 
       donation.process
 
       expect(NbDonationCreateJob).to have_received(:perform_later).
-        with(400, { email: 'user@example.com', occupation: 'job', employer: 'work place' })
+        with(donation.amount_in_cents, { email: donation.email,
+                                         occupation: donation.occupation,
+                                         employer: donation.employer})
     end
 
     it "creates donate action on person" do
-      allow(Stripe::Charge).to receive(:create)
+      stub_payment_processor
       person = stub_person_find_or_initialize_by
-      donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
-        email: 'user@example.com', occupation: 'job', employer: 'work place')
+      donation = build(:donation)
 
       donation.process
 
       expect(person).to have_received(:create_action).
-        with(hash_including(template_id: 'donate', donation_amount_in_cents: 400))
+        with(hash_including(template_id: Activity::DEFAULT_TEMPLATE_IDS[:donate],
+                            donation_amount_in_cents: donation.amount_in_cents))
     end
+  end
+
+  def expect_new_payment_processor_for(donation)
+    expect(PaymentProcessor).to have_received(:new).
+      with(amount_in_cents: donation.amount_in_cents,
+           card: donation.card_token,
+           email: donation.email,
+           description: Donation::DEFAULT_DESCRIPTION % donation.email)
   end
 
   def stub_person_find_or_initialize_by
@@ -77,10 +77,11 @@ describe Donation do
     person
   end
 
-  def stub_stripe_customer_create(id: '', subscription_id: '')
-    subscriptions = [OpenStruct.new(id: subscription_id)]
-    customer = double('customer', id: id, subscriptions: subscriptions)
-    allow(Stripe::Customer).to receive(:create).and_return(customer)
+  def stub_payment_processor(customer_id: nil, subscription_id: nil)
+    fake_customer = double('customer', id: customer_id,
+                           subscription_id: subscription_id)
+    processor = double('processor', charge: nil, create_customer: fake_customer)
+    allow(PaymentProcessor).to receive(:new).and_return(processor)
+    processor
   end
-
 end

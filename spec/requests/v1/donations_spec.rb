@@ -8,7 +8,7 @@ RSpec.describe "POST /donation" do
                                              subscription_id: 'subscription id')
       allow(NbDonationCreateJob).to receive(:perform_later)
 
-      post "/donations", amount_in_cents: 400, stripe_token: 'test token',
+      post "/donations", amount_in_cents: 400, card_token: 'test token',
         recurring: true, email: person.email, occupation: 'job',
         employer: 'work place'
 
@@ -33,7 +33,7 @@ RSpec.describe "POST /donation" do
       allow(Stripe::Charge).to receive(:create)
       allow(NbDonationCreateJob).to receive(:perform_later)
 
-      post "/donations", amount_in_cents: 300, stripe_token: 'test token',
+      post "/donations", amount_in_cents: 300, card_token: 'test token',
         email: 'test@example.com', occupation: 'job', employer: 'work place'
 
       expect(Stripe::Charge).to have_received(:create).

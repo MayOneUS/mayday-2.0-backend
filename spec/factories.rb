@@ -34,6 +34,14 @@ FactoryGirl.define do
     sequence(:remote_id)
   end
 
+  factory :donation do
+    amount_in_cents 700
+    employer 'business'
+    occupation 'job'
+    sequence(:card_token) { |n| "token#{n}" }
+    sequence(:email) { |n| "user#{n}@example.com" }
+  end
+
   factory :legislator do
     sequence(:bioguide_id) { |n| "F#{n}#{Faker::Number.number(8)}" }
     first_name { Faker::Name.first_name }
