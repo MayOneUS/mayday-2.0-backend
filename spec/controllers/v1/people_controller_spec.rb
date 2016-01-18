@@ -3,38 +3,12 @@ require 'rails_helper'
 describe V1::PeopleController,  type: :controller do
   describe "POST create" do
     render_views
-    context "with valid params" do
-      it "returns person" do
-        user = FactoryGirl.create(:person, email: 'user@example.com')
-        allow(Person).to receive(:create_or_update).and_return(user)
+    it "returns error without person params" do
+      post :create
+      json_response = JSON.parse(response.body)
 
-        post :create, person: { email: 'user@example.com', remote_fields: { tags: ['test'] } }
-        json_response = JSON.parse(response.body)
-
-        expect(Person).to have_received(:create_or_update)
-          .with(email: 'user@example.com', remote_fields: { tags: ['test'] })
-        expect(response).to be_success
-        expect(json_response).to have_key('uuid')
-        expect(json_response['uuid']).not_to be_blank
-      end
-      it "marks activities completed" do
-        FactoryGirl.create(:activity, template_id: 'real_id')
-        FactoryGirl.create(:activity, template_id: 'other_id')
-        post :create, person: { email: 'user@example.com' }, actions: ['real_id', 'other_id']
-        json_response = JSON.parse(response.body)
-        expect(response).to be_success
-        expect(json_response).to have_key('completed_activities')
-        expect(json_response['completed_activities']).to match_array ['real_id', 'other_id']
-      end
-    end
-    context "without params" do
-      it "returns error" do
-        post :create
-        json_response = JSON.parse(response.body)
-
-        expect(json_response).to have_key('error')
-        expect(json_response['error']).to eq("person is required")
-      end
+      expect(json_response).to have_key('error')
+      expect(json_response['error']).to eq("person is required")
     end
   end
   describe "GET show" do
