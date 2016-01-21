@@ -14,8 +14,12 @@
 #
 
 require 'rails_helper'
+require 'validates_email_format_of/rspec_matcher'
 
 describe Person do
+
+  it { should validate_email_format_of(:email).
+       with_message('is invalid') }
 
   describe "validations" do
     it "validates with an email and no phone" do

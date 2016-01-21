@@ -29,10 +29,9 @@ class Person < ActiveRecord::Base
   has_many :actions, dependent: :destroy
   has_many :activities, through: :actions
 
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, uniqueness: { case_sensitive: false },
-                    format: { with: VALID_EMAIL_REGEX },
-                    allow_nil: true
+    email_format: { message: 'is invalid' },
+    allow_nil: true
 
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
