@@ -25,11 +25,11 @@ describe "GET /donation_pages/:slug" do
 
     get "/donation_pages/#{donation_page.slug}"
 
-    expect(json_body['title']).to eq donation_page.title
     expect(json_body).to match_donation_page(
       donation_page, :slug, :title, :visible_user_name, :photo_url, :intro_text
     )
-    expect(json_body['donation_amount_in_cents'].to eq 100
+    expect(json_body['donations_total_in_cents']).to eq 100
+    expect(json_body['donations_count']).to eq 1
   end
 end
 

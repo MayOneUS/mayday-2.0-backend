@@ -38,6 +38,30 @@ RSpec.describe DonationPage, type: :model do
     end
   end
 
+  describe "#donations_count" do
+    it "returns count of donations" do
+      page = create(:donation_page)
+      create(:action, donation_page: page)
+      create(:action, donation_page: page)
+
+      count = page.donations_count
+
+      expect(count).to eq 2
+    end
+  end
+
+  describe "#donations_total_in_cents" do
+    it "returns sum of donations" do
+      page = create(:donation_page)
+      create(:action, donation_page: page, donation_amount_in_cents: 100)
+      create(:action, donation_page: page, donation_amount_in_cents: 200)
+
+      sum = page.donations_total_in_cents
+
+      expect(sum).to eq 300
+    end
+  end
+
   describe "#save" do
     it "saves slug in lower case" do
     donation_page = build(:donation_page, slug: 'SLUG')

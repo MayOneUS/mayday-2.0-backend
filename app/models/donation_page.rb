@@ -23,6 +23,14 @@ class DonationPage < ActiveRecord::Base
       order('funds_raised_in_cents desc')
   end
 
+  def donations_count
+    actions.count
+  end
+
+  def donations_total_in_cents
+    actions.sum(:donation_amount_in_cents)
+  end
+
   def to_param
     slug
   end
