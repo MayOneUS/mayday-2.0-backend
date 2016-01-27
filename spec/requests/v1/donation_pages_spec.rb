@@ -21,6 +21,7 @@ end
 describe "GET /donation_pages/:slug" do
   it "shows donation page" do
     donation_page = create(:donation_page)
+    create(:action, donation_page: donation_page, donation_amount_in_cents: 100)
 
     get "/donation_pages/#{donation_page.slug}"
 
@@ -28,17 +29,31 @@ describe "GET /donation_pages/:slug" do
     expect(json_body).to match_donation_page(
       donation_page, :slug, :title, :visible_user_name, :photo_url, :intro_text
     )
+    expect(json_body['donation_amount_in_cents'].to eq 100
   end
 end
 
 describe "POST /donation_pages" do
-  it "creates donation page" do
+  it "creates donation page and returns uuid" do
     page_attributes = attributes_for(:donation_page).stringify_keys
 
     post '/donation_pages', person: attributes_for(:person),
       donation_page: page_attributes
 
     expect(DonationPage.last.attributes).to include page_attributes
+    expect(json_body['uuid']).not_to be_blank
+  end
+end
+
+describe "PUT /donation_pages/:slug" do
+  it "updates donation page" do
+    donation_page = create(:donation_page).reload # reload to get uuid
+
+    put "/donation_pages/#{donation_page.slug}",
+      { donation_page: { title: 'page title' }, uuid: donation_page.uuid }
+
+    donation_page.reload
+    expect(donation_page.title).to eq 'page title'
   end
 end
 

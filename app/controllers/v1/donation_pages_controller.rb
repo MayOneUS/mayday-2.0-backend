@@ -16,7 +16,8 @@ class V1::DonationPagesController < ApplicationController
     donation_page = person.donation_pages.new(donation_page_params)
 
     if person.save && donation_page.save
-      render json: donation_page, status: :created
+      donation_page.reload
+      render json: { uuid: donation_page.uuid }, status: :created
     else
       render json: { errors: merge_errors(person, donation_page) },
         status: :unprocessable_entity
@@ -24,11 +25,15 @@ class V1::DonationPagesController < ApplicationController
   end
 
   def update
-    if @donation_page.update(donation_page_params)
-      head :no_content
+    if @donation_page.uuid == params[:uuid]
+      if @donation_page.update(donation_page_params)
+        head :no_content
+      else
+        render json: { errors: @donation_page.errors },
+          status: :unprocessable_entity
+      end
     else
-      render json: { errors: @donation_page.errors },
-        status: :unprocessable_entity
+      render json: { errors: 'uuid does not match' }, status: :unauthorized
     end
   end
 
