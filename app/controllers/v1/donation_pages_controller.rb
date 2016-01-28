@@ -1,6 +1,4 @@
 class V1::DonationPagesController < ApplicationController
-  before_action :set_donation_page, only: [:show, :update, :destroy]
-
   def index
     @donation_pages = DonationPage.by_funds_raised.limit(limit)
 
@@ -8,6 +6,8 @@ class V1::DonationPagesController < ApplicationController
   end
 
   def show
+    @donation_page = find_donation_page
+
     render :show
   end
 
@@ -25,7 +25,9 @@ class V1::DonationPagesController < ApplicationController
   end
 
   def update
-    if @donation_page.authorize_and_update(donation_page_params)
+    donation_page = find_donation_page
+
+    if donation_page.authorize_and_update(donation_page_params)
       head :no_content
     else
       render json: { errors: @donation_page.errors },
@@ -34,7 +36,9 @@ class V1::DonationPagesController < ApplicationController
   end
 
   def destroy
-    @donation_page.destroy
+    donation_page = find_donation_page
+
+    donation_page.destroy
 
     head :no_content
   end
@@ -58,8 +62,8 @@ class V1::DonationPagesController < ApplicationController
     errors
   end
 
-  def set_donation_page
-    @donation_page = DonationPage.find_by!(slug: params[:slug])
+  def find_donation_page
+    DonationPage.find_by!(slug: params[:slug])
   end
 
   def donation_page_params
