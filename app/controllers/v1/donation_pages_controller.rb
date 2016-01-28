@@ -64,7 +64,7 @@ class V1::DonationPagesController < ApplicationController
 
   def donation_page_params
     params.require(:donation_page).permit(:title, :slug, :visible_user_name,
-                                          :photo_url, :intro_text, :uuid)
+      :photo_url, :intro_text, :goal_in_cents, :uuid)
   end
 
   def person_params
