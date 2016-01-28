@@ -16,7 +16,7 @@ RSpec.describe DonationPage, type: :model do
   # end
 
   describe ".by_funds_raised" do
-    subject do
+    before do
       @worst_page = create(:donation_page)
       @ok_page = create(:donation_page)
       @best_page = create(:donation_page)
@@ -24,9 +24,12 @@ RSpec.describe DonationPage, type: :model do
       create(:action, donation_page: @ok_page, donation_amount_in_cents: 300)
       create(:action, donation_page: @best_page, donation_amount_in_cents: 200)
       create(:action, donation_page: @best_page, donation_amount_in_cents: 200)
+    end
 
+    subject do
       DonationPage.by_funds_raised
     end
+
     it "lists donation pages by funds raised (desc)" do
       expect(subject).to eq [@best_page, @ok_page, @worst_page]
     end
