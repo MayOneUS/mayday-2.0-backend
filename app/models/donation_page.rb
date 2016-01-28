@@ -32,7 +32,7 @@ class DonationPage < ActiveRecord::Base
   end
 
   def authorize_and_update(params)
-    if uuid == params.delete(:uuid)
+    if authorized?(params.delete(:uuid))
       update(params)
     else
       errors.add(:uuid, 'does not match')
@@ -45,6 +45,10 @@ class DonationPage < ActiveRecord::Base
   end
 
   private
+
+  def authorized?(token)
+    uuid == token
+  end
 
   def downcase_slug
     self.slug.downcase!
