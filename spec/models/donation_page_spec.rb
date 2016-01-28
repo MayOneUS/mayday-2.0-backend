@@ -62,6 +62,37 @@ RSpec.describe DonationPage, type: :model do
     end
   end
 
+  describe "#authorize_and_update" do
+    context "correct uuid" do
+      it "updates record with params" do
+        page = create(:donation_page, title: 'title').reload # reload to get uuid
+
+        page.authorize_and_update(title: 'new title', uuid: page.uuid)
+
+        expect(page.title).to eq 'new title'
+      end
+    end
+
+    context "incorrect uuid" do
+      it "doesn't update" do
+        page = create(:donation_page, title: 'original title')
+
+        response = page.authorize_and_update(title: 'new title', uuid: 'wrong')
+
+        expect(response).to be false
+        expect(page.reload.title).to eq 'original title'
+      end
+
+      it "adds error message to errors" do
+        page = create(:donation_page)
+
+        page.authorize_and_update(uuid: 'wrong')
+
+        expect(page.errors).to have_key :uuid
+      end
+    end
+  end
+
   describe "#save" do
     it "saves slug in lower case" do
     donation_page = build(:donation_page, slug: 'SLUG')

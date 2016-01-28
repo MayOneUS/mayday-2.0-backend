@@ -25,15 +25,11 @@ class V1::DonationPagesController < ApplicationController
   end
 
   def update
-    if @donation_page.uuid == params[:uuid]
-      if @donation_page.update(donation_page_params)
-        head :no_content
-      else
-        render json: { errors: @donation_page.errors },
-          status: :unprocessable_entity
-      end
+    if @donation_page.authorize_and_update(donation_page_params)
+      head :no_content
     else
-      render json: { errors: 'uuid does not match' }, status: :unauthorized
+      render json: { errors: @donation_page.errors },
+        status: :unprocessable_entity
     end
   end
 
@@ -68,7 +64,7 @@ class V1::DonationPagesController < ApplicationController
 
   def donation_page_params
     params.require(:donation_page).permit(:title, :slug, :visible_user_name,
-                                          :photo_url, :intro_text)
+                                          :photo_url, :intro_text, :uuid)
   end
 
   def person_params

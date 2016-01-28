@@ -31,6 +31,15 @@ class DonationPage < ActiveRecord::Base
     actions.sum(:donation_amount_in_cents)
   end
 
+  def authorize_and_update(params)
+    if uuid == params.delete(:uuid)
+      update(params)
+    else
+      errors.add(:uuid, 'does not match')
+      false
+    end
+  end
+
   def to_param
     slug
   end
