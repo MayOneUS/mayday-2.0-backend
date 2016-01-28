@@ -4,12 +4,12 @@ describe "PersonWithRemoteFields" do
   describe ".find_or_build" do
     it "finds or initializes person and sets attributes" do
       person = Person.new
-      allow(Person).to receive(:find_or_initialize_by).and_return(person)
+      allow(Person).to receive(:find_by).and_return(person)
 
       person_with_remote_fields = PersonWithRemoteFields
         .find_or_build(email: 'user@example.com', first_name: 'joe')
 
-      expect(Person).to have_received(:find_or_initialize_by).
+      expect(Person).to have_received(:find_by).
         with(email: 'user@example.com')
       expect(person_with_remote_fields).to eq person
       expect(person_with_remote_fields.first_name).to eq 'joe'

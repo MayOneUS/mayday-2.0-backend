@@ -9,9 +9,20 @@ class PersonWithRemoteFields < SimpleDelegator
   ]
 
   def self.find_or_build(attributes)
-    email = attributes.symbolize_keys.delete(:email)
-    person = Person.find_or_initialize_by(email: email)
-    new(person, attributes)
+    # code duplicated from Person to be extracted into new PersonConstructor
+    # class
+    search_values = attributes.symbolize_keys.slice(:uuid, :email, :phone).compact
+
+    search_values.each do |search_key, search_value|
+      case search_key
+        when :email then search_value.downcase!
+        when :phone then search_value = PhonyRails.normalize_number(search_value, default_country_code: 'US')
+      end
+      @person = Person.find_by({search_key => search_value})
+      break if @person.present?
+    end
+
+    new(@person || Person.new, attributes)
   end
 
   def initialize(person, attributes)
