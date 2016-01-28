@@ -66,21 +66,22 @@ RSpec.describe DonationPage, type: :model do
   end
 
   describe "#authorize_and_update" do
-    context "correct uuid" do
+    context "correct access_token" do
       it "updates record with params" do
         page = create(:donation_page, title: 'title').reload # reload to get uuid
 
-        page.authorize_and_update(title: 'new title', uuid: page.uuid)
+        page.authorize_and_update(title: 'new title', access_token: page.uuid)
 
         expect(page.title).to eq 'new title'
       end
     end
 
-    context "incorrect uuid" do
+    context "incorrect access_token" do
       it "doesn't update" do
         page = create(:donation_page, title: 'original title')
 
-        response = page.authorize_and_update(title: 'new title', uuid: 'wrong')
+        response = page.authorize_and_update(title: 'new title',
+                                             access_token: 'wrong')
 
         expect(response).to be false
         expect(page.reload.title).to eq 'original title'
@@ -89,9 +90,9 @@ RSpec.describe DonationPage, type: :model do
       it "adds error message to errors" do
         page = create(:donation_page)
 
-        page.authorize_and_update(uuid: 'wrong')
+        page.authorize_and_update(access_token: 'wrong')
 
-        expect(page.errors).to have_key :uuid
+        expect(page.errors).to have_key :access_token
       end
     end
   end

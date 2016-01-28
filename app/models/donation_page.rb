@@ -31,11 +31,12 @@ class DonationPage < ActiveRecord::Base
     actions.sum(:donation_amount_in_cents)
   end
 
-  def authorize_and_update(params)
-    if authorized?(params.delete(:uuid))
-      update(params)
+  def authorize_and_update(attributes)
+    token = attributes.delete(:access_token)
+    if authorized?(token)
+      update(attributes)
     else
-      errors.add(:uuid, 'does not match')
+      errors.add(:access_token, 'does not match')
       false
     end
   end

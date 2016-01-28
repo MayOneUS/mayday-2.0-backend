@@ -50,7 +50,7 @@ describe "PUT /donation_pages/:slug" do
     donation_page = create(:donation_page).reload # reload to get uuid
 
     put "/donation_pages/#{donation_page.slug}",
-      donation_page: { title: 'page title', uuid: donation_page.uuid }
+      donation_page: { title: 'page title', access_token: donation_page.uuid }
 
     donation_page.reload
     expect(donation_page.title).to eq 'page title'
