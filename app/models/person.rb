@@ -26,6 +26,7 @@ class Person < ActiveRecord::Base
   has_many :connections, through: :calls
   has_many :recordings, through: :calls
   has_many :all_called_legislators, through: :calls, source: :called_legislators
+  has_many :donation_pages, dependent: :destroy
   has_many :actions, dependent: :destroy
   has_many :activities, through: :actions
 

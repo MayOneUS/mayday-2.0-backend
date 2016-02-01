@@ -21,6 +21,15 @@ FactoryGirl.define do
     end
   end
 
+  factory :donation_page do
+    person
+    sequence(:title) { |n| "Donation Page #{n}" }
+    sequence(:slug)  { |n| "slug#{n}" }
+    visible_user_name 'joe smith'
+    photo_url 'www.example.com'
+    intro_text 'donation page'
+  end
+
   factory :location do
     person
     district
