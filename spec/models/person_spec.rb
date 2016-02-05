@@ -14,8 +14,12 @@
 #
 
 require 'rails_helper'
+require 'validates_email_format_of/rspec_matcher'
 
 describe Person do
+
+  it { should validate_email_format_of(:email).
+       with_message('is invalid') }
 
   describe "validations" do
     it "validates with an email and no phone" do
@@ -297,7 +301,7 @@ describe Person do
       end
     end
     context "updating existing user" do
-      let(:person) { FactoryGirl.create(:person) }
+      let(:person) { FactoryGirl.create(:person, :with_nb_callback) }
       before { expect(person).to receive(:update_nation_builder).and_call_original }
 
       it "sends remote_fields to NationBuilder if present" do

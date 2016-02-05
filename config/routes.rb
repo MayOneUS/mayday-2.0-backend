@@ -10,11 +10,15 @@ Rails.application.routes.draw do
       post :targets, on: :collection, action: :targets
       get '/:identifier', on: :collection, action: :show, constraints: { identifier: /[^\/]+/} #allow email as identifier
     end
+    resources :donations,   only: :create
     resources :stats,       only: :index
     resources :actions,     only: :create do
       get :count, on: :collection
     end
     resources :activities,  only: :index
+    resources :donation_pages, except: [:new, :edit], param: :slug do
+      post :validate, on: :collection
+    end
 
     resources :google_forms, only: :create
 
