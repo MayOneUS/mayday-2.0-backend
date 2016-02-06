@@ -40,7 +40,8 @@ class Person < ActiveRecord::Base
 
   before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
-  after_save :update_nation_builder, :save_location, unless: :skip_nb_update
+  after_save :update_nation_builder, unless: :skip_nb_update
+  after_save :save_location
 
   scope :identify, -> identifier {
     includes(:actions)
