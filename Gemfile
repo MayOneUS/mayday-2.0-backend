@@ -26,6 +26,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'versionist'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'oj'
+gem 'will_paginate'
 
 # SysOps + Monitoring
 group :production do

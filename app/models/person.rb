@@ -93,6 +93,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def last_initial
+    last_name.to_s.first
+  end
+
   def completed_activities
     actions.joins(:activity).pluck("activities.template_id")
   end

@@ -1,6 +1,14 @@
 class V1::ActionsController < V1::BaseController
   before_action :set_person, only: :create
 
+  def index
+    @activity = Activity.find_by(template_id: params[:activity_template_id])
+    per_page = params[:limit].presence || 30
+    @actions = @activity.actions.visible.paginate(page: params[:page],
+                                                  per_page: per_page)
+    render
+  end
+
   def create
     activity = Activity.find_or_create_by(template_id: activity_param)
 

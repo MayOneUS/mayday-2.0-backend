@@ -36,24 +36,11 @@ describe Person do
     end
   end
 
-  describe "create" do
+  describe ".create" do
     it "generates uuid" do
       person = Person.create(email: 'user@example.com')
       expect(person.uuid).to_not be_nil
       expect(person.uuid.length).to eq 36
-    end
-  end
-
-  describe "#all_called_legislators" do
-    it "returns those legislators who are called" do
-      call = FactoryGirl.create(:call)
-      connections = create_list(:connection, 2, :completed, call: call)
-      connection_three = FactoryGirl.create(:connection, :failed, call: call)
-      person = call.person
-
-      expected_ids = person.all_called_legislators.map(&:id)
-      expect(expected_ids).to eq(connections.map{|c| c.legislator.id})
-      expect(expected_ids).not_to include(connection_three.legislator.id)
     end
   end
 
@@ -146,6 +133,37 @@ describe Person do
 
         expect(person.email).to eq update_params[:email]
       end
+    end
+  end
+
+  describe "#last_initial" do
+    it "returns first letter of last name" do
+      person = Person.new(last_name: "Smith")
+
+      initial = person.last_initial
+
+      expect(initial).to eq "S"
+    end
+
+    it "returns empty string if last name is null" do
+      person = Person.new
+
+      initial = person.last_initial
+
+      expect(initial).to eq ""
+    end
+  end
+
+  describe "#all_called_legislators" do
+    it "returns those legislators who are called" do
+      call = FactoryGirl.create(:call)
+      connections = create_list(:connection, 2, :completed, call: call)
+      connection_three = FactoryGirl.create(:connection, :failed, call: call)
+      person = call.person
+
+      expected_ids = person.all_called_legislators.map(&:id)
+      expect(expected_ids).to eq(connections.map{|c| c.legislator.id})
+      expect(expected_ids).not_to include(connection_three.legislator.id)
     end
   end
 
