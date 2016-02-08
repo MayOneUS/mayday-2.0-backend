@@ -13,4 +13,11 @@ describe "GET /activities/:template_id/actions" do
     expect(json_body['strike_total_in_cents']).to eq 1100
     expect(json_body['results'].count).to eq 1
   end
+
+  it "lists actions" do
+    get "/activities/not_found/actions"
+
+    expect(json_body['error']).to eq 'Record not found.'
+    expect(response.status).to eq 404
+  end
 end
