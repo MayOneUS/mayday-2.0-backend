@@ -7,12 +7,27 @@ FactoryGirl.define do
     sequence(:email) { |n| "person#{n}@example.com" }
     sequence(:phone) { |n| PhonyRails.normalize_number("555555#{n.to_s.rjust(4,'0')}", default_country_code: 'US')}
 
+    skip_nb_update true
+
+    trait :with_nb_callback do
+      skip_nb_update false
+    end
+
     trait :with_district do
       after(:create) do |person|
         district = create(:district)
         person.create_location(district: district, state: district.state)
       end
     end
+  end
+
+  factory :donation_page do
+    person
+    sequence(:title) { |n| "Donation Page #{n}" }
+    sequence(:slug)  { |n| "slug#{n}" }
+    visible_user_name 'joe smith'
+    photo_url 'www.example.com'
+    intro_text 'donation page'
   end
 
   factory :location do

@@ -25,10 +25,15 @@ describe V1::EventsController,  type: :controller do
       end
 
       it "returns success" do
+        allow(Integration::NationBuilder).to receive(:create_person_and_rsvp)
+
         post :create_rsvp, event_id: 5, person: {email: 'dude@gmail.com'}
+
         expect(response).to be_success
       end
+
       it "stores an action with the right params" do
+        allow(Integration::NationBuilder).to receive(:create_person_and_rsvp)
         action_params = {
           utm_source: 'expected_source',
           utm_medium: 'expected_medium',
@@ -45,8 +50,9 @@ describe V1::EventsController,  type: :controller do
         expect(@person).to have_received(:create_action).with(action_params)
       end
       it "pushes remote_fields to create_or_update" do
-        allow(Integration::NationBuilder).to receive(:parse_person_attributes).and_call_original
+        allow(Integration::NationBuilder).to receive(:create_person_and_rsvp)
         person_params = {email: @person.email, first_name: @person.first_name, remote_fields: {tags: ['20150501_test_tag'], skills: 'I have skills'}}
+
         post :create_rsvp, {
           event_id: 5,
           person: person_params
@@ -64,5 +70,4 @@ describe V1::EventsController,  type: :controller do
     end
 
   end
-
 end

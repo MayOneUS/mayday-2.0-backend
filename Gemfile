@@ -8,6 +8,7 @@ gem 'redis-objects'
 gem 'redis-rails'
 gem 'database_cleaner'
 gem 'phony_rails', :require => false
+gem 'validates_email_format_of'
 
 # Active Job
 gem 'sidekiq'
@@ -17,6 +18,7 @@ gem 'sinatra' # Used for the sidekiq UI
 gem 'rest-client', :require => false
 gem 'oauth2'
 gem 'twilio-ruby', :require => false
+gem 'nationbuilder-rb', require: 'nationbuilder'
 
 # API publishing
 gem 'rails-api'
@@ -32,6 +34,9 @@ group :production do
 end
 gem 'unicorn'
 gem 'airbrake'
+
+# Payment processing
+gem 'stripe'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -61,5 +66,6 @@ group :test do
   gem 'webmock'
   gem 'fakeredis', :require => 'fakeredis/rspec'
   gem 'timecop'
+  gem 'shoulda-matchers'
 end
 

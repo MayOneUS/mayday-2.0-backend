@@ -89,6 +89,7 @@ GEM
     hirb (0.7.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    httpclient (2.7.1)
     i18n (0.7.0)
     jbuilder (2.4.0)
       activesupport (>= 3.0.0, < 5.1)
@@ -106,6 +107,8 @@ GEM
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
+    nationbuilder-rb (1.3.7)
+      httpclient (~> 2.7)
     netrc (0.11.0)
     newrelic_rpm (3.14.1.311)
     nokogiri (1.6.7.1)
@@ -211,6 +214,8 @@ GEM
       ansi
       ast
     safe_yaml (1.0.4)
+    shoulda-matchers (3.0.1)
+      activesupport (>= 4.0.0)
     sidekiq (4.0.1)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
@@ -235,6 +240,9 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    stripe (1.31.0)
+      json (~> 1.8.1)
+      rest-client (~> 1.4)
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (2.0.1)
@@ -253,6 +261,8 @@ GEM
       rack
       raindrops (~> 0.7)
     uniform_notifier (1.9.0)
+    validates_email_format_of (1.6.3)
+      i18n
     versionist (1.4.1)
       activesupport (>= 3)
       railties (>= 3)
@@ -285,6 +295,7 @@ DEPENDENCIES
   fakeredis
   hirb
   jbuilder (~> 2.0)
+  nationbuilder-rb
   newrelic_rpm
   oauth2
   oga
@@ -301,13 +312,16 @@ DEPENDENCIES
   redis-rails
   rest-client
   rspec-rails
+  shoulda-matchers
   sidekiq
   sinatra
   spring
   spring-commands-rspec
+  stripe
   timecop
   twilio-ruby
   unicorn
+  validates_email_format_of
   versionist
   web-console (~> 2.0)
   webmock

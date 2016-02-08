@@ -1,8 +1,8 @@
 class V1::PeopleController < V1::BaseController
 
   def create
-    @person = Person.create_or_update(person_params)
-    if @person.valid?
+    @person = PersonWithRemoteFields.find_or_build(person_params)
+    if @person.save
       if template_ids = params[:actions].presence
         @person.mark_activities_completed(template_ids)
       end

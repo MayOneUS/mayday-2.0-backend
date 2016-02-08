@@ -1,34 +1,18 @@
 require 'rails_helper'
+include ActiveSupport::Testing::TimeHelpers
 
 describe Integration::NationBuilder do
 
-  before(:all) do
-    @person_id = 57126
-    @event_id = 5
-    @rsvp_id = 13
+  before(:each) do
+    Integration::NationBuilder.class_variable_set :@@nb_client, nil
   end
 
-  describe "#query_people_by_email" do
-    it "formats url for target endpoint" do
-      allow(Integration::NationBuilder).to receive(:request_handler).and_call_original
-
-      Integration::NationBuilder.query_people_by_email('dude@gmail.com')
-
-      expect(Integration::NationBuilder).to have_received(:request_handler)
-        .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:people_by_email] % 'dude@gmail.com')
-    end
-    it "responds with a parsed person_id" do
-      response = Integration::NationBuilder.query_people_by_email('dude@gmail.com')
-      expect(response).to have_key('id')
-      expect(response['id']).to eq(@person_id)
-    end
-  end
-
-  describe "#create_person_and_rsvp" do
+  describe ".create_person_and_rsvp" do
     context "with a person object" do
       it "should call proper methods" do
         person_attributes = {'first_name' => 'Fred', 'email' => 'fred@email.com'}
-        allow(Integration::NationBuilder).to receive(:create_or_update_person).and_call_original
+        allow(Integration::NationBuilder).to receive(:create_or_update_person).
+          and_return({'id' => 4})
         allow(Integration::NationBuilder).to receive(:create_rsvp)
 
         Integration::NationBuilder.create_person_and_rsvp(event_id: @event_id, person_attributes: person_attributes)
@@ -40,7 +24,7 @@ describe Integration::NationBuilder do
 
     context "with a person_id" do
       it "should call proper methods" do
-        person_id = @person_id
+        person_id = 3
         allow(Integration::NationBuilder).to receive(:create_or_update_person).and_call_original
         allow(Integration::NationBuilder).to receive(:create_rsvp)
 
@@ -58,37 +42,39 @@ describe Integration::NationBuilder do
     end
   end
 
-  describe "#create_or_update_person" do
-    it "formats url for target endpoint" do
-      body = {person: {'first_name' => 'Fred', 'email' => 'fred@email.com'}}
-      allow(Integration::NationBuilder).to receive(:request_handler).and_call_original
+  describe ".create_or_update_person" do
+    it "responds with person attributes" do
+      fake_response = { 'person' => 'person attributes' }
+      client = stub_nb_request(response: fake_response)
+      attributes = { first_name: 'Fred' }
 
-      Integration::NationBuilder.create_or_update_person(attributes: {first_name: 'Fred', email: 'fred@email.com'})
+      response = Integration::NationBuilder.
+        create_or_update_person(attributes: attributes)
 
-      expect(Integration::NationBuilder).to have_received(:request_handler)
-        .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:people], body: body, method: 'put')
-    end
-    it "responds with a parsed person_id" do
-      response = Integration::NationBuilder.create_or_update_person(attributes: {first_name: 'Fred'})
-      expect(response).to have_key('id')
-      expect(response['id']).to eq(@person_id)
+      expect(client).to have_received(:call).with(:people,
+                                                  :push,
+                                                  person: attributes)
+      expect(response).to eq 'person attributes'
     end
   end
 
-  describe "#create_rsvp" do
-    it "formats url for target endpoint" do
-      body = {'rsvp': {'person_id': @person_id}}
-      allow(Integration::NationBuilder).to receive(:request_handler).and_call_original
+  describe ".create_rsvp" do
+    it "responds with rsvp attributes" do
+      fake_response = { 'rsvp' => 'rsvp attributes' }
+      client = stub_nb_request(response: fake_response)
+      event_id = 2
+      person_id = 5
 
-      Integration::NationBuilder.create_rsvp(event_id: @event_id, person_id: @person_id)
+      response = Integration::NationBuilder.create_rsvp(event_id: event_id,
+                                                        person_id: person_id)
 
-      expect(Integration::NationBuilder).to have_received(:request_handler)
-        .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:rsvps_by_event] % @event_id,  body: body, method: 'post')
-    end
-    it "responds with a parsed rsvp_id" do
-      response = Integration::NationBuilder.create_rsvp(event_id: @event_id, person_id: @person_id)
-      expect(response).to have_key('id')
-      expect(response['id']).to eq(@rsvp_id)
+      expect(client).to have_received(:call).with(:events,
+                                                  :rsvp_create,
+                                                  site_slug: site_slug,
+                                                  id: event_id,
+                                                  rsvp: { person_id: person_id }
+                                                 )
+      expect(response).to eq 'rsvp attributes'
     end
   end
 
@@ -116,37 +102,71 @@ describe Integration::NationBuilder do
     end
 
     describe ".create_event" do
-      it "formats json body for target endpoint" do
-        body = { event: event_attributes }
-        allow(Integration::NationBuilder).to receive(:request_handler).and_call_original
+      it "returns event id" do
+        fake_response = { 'event' => { 'id' => 'event id' } }
+        client = stub_nb_request(response: fake_response)
 
-        Integration::NationBuilder.create_event(attributes: event_attributes)
+        response = Integration::NationBuilder.
+          create_event(attributes: event_attributes)
 
-        expect(Integration::NationBuilder).to have_received(:request_handler)
-          .with(endpoint_path: Integration::NationBuilder::ENDPOINTS[:events],
-                body: body, method: 'post')
-      end
-      it "returns event_id" do
-        response = Integration::NationBuilder.create_event(attributes: event_attributes)
-        expect(response).to eq 13
+        expect(client).to have_received(:call).with(:events,
+                                                    :create,
+                                                    site_slug: site_slug,
+                                                    event: event_attributes
+                                                   )
+        expect(response).to eq 'event id'
       end
     end
   end
 
   describe ".destroy_event" do
     it "returns true" do
-      response = Integration::NationBuilder.destroy_event(14)
+      fake_response = true
+      client = stub_nb_request(response: fake_response)
+      event_id = 2
+
+      response = Integration::NationBuilder.destroy_event(event_id)
+
+      expect(client).to have_received(:call).with(:events,
+                                                  :destroy,
+                                                  site_slug: site_slug,
+                                                  id: event_id)
       expect(response).to eq true
     end
   end
 
-  describe "#list_counts" do
+  describe ".create_donation" do
+    it "responds with a parsed donation object" do
+      travel_to Time.now do
+        fake_response = { 'donation' => 'donation attributes' }
+        client = stub_nb_request(response: fake_response)
+        amount = 400
+        person_id = 5
+
+        response = Integration::NationBuilder.
+          create_donation(amount_in_cents: amount, person_id: person_id)
+
+        expect(client).to have_received(:call).with(:donations,
+                                                    :create,
+                                                    donation: {
+                                                      donor_id: person_id,
+                                                      amount_in_cents: amount,
+                                                      payment_type_name: 'Square',
+                                                      succeeded_at: Time.now
+                                                    }
+                                                   )
+        expect(response).to eq 'donation attributes'
+      end
+    end
+  end
+
+  describe ".list_counts" do
     it "formats url for target endpoint" do
       allow(RestClient).to receive(:get).and_call_original
 
       Integration::NationBuilder.list_counts
 
-      expect(RestClient).to have_received(:get).with(ENV['NATION_BUILDER_DOMAIN'] + Integration::NationBuilder::ENDPOINTS[:list_count_page])
+      expect(RestClient).to have_received(:get).with(ENV['NATION_BUILDER_DOMAIN'] + Integration::NationBuilder::SUPPORTER_COUNT_ENDPOINT)
 
     end
     it "responds with a parsed list counts" do
@@ -155,14 +175,14 @@ describe Integration::NationBuilder do
     end
   end
 
-  describe "#parse_person_attributes" do
-    it "should handle allowed params" do
-      sample_attributes = {first_name: 'Fred', email: 'dude@gmail.com', bad_param: 'bad'}
+  def site_slug
+    Integration::NationBuilder::SITE_SLUG
+  end
 
-      parsed_attributed = Integration::NationBuilder.__send__(:parse_person_attributes, sample_attributes)
-
-      expect(parsed_attributed).not_to have_key(:bad_param)
-      expect(parsed_attributed).to have_key(:first_name)
-    end
+  def stub_nb_request(response:)
+    client = double('client')
+    allow(client).to receive(:call).and_return(response)
+    allow(::NationBuilder::Client).to receive(:new).and_return(client)
+    client
   end
 end
