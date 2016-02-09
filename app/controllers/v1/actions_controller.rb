@@ -5,8 +5,11 @@ class V1::ActionsController < V1::BaseController
     @activity = Activity.find_by(template_id: params[:activity_template_id])
     if @activity
       per_page = params[:limit].presence || 30
-      @actions = @activity.actions.visible.paginate(page: params[:page],
-                                                    per_page: per_page)
+      @actions = @activity.actions.includes(:person).visible.paginate(
+        page: params[:page],
+        per_page: per_page,
+      ).order('created_at DESC')
+
       render
     else
       record_not_found(StandardError.new('Record not found.'))
