@@ -45,7 +45,7 @@ class V1::ActionsController < V1::BaseController
 
   def action_params
     params.permit(:utm_source, :utm_medium, :utm_campaign, :source_url,
-                  :donation_amount_amount_in_cents, :strike_amount_in_cents,
+                  :donation_amount_in_cents, :strike_amount_in_cents,
                   :privacy_status)
   end
 
