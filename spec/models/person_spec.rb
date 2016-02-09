@@ -169,17 +169,11 @@ describe Person do
 
   describe "#save_location" do
 
-    it "calls update location if zip present" do
+    it "calls update location if address info present" do
       expect_any_instance_of(Location).to receive(:update_location).
-        with(address: '2020 Oregon St', zip: '94703', city: nil) { true }
+        with(address: '2020 Oregon St', zip: '94703', city: nil, state_abbrev: nil) { true }
       Person.create(email: 'user@example.com', address: '2020 Oregon St', zip: '94703')
     end
-
-    it "doesn't update location if zip not present" do
-      expect_any_instance_of(Location).not_to receive(:update_location)
-      Person.create(email: 'user@example.com', address: '2020 Oregon St')
-    end
-
   end
 
   describe "#constituent_of?" do
