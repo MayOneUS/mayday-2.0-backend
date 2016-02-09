@@ -262,7 +262,7 @@ class Person < ActiveRecord::Base
   end
 
   def save_location
-    update_location(address: address, zip: zip, city: city) if zip
+    update_location(address: address, zip: zip, city: city) if [zip, address, city].any?
   end
 
 end
