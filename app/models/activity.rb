@@ -21,4 +21,12 @@ class Activity < ActiveRecord::Base
     record_message: 'record-message',
     donate: 'donate'
   }
+
+  def donations_total_in_cents
+    actions.sum(:donation_amount_in_cents)
+  end
+
+  def strike_total_in_cents
+    actions.sum(:strike_amount_in_cents)
+  end
 end

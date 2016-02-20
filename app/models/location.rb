@@ -40,6 +40,13 @@ class Location < ActiveRecord::Base
       new_attributes[:district] = source.is_a?(District) ? source : source.try(:single_district)
 
       update_attributes(new_attributes)
+    elsif new_state = State.find_by(abbrev: address_params[:state_abbrev])
+      update_attributes(
+        address_1: address_params[:address],
+        city: address_params[:city],
+        state: new_state,
+        zip_code: address_params[:zip]
+      )
     end
   end
 
