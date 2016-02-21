@@ -52,12 +52,12 @@ class Person < ActiveRecord::Base
   delegate :update_location, :district, :state, to: :location
 
   FIELDS_ALSO_ON_NB = %w[email first_name last_name is_volunteer phone]
-  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :address, :city, :zip, :is_volunteer, remote_fields: [:event_id, :employer, :occupation, :skills, tags: []]]
-  LOCATION_ATTRIBUTES = [:address, :zip, :city]
+  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :address, :city, :state_abbrev, :zip, :is_volunteer, remote_fields: [:event_id, :employer, :occupation, :skills, tags: []]]
+  LOCATION_ATTRIBUTES = [:address, :zip, :city, :state_abbrev]
   DEFAULT_TARGET_COUNT = 100
 
-  SUPPLAMENTRY_ATTRIBUTES = [:remote_fields] + LOCATION_ATTRIBUTES
-  attr_accessor *SUPPLAMENTRY_ATTRIBUTES, :skip_nb_update
+  SUPPLEMENTARY_ATTRIBUTES = [:remote_fields] + LOCATION_ATTRIBUTES
+  attr_accessor *SUPPLEMENTARY_ATTRIBUTES, :skip_nb_update
 
   def self.create_or_update(person_params)
     search_values = person_params.symbolize_keys.slice(:uuid, :email, :phone).compact
@@ -91,6 +91,10 @@ class Person < ActiveRecord::Base
     Activity.where(template_id: template_ids).each do |activity|
       actions.create(activity: activity)
     end
+  end
+
+  def last_initial
+    last_name.to_s.first
   end
 
   def completed_activities
@@ -258,7 +262,7 @@ class Person < ActiveRecord::Base
   end
 
   def save_location
-    update_location(address: address, zip: zip, city: city) if zip
+    update_location(address: address, zip: zip, city: city, state_abbrev: state_abbrev) if [zip, address, city, state_abbrev].any?
   end
 
 end

@@ -159,6 +159,10 @@ FactoryGirl.define do
     sequence(:utm_medium){ |n| "utm_medium_#{n}"}
     sequence(:utm_campaign){ |n| "utm_campaign_#{n}"}
     source_url Faker::Internet.url
+
+    trait :hidden do
+      privacy_status :hidden
+    end
   end
 
   factory :bill do

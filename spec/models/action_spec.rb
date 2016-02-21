@@ -17,6 +17,9 @@
 require 'rails_helper'
 
 describe Action do
+  it { should define_enum_for(:privacy_status).with([:visible, :hidden]) }
+  it { should validate_presence_of(:person) }
+  it { should validate_presence_of(:activity) }
 
   describe 'scopes' do
     before(:all) do

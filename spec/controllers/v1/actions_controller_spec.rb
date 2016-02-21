@@ -50,6 +50,18 @@ RSpec.describe V1::ActionsController, type: :controller do
         target_action = @person.actions.where(activity: @activity).last
         expect(target_action.source_url).to eq(target_url)
       end
+      it 'stores locations information, even without zip' do
+        email = Faker::Internet.email
+        target_city = 'Tampa'
+        target_state = create(:state)
+
+        post :create, person: { email: email, city: target_city, state_abbrev: target_state.abbrev}, template_id: 'real_id'
+
+        stored_person = Person.find_by(email: email)
+        expect(stored_person.location).to be_present
+        expect(stored_person.location.city).to eq target_city
+        expect(stored_person.location.state).to eq target_state
+      end
       it 'passes along tags in remote_fields' do
         post :create, person: { email: @person.email, remote_fields: {tags: %w[one two]} }, template_id: 'real_id'
         expect(response).to be_success

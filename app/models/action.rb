@@ -15,6 +15,8 @@
 #
 
 class Action < ActiveRecord::Base
+  enum privacy_status: [:visible, :hidden]
+
   belongs_to :person, required: true
   belongs_to :activity, required: true
   belongs_to :donation_page
