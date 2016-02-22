@@ -22,7 +22,7 @@ class Donation
       false
     end
 
-  rescue Stripe::CardError => e
+  rescue Stripe::CardError, Stripe::InvalidRequestError => e
     errors.add(:stripe_token, e.json_body[:error][:message])
     false
   end
