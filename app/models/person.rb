@@ -56,7 +56,7 @@ class Person < ActiveRecord::Base
   LOCATION_ATTRIBUTES = [:address, :zip, :city, :state_abbrev]
   DEFAULT_TARGET_COUNT = 100
 
-  SUPPLEMENTARY_ATTRIBUTES = [:remote_fields] + LOCATION_ATTRIBUTES
+  SUPPLEMENTARY_ATTRIBUTES = [:remote_fields, :full_name] + LOCATION_ATTRIBUTES
   ALL_AVAILABLE_ATTRIBUTES = PERMITTED_PUBLIC_FIELDS + LOCATION_ATTRIBUTES
   attr_accessor *SUPPLEMENTARY_ATTRIBUTES, :skip_nb_update
 
