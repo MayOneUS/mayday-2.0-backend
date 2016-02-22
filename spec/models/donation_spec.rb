@@ -13,6 +13,9 @@ describe Donation do
   describe "process" do
     it "creates subscription if recurring is true" do
       person = stub_person
+      allow(person).to receive(:update)
+      allow(person).to receive(:create_subscription)
+
       stub_stripe_customer_create(id: 'customer id',
                                   subscription_id: 'subscription id')
       donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
@@ -70,10 +73,8 @@ describe Donation do
   end
 
   def stub_person
-    person = create(:person)
-    allow(person).to receive(:update)
+    person = build_stubbed(:person)
     allow(person).to receive(:create_action)
-    allow(person).to receive(:create_subscription)
     person
   end
 
