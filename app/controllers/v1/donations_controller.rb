@@ -1,5 +1,4 @@
 class V1::DonationsController < V1::BaseController
-  before_action :set_person
 
   # Receives person, payment and action attributes. Creates/updates a person
   # creates an action, and creates a stripe single or recurring payment
@@ -16,7 +15,8 @@ class V1::DonationsController < V1::BaseController
   #  * utm_campaign - action utm_campaign
   #  * source_url - action source_url
   def create
-    donation = Donation.new(donation_params.merge(person: @person))
+    person = person_from_params
+    donation = Donation.new(donation_params.merge(person: person))
     if donation.process
       render json: { status: 'success' }
     else
@@ -32,12 +32,4 @@ class V1::DonationsController < V1::BaseController
                   :source_url, :template_id)
   end
 
-  def person_params
-    params.require(:person).permit(Person::PERMITTED_PUBLIC_FIELDS)
-  end
-
-  def set_person
-    person_params.map{|k,v| person_params[k] = v.try(:strip) || v }
-    @person = Person.create_or_update(person_params) if person_params.present?
-  end
 end
