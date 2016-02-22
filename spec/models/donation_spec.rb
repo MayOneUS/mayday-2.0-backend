@@ -34,11 +34,23 @@ describe Donation do
         with(remote_id: 'subscription id')
     end
 
-    it "charges stripe once if recurring is falsy" do
+    it "charges stripe once if recurring not provideded" do
       allow(Stripe::Charge).to receive(:create)
       person = stub_person
       donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
         person: person, occupation: 'job', employer: 'work place')
+
+      donation.process
+
+      expect(Stripe::Charge).to have_received(:create).
+        with(hash_including(amount: 400, source: 'test token', currency: 'usd'))
+    end
+
+    it "charges stripe once if recurring is falsy" do
+      allow(Stripe::Charge).to receive(:create)
+      person = stub_person
+      donation = Donation.new(amount_in_cents: 400, stripe_token: 'test token',
+        person: person, occupation: 'job', employer: 'work place', recurring: 'false')
 
       donation.process
 
