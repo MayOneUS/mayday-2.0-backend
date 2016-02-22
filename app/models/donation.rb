@@ -30,7 +30,7 @@ class Donation
   private
 
   def process_payment
-    if recurring
+    if ActiveRecord::Type::Boolean.new.type_cast_from_user(recurring)
       stripe_customer = StripeCustomer.new(create_stripe_customer)
       person.update(stripe_id: stripe_customer.id)
       person.create_subscription(remote_id: stripe_customer.subscription_id)
