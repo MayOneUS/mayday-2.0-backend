@@ -5,7 +5,7 @@ class PersonWithRemoteFields < SimpleDelegator
   ]
   LOCAL_FIELDS = [
     :email, :phone, :first_name, :last_name,
-    :address, :city, :zip, :is_volunteer
+    :address, :city, :state_abbrev, :zip, :is_volunteer
   ]
 
   def self.find_or_build(attributes)
