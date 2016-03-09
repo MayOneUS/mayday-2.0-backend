@@ -11,27 +11,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151231182833) do
+ActiveRecord::Schema.define(version: 20160206214623) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "citext"
+  enable_extension "uuid-ossp"
 
   create_table "actions", force: :cascade do |t|
-    t.integer  "person_id",                null: false
-    t.integer  "activity_id",              null: false
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.integer  "person_id",                            null: false
+    t.integer  "activity_id",                          null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
     t.string   "utm_source"
     t.string   "utm_medium"
     t.string   "utm_campaign"
     t.string   "source_url"
     t.integer  "donation_amount_in_cents"
+    t.integer  "donation_page_id"
+    t.integer  "strike_amount_in_cents"
+    t.integer  "privacy_status",           default: 0
   end
 
   add_index "actions", ["activity_id"], name: "index_actions_on_activity_id", using: :btree
   add_index "actions", ["donation_amount_in_cents"], name: "index_actions_on_donation_amount_in_cents", using: :btree
+  add_index "actions", ["donation_page_id"], name: "index_actions_on_donation_page_id", using: :btree
   add_index "actions", ["person_id", "activity_id"], name: "index_actions_on_person_id_and_activity_id", using: :btree
   add_index "actions", ["person_id"], name: "index_actions_on_person_id", using: :btree
+  add_index "actions", ["privacy_status"], name: "index_actions_on_privacy_status", using: :btree
 
   create_table "activities", force: :cascade do |t|
     t.string   "name"
@@ -83,6 +90,23 @@ ActiveRecord::Schema.define(version: 20151231182833) do
 
   add_index "districts_zip_codes", ["district_id", "zip_code_id"], name: "index_districts_zip_codes_on_district_id_and_zip_code_id", using: :btree
   add_index "districts_zip_codes", ["zip_code_id", "district_id"], name: "index_districts_zip_codes_on_zip_code_id_and_district_id", unique: true, using: :btree
+
+  create_table "donation_pages", force: :cascade do |t|
+    t.integer  "person_id",                                        null: false
+    t.string   "title",                                            null: false
+    t.citext   "slug",                                             null: false
+    t.string   "visible_user_name"
+    t.string   "photo_url"
+    t.text     "intro_text"
+    t.integer  "goal_in_cents"
+    t.uuid     "uuid",              default: "uuid_generate_v4()"
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "donation_pages", ["person_id"], name: "index_donation_pages_on_person_id", using: :btree
+  add_index "donation_pages", ["slug"], name: "index_donation_pages_on_slug", unique: true, using: :btree
+  add_index "donation_pages", ["uuid"], name: "index_donation_pages_on_uuid", unique: true, using: :btree
 
   create_table "events", force: :cascade do |t|
     t.datetime "starts_at"
@@ -258,8 +282,10 @@ ActiveRecord::Schema.define(version: 20151231182833) do
   add_index "zip_codes", ["zip_code"], name: "index_zip_codes_on_zip_code", unique: true, using: :btree
 
   add_foreign_key "actions", "activities"
+  add_foreign_key "actions", "donation_pages"
   add_foreign_key "actions", "people"
   add_foreign_key "districts", "states"
+  add_foreign_key "donation_pages", "people"
   add_foreign_key "ivr_calls", "people"
   add_foreign_key "ivr_connections", "ivr_calls", column: "call_id"
   add_foreign_key "ivr_connections", "legislators"

@@ -3,12 +3,12 @@ class Donation
 
   DEFAULT_DESCRIPTION = 'Donation from %s'
 
-  attr_accessor :email, :employer, :occupation, :card_token, :recurring,
+  attr_accessor :person, :employer, :occupation, :card_token, :recurring,
     :utm_source, :utm_medium, :utm_campaign, :source_url, :amount_in_cents
 
   attr_writer :template_id
 
-  validates :email, presence: true, email_format: true
+  validates :person, presence: true
   validates :employer, presence: true
   validates :occupation, presence: true
   validates :card_token, presence: true
@@ -17,7 +17,6 @@ class Donation
 
   def process
     if valid?
-      find_or_create_person
       process_payment
       record_donation
       create_donate_action
@@ -25,22 +24,15 @@ class Donation
       false
     end
 
-  rescue PaymentProcessor::CardError => e
+  rescue PaymentProcessor::CardError, Stripe::InvalidRequestError => e
     errors.add(:card_token, e.message)
     false
   end
 
   private
 
-  attr_reader :person
-
-  def find_or_create_person
-    @person = Person.find_or_initialize_by(email: email)
-    @person.update(skip_nb_update: true)
-  end
-
   def process_payment
-    if recurring
+    if ActiveRecord::Type::Boolean.new.type_cast_from_user(recurring)
       customer = create_customer_and_subscription
       person.update(stripe_id: customer.id)
       person.create_subscription(remote_id: customer.subscription_id)
@@ -71,7 +63,7 @@ class Donation
 
   def person_attributes
     {
-      email: email,
+      email: person.email,
       employer: employer,
       occupation: occupation
     }
@@ -96,8 +88,8 @@ class Donation
     {
       card: card_token,
       amount_in_cents: amount_as_integer,
-      email: email,
-      description: DEFAULT_DESCRIPTION % email
+      email: person.email,
+      description: DEFAULT_DESCRIPTION % person.email
     }
   end
 

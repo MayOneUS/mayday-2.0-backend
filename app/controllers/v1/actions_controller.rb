@@ -1,8 +1,23 @@
 class V1::ActionsController < V1::BaseController
-  before_action :set_person, only: :create
+
+  def index
+    @activity = Activity.find_by(template_id: params[:activity_template_id])
+    if @activity
+      per_page = params[:limit].presence || 30
+      @actions = @activity.actions.includes(:person).visible.paginate(
+        page: params[:page],
+        per_page: per_page,
+      ).order('created_at DESC')
+
+      render
+    else
+      record_not_found(StandardError.new('Record not found.'))
+    end
+  end
 
   def create
     activity = Activity.find_or_create_by(template_id: activity_param)
+    @person = person_from_params
 
     action_attributes = {person: @person, activity: activity}.merge(action_params)
     action = Action.create(action_attributes)
@@ -32,16 +47,9 @@ class V1::ActionsController < V1::BaseController
   end
 
   def action_params
-    params.permit(:utm_source, :utm_medium, :utm_campaign, :source_url, :donation_amount)
-  end
-
-  def person_params
-    params.require(:person).permit(Person::PERMITTED_PUBLIC_FIELDS)
-  end
-
-  def set_person
-    person_params.map{|k,v| person_params[k] = v.try(:strip) || v }
-    @person = Person.create_or_update(person_params) if person_params.present?
+    params.permit(:utm_source, :utm_medium, :utm_campaign, :source_url,
+                  :donation_amount_in_cents, :strike_amount_in_cents,
+                  :privacy_status)
   end
 
 end

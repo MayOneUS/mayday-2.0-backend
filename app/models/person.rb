@@ -26,13 +26,13 @@ class Person < ActiveRecord::Base
   has_many :connections, through: :calls
   has_many :recordings, through: :calls
   has_many :all_called_legislators, through: :calls, source: :called_legislators
+  has_many :donation_pages, dependent: :destroy
   has_many :actions, dependent: :destroy
   has_many :activities, through: :actions
 
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
   validates :email, uniqueness: { case_sensitive: false },
-                    format: { with: VALID_EMAIL_REGEX },
-                    allow_nil: true
+    email_format: { message: 'is invalid' },
+    allow_nil: true
 
   validates :email, presence: true, unless: :phone
   validates :phone, presence: true, unless: :email
@@ -40,7 +40,8 @@ class Person < ActiveRecord::Base
 
   before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
-  after_save :update_nation_builder, :save_location, unless: :skip_nb_update
+  after_save :update_nation_builder, unless: :skip_nb_update
+  after_save :save_location
 
   scope :identify, -> identifier {
     includes(:actions)
@@ -51,12 +52,13 @@ class Person < ActiveRecord::Base
   delegate :update_location, :district, :state, to: :location
 
   FIELDS_ALSO_ON_NB = %w[email first_name last_name is_volunteer phone]
-  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :address, :city, :zip, :is_volunteer, remote_fields: [:event_id, :employer, :occupation, :skills, tags: []]]
-  LOCATION_ATTRIBUTES = [:address, :zip, :city]
+  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :full_name, :address, :city, :state_abbrev, :zip, :is_volunteer, remote_fields: [:event_id, :employer, :occupation, :skills, tags: []]]
+  LOCATION_ATTRIBUTES = [:address, :zip, :city, :state_abbrev]
   DEFAULT_TARGET_COUNT = 100
 
-  SUPPLAMENTRY_ATTRIBUTES = [:remote_fields] + LOCATION_ATTRIBUTES
-  attr_accessor *SUPPLAMENTRY_ATTRIBUTES, :skip_nb_update
+  SUPPLEMENTARY_ATTRIBUTES = [:remote_fields, :full_name] + LOCATION_ATTRIBUTES
+  ALL_AVAILABLE_ATTRIBUTES = PERMITTED_PUBLIC_FIELDS + LOCATION_ATTRIBUTES
+  attr_accessor *SUPPLEMENTARY_ATTRIBUTES, :skip_nb_update
 
   def self.create_or_update(person_params)
     search_values = person_params.symbolize_keys.slice(:uuid, :email, :phone).compact
@@ -90,6 +92,10 @@ class Person < ActiveRecord::Base
     Activity.where(template_id: template_ids).each do |activity|
       actions.create(activity: activity)
     end
+  end
+
+  def last_initial
+    last_name.to_s.first
   end
 
   def completed_activities
@@ -257,7 +263,7 @@ class Person < ActiveRecord::Base
   end
 
   def save_location
-    update_location(address: address, zip: zip, city: city) if zip
+    update_location(address: address, zip: zip, city: city, state_abbrev: state_abbrev) if [zip, address, city, state_abbrev].any?
   end
 
 end

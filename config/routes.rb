@@ -15,7 +15,12 @@ Rails.application.routes.draw do
     resources :actions,     only: :create do
       get :count, on: :collection
     end
-    resources :activities,  only: :index
+    resources :activities,  only: :index, param: :template_id do
+      resources :actions, only: :index
+    end
+    resources :donation_pages, except: [:new, :edit], param: :slug do
+      post :validate, on: :collection
+    end
 
     resources :google_forms, only: :create
 

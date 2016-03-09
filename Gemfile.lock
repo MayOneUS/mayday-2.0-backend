@@ -89,6 +89,7 @@ GEM
     hirb (0.7.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    httpclient (2.7.1)
     i18n (0.7.0)
     jbuilder (2.4.0)
       activesupport (>= 3.0.0, < 5.1)
@@ -106,6 +107,8 @@ GEM
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
+    nationbuilder-rb (1.3.7)
+      httpclient (~> 2.7)
     netrc (0.11.0)
     newrelic_rpm (3.14.1.311)
     nokogiri (1.6.7.1)
@@ -273,6 +276,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
+    will_paginate (3.1.0)
     yard (0.8.7.6)
 
 PLATFORMS
@@ -292,6 +296,7 @@ DEPENDENCIES
   fakeredis
   hirb
   jbuilder (~> 2.0)
+  nationbuilder-rb
   newrelic_rpm
   oauth2
   oga
@@ -321,6 +326,7 @@ DEPENDENCIES
   versionist
   web-console (~> 2.0)
   webmock
+  will_paginate
 
 BUNDLED WITH
    1.11.2

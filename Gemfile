@@ -18,6 +18,7 @@ gem 'sinatra' # Used for the sidekiq UI
 gem 'rest-client', :require => false
 gem 'oauth2'
 gem 'twilio-ruby', :require => false
+gem 'nationbuilder-rb', require: 'nationbuilder'
 
 # API publishing
 gem 'rails-api'
@@ -25,6 +26,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'versionist'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'oj'
+gem 'will_paginate'
 
 # SysOps + Monitoring
 group :production do

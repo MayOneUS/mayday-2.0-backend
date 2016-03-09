@@ -14,8 +14,12 @@
 #
 
 require 'rails_helper'
+require 'validates_email_format_of/rspec_matcher'
 
 describe Person do
+
+  it { should validate_email_format_of(:email).
+       with_message('is invalid') }
 
   describe "validations" do
     it "validates with an email and no phone" do
@@ -32,24 +36,11 @@ describe Person do
     end
   end
 
-  describe "create" do
+  describe ".create" do
     it "generates uuid" do
       person = Person.create(email: 'user@example.com')
       expect(person.uuid).to_not be_nil
       expect(person.uuid.length).to eq 36
-    end
-  end
-
-  describe "#all_called_legislators" do
-    it "returns those legislators who are called" do
-      call = FactoryGirl.create(:call)
-      connections = create_list(:connection, 2, :completed, call: call)
-      connection_three = FactoryGirl.create(:connection, :failed, call: call)
-      person = call.person
-
-      expected_ids = person.all_called_legislators.map(&:id)
-      expect(expected_ids).to eq(connections.map{|c| c.legislator.id})
-      expect(expected_ids).not_to include(connection_three.legislator.id)
     end
   end
 
@@ -145,19 +136,44 @@ describe Person do
     end
   end
 
+  describe "#last_initial" do
+    it "returns first letter of last name" do
+      person = Person.new(last_name: "Smith")
+
+      initial = person.last_initial
+
+      expect(initial).to eq "S"
+    end
+
+    it "returns empty string if last name is null" do
+      person = Person.new
+
+      initial = person.last_initial
+
+      expect(initial).to eq ""
+    end
+  end
+
+  describe "#all_called_legislators" do
+    it "returns those legislators who are called" do
+      call = FactoryGirl.create(:call)
+      connections = create_list(:connection, 2, :completed, call: call)
+      connection_three = FactoryGirl.create(:connection, :failed, call: call)
+      person = call.person
+
+      expected_ids = person.all_called_legislators.map(&:id)
+      expect(expected_ids).to eq(connections.map{|c| c.legislator.id})
+      expect(expected_ids).not_to include(connection_three.legislator.id)
+    end
+  end
+
   describe "#save_location" do
 
-    it "calls update location if zip present" do
+    it "calls update location if address info present" do
       expect_any_instance_of(Location).to receive(:update_location).
-        with(address: '2020 Oregon St', zip: '94703', city: nil) { true }
+        with(address: '2020 Oregon St', zip: '94703', city: nil, state_abbrev: nil) { true }
       Person.create(email: 'user@example.com', address: '2020 Oregon St', zip: '94703')
     end
-
-    it "doesn't update location if zip not present" do
-      expect_any_instance_of(Location).not_to receive(:update_location)
-      Person.create(email: 'user@example.com', address: '2020 Oregon St')
-    end
-
   end
 
   describe "#constituent_of?" do

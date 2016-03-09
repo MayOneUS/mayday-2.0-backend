@@ -21,6 +21,15 @@ FactoryGirl.define do
     end
   end
 
+  factory :donation_page do
+    person
+    sequence(:title) { |n| "Donation Page #{n}" }
+    sequence(:slug)  { |n| "slug#{n}" }
+    visible_user_name 'joe smith'
+    photo_url 'www.example.com'
+    intro_text 'donation page'
+  end
+
   factory :location do
     person
     district
@@ -35,11 +44,11 @@ FactoryGirl.define do
   end
 
   factory :donation do
+    person
     amount_in_cents 700
     employer 'business'
     occupation 'job'
     sequence(:card_token) { |n| "token#{n}" }
-    sequence(:email) { |n| "user#{n}@example.com" }
   end
 
   factory :legislator do
@@ -158,6 +167,10 @@ FactoryGirl.define do
     sequence(:utm_medium){ |n| "utm_medium_#{n}"}
     sequence(:utm_campaign){ |n| "utm_campaign_#{n}"}
     source_url Faker::Internet.url
+
+    trait :hidden do
+      privacy_status :hidden
+    end
   end
 
   factory :bill do

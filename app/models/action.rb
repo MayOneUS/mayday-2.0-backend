@@ -15,8 +15,11 @@
 #
 
 class Action < ActiveRecord::Base
+  enum privacy_status: [:visible, :hidden]
+
   belongs_to :person, required: true
   belongs_to :activity, required: true
+  belongs_to :donation_page
 
   scope :by_type, ->(activity_type) { joins(:activity).where('activities.activity_type' => activity_type) }
   scope :by_date, ->(start_at, end_at=nil) { where("created_at >= ? AND created_at <= ?", start_at, end_at || Time.now) }
