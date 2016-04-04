@@ -93,7 +93,7 @@ class NationBuilder
 
   def self.call_nation_builder(*args)
     nb_client.call(*args)
-  rescue ::NationBuilder::ClientError => e
+  rescue ::NationBuilder::ClientError, SocketError => e
     e.message
   end
 
