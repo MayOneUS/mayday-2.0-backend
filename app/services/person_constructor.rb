@@ -7,13 +7,12 @@ class PersonConstructor
     remote_fields: PersonWithRemoteFields::REMOTE_PARAMS
   ]
 
-  def self.permitted_params
+  PERMITTED_PARAMS =
     Person::PERMITTED_PARAMS | PersonFinder::SEARCH_KEYS +
       PersonWithRemoteFields::REMOTE_PARAMS +
       Location::PERMITTED_PARAMS +
       KEY_NAME_MAPPINGS.keys +
       OLD_REMOTE_PARAMS
-  end
 
   def initialize(params)
     @params = params.deep_symbolize_keys

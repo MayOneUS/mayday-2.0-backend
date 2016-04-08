@@ -29,8 +29,8 @@ class V1::GoogleFormsController < V1::BaseController
   end
 
   def fetch_person_params
-    person_params = params.permit(PersonConstructor.permitted_params)
-    nested_person_params = params.permit(person: PersonConstructor.permitted_params)[:person]  || {}
+    person_params = params.permit(PersonConstructor::PERMITTED_PARAMS)
+    nested_person_params = params.permit(person: PersonConstructor::PERMITTED_PARAMS)[:person]  || {}
     person_params.merge(nested_person_params)
   end
 

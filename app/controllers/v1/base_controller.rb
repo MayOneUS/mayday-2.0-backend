@@ -24,7 +24,7 @@ class V1::BaseController < ApplicationController
   end
 
   def create_person_and_action(default_template_id: nil)
-    person_params = params.require(:person).permit(PersonConstructor.permitted_params)
+    person_params = params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
     person = PersonConstructor.new(person_params).build.tap(&:save) # temporary fix
 
     action_params = params.permit(:template_id, :utm_source, :utm_medium, :utm_campaign, :source_url)

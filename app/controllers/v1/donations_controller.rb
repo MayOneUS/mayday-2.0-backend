@@ -33,6 +33,6 @@ class V1::DonationsController < V1::BaseController
   end
 
   def person_params
-    params.require(:person).permit(PersonConstructor.permitted_params)
+    params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
   end
 end

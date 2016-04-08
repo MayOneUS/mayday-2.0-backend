@@ -76,20 +76,4 @@ describe PersonConstructor do
       and_return(person)
     person
   end
-
-  # def stub_location_comparer(person:, new_params:, output: 'comparer attrs')
-  #   comparer = double('comparer', new_attributes: output)
-  #   allow(LocationComparer).to receive(:new).
-  #     with(old: person.location.attributes.symbolize_keys, new: new_params).
-  #     and_return(comparer)
-  #   comparer
-  # end
-
-  # def stub_location_constructor(input:, output: 'constructor attrs')
-  #   constructor = double('constructor', attributes: output)
-  #   allow(LocationConstructor).to receive(:new).
-  #     with(input).
-  #     and_return(constructor)
-  #   constructor
-  # end
 end

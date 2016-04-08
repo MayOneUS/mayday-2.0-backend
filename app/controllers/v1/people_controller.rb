@@ -30,6 +30,6 @@ class V1::PeopleController < V1::BaseController
   private
 
   def person_params
-    params.require(:person).permit(PersonConstructor.permitted_params)
+    params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
   end
 end
