@@ -26,6 +26,11 @@ class PersonConstructor
     person
   end
 
+  def self.build(params)
+    person = self.new(params)
+    person.build
+  end
+
   private
 
   attr_reader :params
@@ -56,18 +61,15 @@ class PersonConstructor
     params.merge!(params.delete(:remote_fields) || {})
   end
 
-  def strip_whitespace_from_values
-    params.merge!(params){ |k, v1| v1.try(:strip) || v1 }
-  end
-
   def normalize_keys
+    mapped_keys = params.keys & KEY_NAME_MAPPINGS.keys
     mapped_keys.each do |key|
       params[ KEY_NAME_MAPPINGS[key] ] = params.delete(key)
     end
   end
 
-  def mapped_keys
-    params.keys & KEY_NAME_MAPPINGS.keys
+  def strip_whitespace_from_values
+    params.merge!(params){ |k, v, _| v.try(:strip) || v }
   end
 
   def person_params
