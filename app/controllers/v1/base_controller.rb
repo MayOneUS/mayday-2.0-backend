@@ -5,7 +5,6 @@ class V1::BaseController < ApplicationController
 
   protected
 
-  # OAuth2 errors are no longer relevant. Need to research NB errors
   def rescue_error_messages
     begin
       response = yield

@@ -16,7 +16,6 @@ class V1::ActionsController < V1::BaseController
   end
 
   def create
-    # need to handle invalid person
     activity = Activity.find_or_create_by(template_id: activity_param)
     if person_params.any? # temporary fix
       @person = PersonConstructor.build(person_params).tap(&:save)

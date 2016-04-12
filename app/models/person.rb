@@ -178,7 +178,6 @@ class Person < ActiveRecord::Base
     save!
   end
 
-  # is this method ever called?
   def self.merge_duplicates!(records, compare_on:)
     records.each do |record|
       next if record.nil?
@@ -196,7 +195,6 @@ class Person < ActiveRecord::Base
     end.compact
   end
 
-  # is this ever called?
   def self.update_nation_builder_call_counts!
     select(:phone,:email,:id).includes(:connections).find_each do |person|
       person.set_remote_call_counts!

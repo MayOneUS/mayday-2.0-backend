@@ -34,7 +34,6 @@ class NationBuilder
   end
 
   def self.person_params(params)
-    # TO DO: refactor
     person = params.symbolize_keys
     address = person.slice(*MAPPINGS_LOCATION.keys)
     if address.any?
