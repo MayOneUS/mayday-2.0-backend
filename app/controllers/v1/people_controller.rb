@@ -1,7 +1,7 @@
 class V1::PeopleController < V1::BaseController
 
   def create
-    @person = PersonWithRemoteFields.find_or_build(person_params)
+    @person = PersonConstructor.build(person_params)
     if @person.save
       if template_ids = params[:actions].presence
         @person.mark_activities_completed(template_ids)
@@ -19,7 +19,7 @@ class V1::PeopleController < V1::BaseController
   end
 
   def targets
-   @person = Person.create_or_update(person_params)
+    @person = PersonConstructor.build(person_params).tap(&:save) # temporary fix
     if @person.valid?
       render
     else
@@ -30,10 +30,6 @@ class V1::PeopleController < V1::BaseController
   private
 
   def person_params
-    params.require(:person).permit(Person::PERMITTED_PUBLIC_FIELDS)
-  end
-
-  def location_params
-    params.require(:person).permit(:address, :zip)
+    params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
   end
 end

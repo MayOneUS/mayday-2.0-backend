@@ -21,7 +21,7 @@ describe V1::EventsController,  type: :controller do
         @activity = FactoryGirl.create(:activity, template_id: Activity::DEFAULT_TEMPLATE_IDS[:rsvp])
         @person = FactoryGirl.build(:person)
         allow(@person).to receive(:create_action)
-        allow(Person).to receive_message_chain(:create_or_update).and_return(@person)
+        allow(PersonConstructor).to receive(:build).and_return(@person)
       end
 
       it "returns success" do
@@ -58,7 +58,8 @@ describe V1::EventsController,  type: :controller do
           person: person_params
         }
 
-        expect(Person).to have_received(:create_or_update)
+        expect(Integration::NationBuilder).to have_received(:create_person_and_rsvp).
+          with(event_id: '5', person_attributes: @person.attributes.symbolize_keys)
       end
     end
     context "with missing person parameters" do
@@ -68,6 +69,5 @@ describe V1::EventsController,  type: :controller do
         expect(JSON.parse(response.body)).to have_key('error')
       end
     end
-
   end
 end

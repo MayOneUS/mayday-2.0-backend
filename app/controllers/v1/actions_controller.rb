@@ -17,7 +17,9 @@ class V1::ActionsController < V1::BaseController
 
   def create
     activity = Activity.find_or_create_by(template_id: activity_param)
-    @person = person_from_params
+    if person_params.any? # temporary fix
+      @person = PersonConstructor.build(person_params).tap(&:save)
+    end
 
     action_attributes = {person: @person, activity: activity}.merge(action_params)
     action = Action.create(action_attributes)
@@ -52,4 +54,7 @@ class V1::ActionsController < V1::BaseController
                   :privacy_status)
   end
 
+  def person_params
+    params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
+  end
 end

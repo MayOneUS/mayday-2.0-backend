@@ -40,8 +40,6 @@ class Person < ActiveRecord::Base
 
   before_create :generate_uuid, unless: :uuid?
   before_save :downcase_email
-  after_save :update_nation_builder, unless: :skip_nb_update
-  after_save :save_location
 
   scope :identify, -> identifier {
     includes(:actions)
@@ -49,36 +47,12 @@ class Person < ActiveRecord::Base
   }
 
   alias_method :location_association, :location
-  delegate :update_location, :district, :state, to: :location
+  delegate :district, :state, to: :location
 
-  FIELDS_ALSO_ON_NB = %w[email first_name last_name is_volunteer phone]
-  PERMITTED_PUBLIC_FIELDS = [:email, :phone, :first_name, :last_name, :full_name, :address, :city, :state_abbrev, :zip, :is_volunteer, remote_fields: [:event_id, :employer, :occupation, :skills, tags: []]]
-  LOCATION_ATTRIBUTES = [:address, :zip, :city, :state_abbrev]
   DEFAULT_TARGET_COUNT = 100
+  PERMITTED_PARAMS = [:email, :phone, :first_name, :last_name, :is_volunteer]
 
-  SUPPLEMENTARY_ATTRIBUTES = [:remote_fields, :full_name] + LOCATION_ATTRIBUTES
-  ALL_AVAILABLE_ATTRIBUTES = PERMITTED_PUBLIC_FIELDS + LOCATION_ATTRIBUTES
-  attr_accessor *SUPPLEMENTARY_ATTRIBUTES, :skip_nb_update
-
-  def self.create_or_update(person_params)
-    search_values = person_params.symbolize_keys.slice(:uuid, :email, :phone).compact
-
-    search_values.each do |search_key, search_value|
-      case search_key
-        when :email then search_value.downcase!
-        when :phone then search_value = PhonyRails.normalize_number(search_value, default_country_code: 'US')
-      end
-      @person = find_by({search_key => search_value})
-      break if @person.present?
-    end
-
-    if search_values.any? && @person.present?
-      @person.update(person_params)
-    else
-      @person = create(person_params)
-    end
-    @person
-  end
+  attr_accessor :remote_fields
 
   def self.new_uuid
     SecureRandom.uuid
@@ -193,9 +167,11 @@ class Person < ActiveRecord::Base
 
     #merge attributes
     updated_attributes = other.attributes.compact!.merge(attributes.compact!)
-    update(updated_attributes)
-    location_attrs = updated_attributes.slice(LOCATION_ATTRIBUTES)
-    update_location(location_attrs) if location_attrs.any?
+    assign_attributes(updated_attributes)
+
+    # note location merges in opposite direction
+    location.becomes(LocationComparable).
+      merge(other.location.becomes(LocationComparable))
 
     #cleanup
     other.reload.destroy
@@ -227,7 +203,9 @@ class Person < ActiveRecord::Base
 
   def set_remote_call_counts!
     remote_fields = {representative_call_attempts: representative_call_attempts, representative_calls_count: representative_calls_count}
-    update_remote_attributes(remote_fields) if representative_call_attempts > 0
+    if representative_call_attempts > 0
+      becomes(PersonWithRemoteFields).update(custom_fields: remote_fields)
+    end
   end
 
   def representative_call_attempts
@@ -238,21 +216,7 @@ class Person < ActiveRecord::Base
     connections.completed.count
   end
 
-  def update_remote_attributes(remote_attributes)
-    self.remote_fields ||= {}
-    remote_fields.merge!(remote_attributes)
-    update_nation_builder
-  end
-
   private
-
-  def update_nation_builder
-    relevant_fields = changed & FIELDS_ALSO_ON_NB
-    if relevant_fields.any? || remote_fields.present?
-      nb_attributes = self.slice(:email, :phone, *relevant_fields).merge(remote_fields || {}).compact
-      NbPersonPushJob.perform_later(nb_attributes.symbolize_keys)
-    end
-  end
 
   def downcase_email
     email && self.email = email.downcase
@@ -261,9 +225,4 @@ class Person < ActiveRecord::Base
   def generate_uuid
     self.uuid = self.class.new_uuid
   end
-
-  def save_location
-    update_location(address: address, zip: zip, city: city, state_abbrev: state_abbrev) if [zip, address, city, state_abbrev].any?
-  end
-
 end
