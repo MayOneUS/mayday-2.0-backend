@@ -86,7 +86,7 @@ describe Location do
   end
 
   describe "#as_json" do
-    it "includes state_abbrev and not state" do
+    it "returns correct fields by default" do
       state = build(:state)
       location = Location.new(address_1: 'address', state: state)
 
@@ -96,6 +96,14 @@ describe Location do
         'address_1' => 'address', 'address_2' => nil, 'city' => nil,
         'state_abbrev' => state.abbrev, 'zip_code' => nil
       })
+    end
+
+    it "returns specified fields when called with args" do
+      location = Location.new(address_1: 'address', city: 'city')
+
+      json = location.as_json(only: [:city])
+
+      expect(json).to eq('city' => 'city')
     end
   end
 end

@@ -40,11 +40,19 @@ describe PersonWithRemoteFields do
 
     it "includes location attributes" do
       person = PersonWithRemoteFields.new
-      person.guaranteed_location.zip_code = '01111'
+      state = build(:state)
+      person.build_location(state: state, zip_code: '01111')
 
       params = person.params_for_remote_update
 
-      expect(params).to include(phone: nil, zip_code: '01111')
+      expect(params).to eq(
+        phone: nil,
+        address_1: nil,
+        address_2: nil,
+        city: nil,
+        state_abbrev: state.abbrev,
+        zip_code: '01111'
+      )
     end
 
     it "includes custom fields" do
@@ -54,16 +62,6 @@ describe PersonWithRemoteFields do
       params = person.params_for_remote_update
 
       expect(params).to include(phone: nil, foo: 'bar')
-    end
-
-    it "converts state to string" do
-      person = PersonWithRemoteFields.new
-      state = create(:state)
-      person.guaranteed_location.state = state
-
-      params = person.params_for_remote_update
-
-      expect(params).to include(phone: nil, state_abbrev: state.abbrev)
     end
 
     it "symbolizes keys" do
