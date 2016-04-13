@@ -18,164 +18,84 @@
 require 'rails_helper'
 
 describe Location do
-  it "validates required associations" do
-    location = Location.new
-    location.valid?
-
-    expect(location.errors).to have_key(:person)
+  it { should belong_to(:person) }
+  it { should validate_presence_of(:state) }
+  it { should validate_presence_of(:zip_code) }
+  it "doesn't validate presence of zip_code if state is present" do
+    expect(Location.new(state: build(:state))).
+      not_to validate_presence_of(:zip_code)
   end
-
-  describe "#update_location" do
-    let(:location) { FactoryGirl.create(:location, zip_code: '03431') }
-    context "with a bad address" do
-      it "doesn't change location" do
-        expect{
-          location.update_location(address: '2020 Oregon St', zip: 'bad')
-          }.not_to change{location.attributes}
-      end
+  it "doesn't validate presence of state if zip_code is present" do
+    expect(Location.new(zip_code: '00001')).not_to validate_presence_of(:state)
+  end
+  describe "zip_code format" do
+    ['00000', '123456789', '11111-0000'].each do |valid_zip|
+      it { should allow_value(valid_zip).for(:zip_code) }
     end
-
-    context "with a good address" do
-      let (:state)    { FactoryGirl.create(:state, abbrev: 'CA') }
-      let!(:district) { FactoryGirl.create(:district, state: state, district: '13') }
-
-      before do
-        location.update_location(address: '2020 Oregon St', zip: '94703')
-      end
-
-      it "sets address" do
-        expect(location.address_1).to eq '2020 Oregon St'
-      end
-      it "sets district" do
-        expect(location.district).to eq district
-      end
-      it "sets state" do
-        expect(location.state).to eq state
-      end
-      it "sets zip" do
-        expect(location.zip_code).to eq '94703'
-      end
-    end
-
-    context "with zip only" do
-      context "with same zip already stored" do
-        it "doesn't change location" do
-          original_attributes = location.attributes
-          location.update_location(zip: '03431')
-          expect(location.attributes).to eq original_attributes
-        end
-      end
-
-      context "with different zip already stored" do
-        context "for invalid zip" do
-          it "doesn't change location" do
-            original_attributes = location.attributes
-            location.update_location(zip: '999999')
-            expect(location.attributes).to eq original_attributes
-          end
-        end
-        context "for zip found" do
-          let!(:zip) { FactoryGirl.create(:zip_code, zip_code: '94703') }
-          let!(:district) { FactoryGirl.create(:district) }
-
-          context "with multiple districts" do
-            before do
-              zip.districts = [district, FactoryGirl.create(:district)]
-              location.update_location(zip: '94703')
-            end
-
-            it "clears address" do
-              expect(location.address_1).to be_nil
-            end
-            it "clears district" do
-              expect(location.district).to be_nil
-            end
-            it "sets state" do
-              expect(location.state).to eq zip.state
-            end
-            it "sets zip" do
-              expect(location.zip_code).to eq '94703'
-            end
-          end
-          context "with single district" do
-            before do
-              zip.districts = [district]
-              location.update_location(zip: '94703')
-            end
-
-            it "clears address" do
-              expect(location.address_1).to be_nil
-            end
-            it "sets district" do
-              expect(location.district).to eq district
-            end
-            it "sets state" do
-              expect(location.state).to eq zip.state
-            end
-            it "sets zip" do
-              expect(location.zip_code).to eq '94703'
-            end
-          end
-        end
-
-        context "for zip not found" do
-          before do
-            allow(ZipCode).to receive(:find_by).and_return(nil)
-          end
-
-          it "clears district" do
-            expect{
-              location.update_location(zip: '94703')
-            }.not_to change{location.district}
-          end
-          it "clears state" do
-            expect{
-              location.update_location(zip: '94703')
-            }.not_to change{location.state}
-          end
-          it "sets zip" do
-            expect{
-              location.update_location(zip: '94703')
-            }.not_to change{location.zip_code}
-          end
-        end
-      end
+    ['bad', '123456', '1234567890', '11111--0000'].each do |bad_zip|
+      it { should_not allow_value(bad_zip).for(:zip_code) }
     end
   end
 
-  describe "#update_nation_builder" do
-    let(:person) { FactoryGirl.create(:person, email: 'user@example.com') }
-    let(:location_attributes) do
-      {
-        address_1:    nil,
-        address_2:    nil,
-        city:         'Keene',
-        zip_code:     nil,
-        state_abbrev: nil
-      }.stringify_keys
-    end
-    context "creating new location" do
-      it "sends call to update NationBuilder" do
-        expect_any_instance_of(Location).to receive(:update_nation_builder).and_call_original
-        expect(NbPersonPushAddressJob).to receive(:perform_later).
-          with('user@example.com', location_attributes)
-        person.create_location(city: 'Keene')
-      end
-    end
-    context "updating existing location" do
-      let(:location) { person.create_location(city: 'Berkeley') }
-      before { expect(location).to receive(:update_nation_builder).and_call_original }
+  describe "#state_abbrev=" do
+    it "sets state" do
+      location = Location.new
+      state = create(:state)
 
-      it "sends call to update Nation if relevant field changed" do
-        expect(NbPersonPushAddressJob).to receive(:perform_later).
-          with('user@example.com', location_attributes)
-        location.update(city: 'Keene')
-      end
+      location.state_abbrev = state.abbrev
 
-      it "doesn't send call to update Nation if no relevant field changed" do
-        expect(NbPersonPushAddressJob).not_to receive(:perform_later)
-        location.update(city: 'Berkeley')
-      end
+      expect(location.state).to eq state
+    end
+  end
+
+  describe "#set_state" do
+    it "sets state based on zip" do
+      zip = create(:zip_code)
+      location = Location.new(zip_code: zip.zip_code)
+
+      location.set_state
+
+      expect(location.state).to eq zip.state
+    end
+  end
+
+  describe "#set_missing_attributes" do
+    it "sets state and district based on zip, if possible" do
+      zip = create(:zip_code)
+      district = create(:district)
+      zip.districts << district
+      location = Location.new(zip_code: zip.zip_code)
+
+      location.set_missing_attributes
+
+      expect(location.district).to eq district
+      expect(location.state).to eq zip.state
+    end
+
+    it "sets district based on address if it can't use zip" do
+      location = Location.new(address_1: 'address', zip_code: 'zip')
+      district = District.new
+      allow(District).to receive(:find_by_address).and_return(district)
+
+      location.set_missing_attributes
+
+      expect(location.district).to eq district
+      expect(District).to have_received(:find_by_address).
+        with(address: 'address', city: nil, zip_code: 'zip')
+    end
+  end
+
+  describe "#as_json" do
+    it "includes state_abbrev and not state" do
+      state = build(:state)
+      location = Location.new(address_1: 'address', state: state)
+
+      json = location.as_json
+
+      expect(json).to eq({
+        'address_1' => 'address', 'address_2' => nil, 'city' => nil,
+        'state_abbrev' => state.abbrev, 'zip_code' => nil
+      })
     end
   end
 end

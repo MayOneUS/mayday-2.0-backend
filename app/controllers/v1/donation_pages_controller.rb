@@ -72,7 +72,7 @@ class V1::DonationPagesController < ApplicationController
   end
 
   def person_params
-    params.require(:person).permit(Person::PERMITTED_PUBLIC_FIELDS)
+    params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
   end
 
   def find_or_initialize_person

@@ -22,18 +22,9 @@ class V1::BaseController < ApplicationController
     render json: {error: error.message}, status: :not_found
   end
 
-  def default_person_params
-    params.require(:person).permit(Person::ALL_AVAILABLE_ATTRIBUTES)
-  end
-
-  def person_from_params
-    default_person_params.map{|k,v| default_person_params[k] = v.try(:strip) || v }
-    Person.create_or_update(default_person_params) if default_person_params.present?
-  end
-
   def create_person_and_action(default_template_id: nil)
-    person_params = default_person_params
-    person = Person.create_or_update(person_params)
+    person_params = params.require(:person).permit(PersonConstructor::PERMITTED_PARAMS)
+    person = PersonConstructor.build(person_params).tap(&:save) # temporary fix
 
     action_params = params.permit(:template_id, :utm_source, :utm_medium, :utm_campaign, :source_url)
     action_params[:template_id] ||= default_template_id

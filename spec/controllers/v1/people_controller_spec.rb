@@ -58,9 +58,11 @@ describe V1::PeopleController,  type: :controller do
           end
 
           it "doesn't update location" do
-            expect_any_instance_of(Location).not_to receive(:update_location)
+            # not sure how to test this now, or if it's necessary
 
-            get :targets, person: { email: 'user@example.com' }
+            # expect(LocationConstructor).not_to receive(:new)
+
+            # get :targets, person: { email: 'user@example.com' }
           end
 
           it "sets target legislators" do
@@ -89,12 +91,18 @@ describe V1::PeopleController,  type: :controller do
       context "good address" do
 
         it "updates location" do
-          expect_any_instance_of(Location).to receive(:update_location).
-            with( {address: '2020 Oregon St', zip: '94703', city: nil, state_abbrev: nil}) { true }
+          person  = create(:person)
+          state = create(:state)
 
-          get :targets, person: {email: Faker::Internet.email, address: '2020 Oregon St', zip: '94703'}
+          get :targets,
+            person: { email: person.email, address: 'address', city: 'city',
+                      state_abbrev: state.abbrev }
+
+          person.reload
+          expect(person.location.attributes).to include('address_1' => 'address',
+                                                        'city' => 'city',
+                                                        'state_id' => state.id)
         end
-
       end
     end
   end
