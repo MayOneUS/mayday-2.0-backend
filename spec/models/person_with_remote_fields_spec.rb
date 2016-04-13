@@ -20,22 +20,22 @@ describe PersonWithRemoteFields do
       expect(params).to eq({})
     end
 
-    it "always includes email or phone" do
-      person = PersonWithRemoteFields.new
+    it "always includes email if present" do
+      person = create(:person).becomes(PersonWithRemoteFields)
       person.first_name = 'name'
 
       params = person.params_for_remote_update
 
-      expect(params).to eq(phone: nil, first_name: 'name')
+      expect(params).to eq(email: person.email, first_name: 'name')
     end
 
-    it "includes remote attributes" do
-      person = PersonWithRemoteFields.new
-      person.employer = 'work'
+    it "includes phone if email not present" do
+      person = create(:person, email: nil).becomes(PersonWithRemoteFields)
+      person.first_name = 'name'
 
       params = person.params_for_remote_update
 
-      expect(params).to eq(phone: nil, employer: 'work')
+      expect(params).to eq(phone: person.phone, first_name: 'name')
     end
 
     it "includes location attributes" do
@@ -55,13 +55,22 @@ describe PersonWithRemoteFields do
       )
     end
 
+    it "includes remote attributes" do
+      person = PersonWithRemoteFields.new
+      person.employer = 'work'
+
+      params = person.params_for_remote_update
+
+      expect(params).to eq(phone: nil, employer: 'work')
+    end
+
     it "includes custom fields" do
       person = PersonWithRemoteFields.new
       person.custom_fields[:foo] = 'bar'
 
       params = person.params_for_remote_update
 
-      expect(params).to include(phone: nil, foo: 'bar')
+      expect(params).to eq(phone: nil, foo: 'bar')
     end
 
     it "symbolizes keys" do
