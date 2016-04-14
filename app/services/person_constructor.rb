@@ -55,6 +55,7 @@ class PersonConstructor
     flatten_remote_fields
     normalize_keys
     strip_whitespace_from_values
+    normalize_zip_code
   end
 
   def flatten_remote_fields
@@ -70,6 +71,12 @@ class PersonConstructor
 
   def strip_whitespace_from_values
     params.merge!(params){ |k, v, _| v.try(:strip) || v }
+  end
+
+  def normalize_zip_code
+    if params[:zip_code]
+      params[:zip_code] = params[:zip_code].gsub!(/\A(\d{5})[^\w]?(\d{4})?\z/, '\1')
+    end
   end
 
   def person_params
