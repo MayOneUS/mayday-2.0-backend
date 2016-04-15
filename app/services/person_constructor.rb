@@ -74,9 +74,7 @@ class PersonConstructor
   end
 
   def normalize_zip_code
-    if params[:zip_code]
-      params[:zip_code] = params[:zip_code].gsub!(/\A(\d{5})[^\w]?(\d{4})?\z/, '\1')
-    end
+    params[:zip_code].try(:gsub!, /\A(\d{5})[^\w]?(\d{4})\z/, '\1')
   end
 
   def person_params
