@@ -1,8 +1,8 @@
 class BlogFetcher
   BASE_URL = 'http://blog.mayday.us/api'
   ENDPOINTS = {
-    recent:         '/read/json?num=5',
-    press_releases: '/read/json?tagged=press%20release&num=5'
+    recent:         '/read/json?num=5&type=text',
+    press_releases: '/read/json?tagged=press%20release&num=5&type=text'
   }
 
   KEY_BASE = "blog_feeds"
@@ -19,7 +19,7 @@ class BlogFetcher
     if feed.present?
       # TODO: small bug here.  If nothign is returned, we set an empty key
       feed.slice!('var tumblr_api_read = ')
-      feed.slice!(";\n")
+      feed.slice!(/\;\z/)
     end
     redis.set(key(param), feed)
     redis.expire(key(param), EXPIRE_SECONDS)
