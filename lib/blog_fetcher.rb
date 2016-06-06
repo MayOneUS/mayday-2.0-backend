@@ -20,6 +20,7 @@ class BlogFetcher
       # TODO: small bug here.  If nothign is returned, we set an empty key
       feed.slice!('var tumblr_api_read = ')
       feed.slice!(/\;\z/)
+      feed.slice!(/<img[^>]+\>/i)
     end
     redis.set(key(param), feed)
     redis.expire(key(param), EXPIRE_SECONDS)
