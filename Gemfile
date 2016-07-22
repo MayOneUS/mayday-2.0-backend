@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.2.4'
 
-gem 'rails', '4.2.0'
+gem 'rails', '4.2.7'
 gem 'pg'
 gem 'redis'
 gem 'redis-objects'
@@ -44,7 +44,6 @@ gem 'stripe'
 
 group :development, :test do
   gem 'byebug'
-  gem 'web-console', '~> 2.0'
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'dotenv-rails'
@@ -53,6 +52,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'web-console', '~> 2.0'
   gem 'annotate', '>=2.6.0'
   gem 'rack-mini-profiler'
   gem 'bullet'
