@@ -61,7 +61,8 @@ class PersonWithRemoteFields < Person
 
   def location_params
     if location && (location.changed & Location::ADDRESS_FIELDS.map(&:to_s)).any?
-      location.as_json  # maybe dangerous to reuse serializable_hash here?
+      location.as_json(methods: [:state_abbrev],
+                       only: [:address_1, :address_2, :city, :zip_code])
     else
       {}
     end

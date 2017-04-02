@@ -20,13 +20,39 @@ describe PersonWithRemoteFields do
       expect(params).to eq({})
     end
 
-    it "always includes email or phone" do
-      person = PersonWithRemoteFields.new
+    it "always includes email if present" do
+      person = create(:person).becomes(PersonWithRemoteFields)
       person.first_name = 'name'
 
       params = person.params_for_remote_update
 
-      expect(params).to eq(phone: nil, first_name: 'name')
+      expect(params).to eq(email: person.email, first_name: 'name')
+    end
+
+    it "includes phone if email not present" do
+      person = create(:person, email: nil).becomes(PersonWithRemoteFields)
+      person.first_name = 'name'
+
+      params = person.params_for_remote_update
+
+      expect(params).to eq(phone: person.phone, first_name: 'name')
+    end
+
+    it "includes location attributes" do
+      person = PersonWithRemoteFields.new
+      state = build(:state)
+      person.build_location(state: state, zip_code: '01111')
+
+      params = person.params_for_remote_update
+
+      expect(params).to eq(
+        phone: nil,
+        address_1: nil,
+        address_2: nil,
+        city: nil,
+        state_abbrev: state.abbrev,
+        zip_code: '01111'
+      )
     end
 
     it "includes remote attributes" do
@@ -38,32 +64,13 @@ describe PersonWithRemoteFields do
       expect(params).to eq(phone: nil, employer: 'work')
     end
 
-    it "includes location attributes" do
-      person = PersonWithRemoteFields.new
-      person.guaranteed_location.zip_code = '01111'
-
-      params = person.params_for_remote_update
-
-      expect(params).to include(phone: nil, zip_code: '01111')
-    end
-
     it "includes custom fields" do
       person = PersonWithRemoteFields.new
       person.custom_fields[:foo] = 'bar'
 
       params = person.params_for_remote_update
 
-      expect(params).to include(phone: nil, foo: 'bar')
-    end
-
-    it "converts state to string" do
-      person = PersonWithRemoteFields.new
-      state = create(:state)
-      person.guaranteed_location.state = state
-
-      params = person.params_for_remote_update
-
-      expect(params).to include(phone: nil, state_abbrev: state.abbrev)
+      expect(params).to eq(phone: nil, foo: 'bar')
     end
 
     it "symbolizes keys" do
