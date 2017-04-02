@@ -16,28 +16,52 @@
 require 'rails_helper'
 
 describe ZipCode do
+  describe "#single_district?" do
+    it "returns true if zip code has 1 district" do
+      zip = ZipCode.new
+      zip.districts << District.new
 
-  describe ".valid_zip_5" do
-    it "accepts valid zip codes" do
-      good_zips = %w[94703 950601234 05301-1234]
-      results = good_zips.select{|zip| ZipCode.valid_zip?(zip) }
-      expect(results).to eq %w[94703 950601234 05301-1234]
+      result = zip.single_district?
+
+      expect(result).to be true
     end
 
-    it "rejects bad zip codes" do
-      bad_zips = %w[1234 123456 12345-124]
-      results = bad_zips.select{|zip| ZipCode.valid_zip?(zip) }
-      expect(results).to eq []
+    it "returns false if zip code has no districts" do
+      zip = ZipCode.new
+
+      result = zip.single_district?
+
+      expect(result).to be false
+    end
+
+    it "returns false if zip code has multiple districts" do
+      zip = ZipCode.new
+      zip.districts << [District.new, District.new]
+
+      result = zip.single_district?
+
+      expect(result).to be false
     end
   end
 
-  describe ".find_by_zip" do
-    it "converts input to zip-5 and finds zip_code" do
-      allow(ZipCode).to receive(:find_by)
+  describe "#single_district" do
+    it "returns district if zip code has 1 district" do
+      zip = ZipCode.new
+      district = District.new
+      zip.districts << district
 
-      ZipCode.find_by_zip('111110000')
+      result = zip.single_district
 
-      expect(ZipCode).to have_received(:find_by).with(zip_code: '11111')
+      expect(result).to eq district
+    end
+
+    it "returns nil if zip code has multiple districts" do
+      zip = ZipCode.new
+      zip.districts << [District.new, District.new]
+
+      result = zip.single_district
+
+      expect(result).to be nil
     end
   end
 end

@@ -59,6 +59,25 @@ describe PersonConstructor do
 
       expect(person.location.city).to eq 'city'
     end
+
+    it "normalizes zip codes before assigning to location" do
+      params = { zip_code: '12345-0001' }
+      expected_params = { zip_code: '12345' }
+      stub_person_finder(expected_params)
+
+      person = PersonConstructor.build(params)
+
+      expect(person.location.zip_code).to eq '12345'
+    end
+
+    it "passes bad zips through to the model" do
+      params = { zip_code: '123456' }
+      stub_person_finder(params, found: false)
+
+      PersonConstructor.build(params)
+
+      expect(PersonFinder).to have_received(:new).with(params)
+    end
   end
 
   def stub_person_finder(params, found: true)

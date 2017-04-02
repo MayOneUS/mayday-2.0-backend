@@ -23,7 +23,7 @@ class Location < ActiveRecord::Base
   validates :state, presence: true, unless: :zip_code
   validates :zip_code, presence: true, unless: :state
   validates :zip_code, allow_nil: true,
-    format: { with: /\A\d{5}[^\w]?(\d{4})?\z/ }
+    format: { with: /\A\d{5}\z/ }
 
   ADDRESS_FIELDS = [
     :address_1, :address_2, :city, :state_id, :zip_code, :district_id
@@ -67,7 +67,7 @@ class Location < ActiveRecord::Base
   end
 
   def find_zip_code
-    @_find_zip_code ||= zip_code && ZipCode.find_by_zip(zip_code)
+    @_find_zip_code ||= zip_code && ZipCode.find_by(zip_code: zip_code)
   end
 
   def serializable_hash(options)
